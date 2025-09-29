@@ -158,10 +158,10 @@ public class AuthController {
         ResponseCookie logoutCookie = createLogoutCookie();
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, logoutCookie.toString())
-            .body("Logout successful");
-    }
-}
----------------------------------------------------------------------------------------------------
+            .body("Logout s
+
+
+----'zz------------------------
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
