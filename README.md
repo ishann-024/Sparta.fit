@@ -377,9 +377,9 @@ public class LoginResponse {
 
 
 
-------------------------------
-In this previous approach we were passing bearer token in Authorization in POstman and then fetching teamleaderId from the token by authentication.getName() but now that we have stored token in Httponly cookie how do these controller change
-AllArgsConstructor
+-----------------------------------------------
+Since the backend is working with token and cookie Give angular code for handling cookie and token for follwoing api
+@AllArgsConstructor
 @NoArgsConstructor
 @RestController
 @RequestMapping("/api/team-leader")
@@ -399,8 +399,8 @@ public class TeamLeadController {
 	
 	// Extract id from jwt ------------------------------------------------------------
 	@GetMapping("/projects")
-	public ResponseEntity<ProjectResponseDTO> teamLeaderId(String token) {
-		return ResponseEntity.ok(teamLeadService.getProjectsByTeamLeader(jwtTokenUtil.getUserIdFromToken(token)));
+	public ResponseEntity<ProjectResponseDTO> teamLeaderId(Authentication authentication) {
+		return ResponseEntity.ok(teamLeadService.getProjectsByTeamLeader(authentication.getName()));
 	}
 	
     // ---------------------------------------------------------------------------------
@@ -411,13 +411,6 @@ public class TeamLeadController {
 		return ResponseEntity.ok("Job Request Created Successfully");
 	}
 
-	// 3. Get all job requests created by TL
-	//	@GetMapping("/{teamLeaderId}/job-requests")
-	//	public ResponseEntity<List<JobRequest>> getJobRequestsByTeamLeader(@PathVariable("teamLeaderId") String teamLeaderId) {
-	//		List<JobRequest> jobRequests = teamLeadService.getJobRequestsByTeamLeader(teamLeaderId);
-	//		return ResponseEntity.ok(jobRequests);
-	//	}
-	
 	//------------------------------------------------------------------------
 	@GetMapping("/get-job-requests")
 		public ResponseEntity<List<JobRequest>> getJobRequestsByTeamLeader(Authentication authentication) {		 
@@ -454,122 +447,3 @@ public class TeamLeadController {
 		int teamMembers = teamLeadService.getTeamMemberCountByTeamLeaderId(authentication.getName());
 		return ResponseEntity.ok(teamMembers);
 	}
-}
-
-------------- JWT Auth
-@Component
-public class JwtAuthFilter extends OncePerRequestFilter {
-
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private EmployeeAuthService employeeAuthService;
-
-    @Autowired
-    private CandidateAuthService candidateAuthService;
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String jwt = getJwtFromRequest(request);
-            
-            if (StringUtils.hasText(jwt)) {
-                if (jwtTokenUtil.validateToken(jwt)) {
-                    String username = jwtTokenUtil.getUsernameFromToken(jwt);
-                    
-                    UserDetails userDetails = null;
-                    
-                    if (username.startsWith("MGS")) {
-                        userDetails = employeeAuthService.loadUserByUsername(username);
-                    } else {
-                        userDetails = candidateAuthService.loadUserByUsername(username);
-                    }
-                    
-                    if (userDetails != null) {
-                        UsernamePasswordAuthenticationToken authentication = 
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                        
-                        System.out.println("✅ Authenticated user: " + username + " with authorities: " + userDetails.getAuthorities());
-                    }
-                } else {
-                    System.out.println("❌ JWT token validation failed");
-                }
-            }
-        } catch (Exception ex) {
-            System.out.println("❌ JWT Filter Error: " + ex.getMessage());
-        }
-        
-        filterChain.doFilter(request, response);
-    }
-
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-}
-
-Security Config
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
-    
-    @Autowired
-    private EmployeeAuthService employeeAuthService;
-    
-    @Autowired 
-    private CandidateAuthService candidateAuthService;
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(username -> {
-            if (username.startsWith("MGS")) {
-                return employeeAuthService.loadUserByUsername(username);
-            } else {
-                return candidateAuthService.loadUserByUsername(username);
-            }
-        });
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors().and()
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/team-leader/**").hasRole("TEAMLEAD")
-                //.requestMatchers("/api/team-leader/**").permitAll()
-                .requestMatchers("/api/project-manager/**").hasRole("PROJECTMANAGER")
-                .requestMatchers("/api/hr/**").hasRole("HR")
-                .requestMatchers("/api/interviewer/**").hasRole("INTERVIEWER")
-                .anyRequest().authenticated()
-            );
-
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
-}
