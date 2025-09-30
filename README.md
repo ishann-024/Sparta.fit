@@ -39,30 +39,102 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 employee-login-service.ts : 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { EmployeeLoginRequest } from '../dto/EmployeeLoginRequest';
-import { CandidateLoginResponseDto } from '../dto/CandidateLoginResponseDto';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Router } from '@angular/router';
+import { EmployeeLoginRequest } from '../../dto/EmployeeLoginRequest';
+import { CandidateLoginResponseDto } from '../../dto/CandidateLoginResponseDto';
+import { EmployeeLoginService } from '../../service/employee-login-service';
+import { CommonModule } from '@angular/common';
 
-@Injectable({
-  providedIn: 'root'
+@Component({
+  selector: 'app-employee-login',
+  standalone: true,
+  imports: [FormsModule, CommonModule],
+  templateUrl: './employee-login.html',
+  styleUrl: './employee-login.css',
 })
-export class EmployeeLoginService {
-  
+export class EmployeeLogin {
+  employeeLogin: EmployeeLoginRequest = new EmployeeLoginRequest();
+  employeeResponseDTo: CandidateLoginResponseDto = new CandidateLoginResponseDto();
+  isLoading: boolean = false; // Added loading state
 
-  baseurl: string= "http://localhost:8082/api/auth/";
+  constructor(private employeeLoginService: EmployeeLoginService, private router: Router) {}
 
-  constructor(private httpClient:HttpClient){
+  loginEmployee() {
+    console.log(this.employeeLogin);
+    this.isLoading = true;
+
+    this.employeeLoginService.employeeLogin(this.employeeLogin).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.employeeResponseDTo = data;
+        console.log(this.employeeResponseDTo);
+        if (this.employeeResponseDTo.role == 'TEAMLEAD') {
+          this.router.navigate(['tl-dashboard']);
+        } else if (this.employeeResponseDTo.role == 'HR') {
+          this.router.navigate(['hr-dashboard']);
+        } else if (this.employeeResponseDTo.role == 'PROJECTMANAGER') {
+          this.router.navigate(['pm-dashboard']);
+        } else if (this.employeeResponseDTo.role == 'EMPLOYEE') {
+          this.router.navigate(['candidateDashboard']);
+        }
+      },
+      error: (err) => {
+        console.log('Exception Occurred While Calling API');
+        this.isLoading = false; // Stop loading on error
+      },
+      complete: () => {
+        console.log('Data completed Successfully');
+        this.isLoading = false; // Stop loading on completion
+      },
+    });
   }
-
-  employeeLogin(employeeLogin : EmployeeLoginRequest): Observable<CandidateLoginResponseDto>{
-    
-      return this.httpClient.post<CandidateLoginResponseDto>(this.baseurl + "login/employee",employeeLogin);
-    
-  }
-
 }
+
+tl-overview.ts (where we are calling the service) :
+import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { TlService } from '../../service/tl-service';
+
+@Component({
+  selector: 'app-tl-overview',
+  imports: [RouterOutlet,RouterLink],
+  templateUrl: './tl-overview.html',
+  styleUrl: './tl-overview.css'
+})
+export class TlOverview implements OnInit {
+  pendingJobRequestsCount: number = 0;
+  errorMessage: string = '';
+
+  constructor(private tlService: TlService) {}
+
+  ngOnInit(): void {
+    this.fetchPendingJobRequestsCount();
+  }
+  fetchPendingJobRequestsCount(): void { 
+    this.tlService.getPendingJobRequestsCount().subscribe({
+      next: (data) => {
+        this.pendingJobRequestsCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API"); 
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+}
+
 
 
 Tl-service : 
