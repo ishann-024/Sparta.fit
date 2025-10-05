@@ -1,18 +1,23 @@
 I am getting following error : 
-:4200/tl-dashboard/settings:1 Access to XMLHttpRequest at 'http://localhost:8082/api/team-leader//auth/logout' from origin 'http://localhost:4200' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
-teamlead-dashboard.ts:22 Logout error :  HttpErrorResponse {headers: _HttpHeaders, status: 0, statusText: 'Unknown Error', url: 'http://localhost:8082/api/team-leader//auth/logout', 
-
-loginEmployee @ employee-login.ts:33
-EmployeeLogin_Template_form_submit_11_listener @ employee-login.html:14
-executeListenerWithErrorHandling @ debug_node.mjs:13155
-wrapListenerIn_markDirtyAndPreventDefault @ debug_node.mjs:13144
-
-teamlead-dashboard.ts:16  POST http://localhost:8082/api/team-leader//auth/logout net::ERR_FAILED
-
+teamlead-dashboard.ts:23 Logout error :  HttpErrorResponse
 service.ts : 
-logout(): Observable<any> {
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeLoginService {
+  
+
+  baseurl: string= "http://localhost:8082/api/auth/";
+
+  constructor(private httpClient:HttpClient,private router:Router){
+  }
+  employeeLogin(employeeLogin : EmployeeLoginRequest): Observable<CandidateLoginResponseDto>{ 
+      return this.httpClient.post<CandidateLoginResponseDto>(this.baseurl + "login/employee",employeeLogin);
+  }
+
+  logout(): Observable<any> {
     return this.httpClient.post(
-      this.baseurl+"/auth/logout", 
+      this.baseurl+"logout", 
       {}, 
       { withCredentials: true }
     ).pipe(
@@ -22,10 +27,20 @@ logout(): Observable<any> {
       })
     );
   }
+}
 
-  subscribe : 
+
+subscribe : 
+  Component({
+  selector: 'app-teamlead-dashboard',
+  imports: [RouterOutlet,RouterLink,RouterModule,CommonModule,FormsModule],
+  templateUrl: './teamlead-dashboard.html',
+  styleUrl: './teamlead-dashboard.css'
+})
+export class TeamleadDashboard {
+  constructor(private employeeLoginService : EmployeeLoginService,private router:Router){}
   onLogout(): void{
-    this.tlService.logout().subscribe({
+    this.employeeLoginService.logout().subscribe({
       next: () => {
         console.log("Logout Successfull");
         this.router.navigate(['/dashboard/employee-login']);
@@ -35,17 +50,18 @@ logout(): Observable<any> {
       }
     });
   }
+}
 
   Html : 
-  <li class="nav-item">
+<li class="nav-item">
               <a (click)="onLogout()" class="nav-link" style="cursor: pointer;">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
               </a>
             </li>
-
+  
   Spring controller : 
-  RestController
+@RestController
 @RequestMapping("/api/auth")
 //@CrossOrigin(origins = "*", allowCredentials = "true")
 public class AuthController {
