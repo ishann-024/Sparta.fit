@@ -1,328 +1,230 @@
-this is in our service but check if you are routing it correctly to login page.
-I am attaching app-routes.ts 
-I am also giving you my html where you can call the function
-  logout(): Observable<any> {
-    return this.http.post(
-      `${this.apiUrl}/auth/logout`, 
+I am getting following error : 
+:4200/tl-dashboard/settings:1 Access to XMLHttpRequest at 'http://localhost:8082/api/team-leader//auth/logout' from origin 'http://localhost:4200' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+teamlead-dashboard.ts:22 Logout error :  HttpErrorResponse {headers: _HttpHeaders, status: 0, statusText: 'Unknown Error', url: 'http://localhost:8082/api/team-leader//auth/logout', 
+
+loginEmployee @ employee-login.ts:33
+EmployeeLogin_Template_form_submit_11_listener @ employee-login.html:14
+executeListenerWithErrorHandling @ debug_node.mjs:13155
+wrapListenerIn_markDirtyAndPreventDefault @ debug_node.mjs:13144
+
+teamlead-dashboard.ts:16  POST http://localhost:8082/api/team-leader//auth/logout net::ERR_FAILED
+
+service.ts : 
+logout(): Observable<any> {
+    return this.httpClient.post(
+      this.baseurl+"/auth/logout", 
       {}, 
       { withCredentials: true }
     ).pipe(
       tap(() => {
         // Redirect to login page after successful logout
-        this.router.navigate(['/login']);
+        this.router.navigate(['/dashboard/employee-login']);
       })
     );
   }
 
-
-export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  {
-    path: 'dashboard', component: Dashboard,
-    children: [
-      { path: 'employee-login', component: EmployeeLogin },
-      { path: 'candidate-login', component: CandidateLogin },
-      { path: 'candidate-registration', component: CandidateRegistration },
-    ]
-  },
-
-    { path: 'candidateDashboard', redirectTo: 'candidateDashboard/overview', pathMatch: 'full' },
-
-  {
-    path: 'candidateDashboard',
-    component: CandidateDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: Overview, // Your default dashboard
+  subscribe : 
+  onLogout(): void{
+    this.tlService.logout().subscribe({
+      next: () => {
+        console.log("Logout Successfull");
+        this.router.navigate(['/dashboard/employee-login']);
       },
-      {
-        path: 'my-applications',
-        component: CandidateMyapplications,
-      },
-      {
-        path: 'find-jobs',
-        component: FindJobs,
-      },
-      {
-        path: 'interviews',
-        component: Interviews,
-      },
-      {
-        path: 'edit-profile',
-        component: CandidateEditProfile,
-      },
-      {
-        path: 'settings',
-        component: Settings,
-      },
-    ],
-  },
-
-
-  { path: 'tl-dashboard', redirectTo: 'tl-dashboard/overview', pathMatch: 'full' },
-
-
-  {
-    path: 'tl-dashboard',
-    component: TeamleadDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: TlOverview, // Your default dashboard
-      },
-      {
-        path: 'my-projects',
-        component: MyProject,
-      },
-      {
-        path: 'job-requests',
-        component: JobRequest,
-      },
-      {
-        path: 'team-members',
-        component: TeamMembers,
-      },
-      {
-        path: 'pending-interviews',
-        component: PendingInterviews,
-      },
-      {
-        path: 'settings',
-        component: TlSettings,
-      },
-    ],
-  },
-
-
-
-  { path: 'pm-dashboard', redirectTo: 'pm-dashboard/overview', pathMatch: 'full' },
-
-
-  {
-    path: 'pm-dashboard',
-    component: PmDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: PmOverview, // Your default dashboard
-      },
-      {
-        path: 'assign-project',
-        component: AssignProject,
-      },
-      {
-        path: 'job-requests',
-        component: PmJobRequests,
-      },
-      {
-        path: 'bench-employees',
-        component: BenchEmployees,
-      },
-      {
-        path: 'team-members',
-        component: PmTeamMembers,
-      },
-      {
-        path: 'pending-interviews',
-        component: PmPendingInterviews,
-      },
-      {
-        path: 'settings',
-        component: PmSettings,
-      },
-    ],
-  },
-
-  { path: 'hr-dashboard', component: HrDashboard },
-
-  { path: 'hr-dashboard', redirectTo: 'hr-dashboard/overview', pathMatch: 'full' },
-
-
-  {
-    path: 'hr-dashboard',
-    component: HrDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: HrOverview, 
-      },
-      {
-        path: 'job-requests',
-        component: HrJobRequests,
-      },
-      {
-        path: 'applied-candidates',
-        component: AppliedCandidates,
-      },
-      {
-        path: 'shortlisted-candidates',
-        component: ShortlistedCandidates,
-      },
-      {
-        path: 'interviews',
-        component: HrInterviews,
-      },
-      {
-        path: 'settings',
-        component: HrSettings,
-      },
-    ],
-  },
-
-  { path: '**', redirectTo: 'candidate-login' }
-
-];
-
-
-  logout(): Observable<any> {
-    return this.http.post(
-      `${this.apiUrl}/auth/logout`, 
-      {}, 
-      { withCredentials: true }
-    ).pipe(
-      tap(() => {
-        // Redirect to login page after successful logout
-        this.router.navigate(['/login']);
-      })
-    );
+      error: (error) => {
+        console.error('Logout error : ', error);
+      }
+    });
   }
 
-  Dashboard : 
-  <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jobie - Team Lead Dashboard</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="dashboard-container">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        
-
-        <div class="user-profile">
-          <div class="user-avatar">SJ</div>
-          <div class="user-info">
-            <h3>Sarah Johnson</h3>
-            <p>Team Lead - Frontend</p>
-          </div>
-        </div>
-
-        <nav>
-          <ul class="nav-menu">
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/overview"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/my-projects"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-project-diagram"></i>
-                <span>My Projects</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/job-requests"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-clipboard-list"></i>
-                <span>Job Requests</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/team-members"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-user-friends"></i>
-                <span>Team Members</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/pending-interviews"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-calendar-alt"></i>
-                <span>Pending Interviews</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/settings"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="Logout" class="nav-link">
+  Html : 
+  <li class="nav-item">
+              <a (click)="onLogout()" class="nav-link" style="cursor: pointer;">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
               </a>
             </li>
-          </ul>
-        </nav>
-      </aside>
 
-      <!-- Main Content -->
-      <main class="main-content">
-        <!-- Header -->
-        <header class="header">
-          <div class="welcome-section">
-            <h1 id="welcomeMessage">Welcome Back, Sarah!</h1>
-            <p>Lead your team to success and manage projects efficiently</p>
-          </div>
-         
-          <div class="header-actions">
-            <!-- <div class="search-box">
-              <input type="text" placeholder="Search projects, team members..." id="globalSearch" />
-              <i class="fas fa-search"></i>
-            </div> -->
+  Spring controller : 
+  RestController
+@RequestMapping("/api/auth")
+//@CrossOrigin(origins = "*", allowCredentials = "true")
+public class AuthController {
 
-            <div class="notification-btn" onclick="toggleNotifications()">
-              <i class="fas fa-bell"></i>
-              <span class="notification-badge">3</span>
-            </div>
-          </div>
-        </header>
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-        <section class="content-area">
-          <router-outlet></router-outlet>
-        </section>
-      </main>
-    </div>
-  </body>
-</html>
+	@Autowired
+	private JwtTokenUtil jwtTokenUtil;
 
+	@Autowired
+	private EmployeeAuthService employeeAuthService;
+
+	@Autowired
+	private CandidateAuthService candidateAuthService;
+
+	@Value("${app.cookie.secure:false}")
+	private boolean cookieSecure;
+
+	@Value("${jwt.expiration.ms:86400000}") // Default 24 hours
+	private long jwtExpirationMs;
+
+	private ResponseCookie createJwtCookie(String jwt) {
+		return ResponseCookie.from("jwt-token", jwt).httpOnly(true).secure(cookieSecure).path("/")
+				.maxAge(jwtExpirationMs / 1000).sameSite("Lax").build();
+	}
+
+	private ResponseCookie createLogoutCookie() {
+		return ResponseCookie.from("jwt-token", "").httpOnly(true).secure(cookieSecure).path("/").maxAge(0)
+				.sameSite("Lax").build();
+	}
+
+	@PostMapping("/login/employee")
+	public ResponseEntity<?> loginEmployee(@RequestBody EmployeeLoginRequest loginRequest) {
+		try {
+			// Authenticate the user
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmployeeId(), loginRequest.getPassword()));
+
+			// Set authentication in security context
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			// Load user details to get UserPrincipal
+			UserPrincipal userPrincipal = (UserPrincipal) employeeAuthService
+					.loadUserByUsername(loginRequest.getEmployeeId());
+
+			// Generate JWT token
+			String jwt = jwtTokenUtil.generateToken(userPrincipal);
+			ResponseCookie jwtCookie = createJwtCookie(jwt);
+
+			// Create response
+			LoginResponse res = new LoginResponse(null, // Token not in response body
+					userPrincipal.getUserId(), userPrincipal.getFullName(), userPrincipal.getRole(), "EMPLOYEE");
+
+			System.out.println("Employee login successful: " + loginRequest.getEmployeeId());
+
+			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(res);
+
+		} catch (BadCredentialsException e) {
+			System.out.println("Employee login failed: " + loginRequest.getEmployeeId());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login error: " + e.getMessage());
+		}
+	}
+
+	@PostMapping("/login/candidate")
+	public ResponseEntity<?> loginCandidate(@RequestBody CandidateLoginRequest loginRequest) {
+		try {
+			// Authenticate the user
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+			// Set authentication in security context
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			// Load user details to get UserPrincipal
+			UserPrincipal userPrincipal = (UserPrincipal) candidateAuthService
+					.loadUserByUsername(loginRequest.getEmail());
+
+			// Generate JWT token
+			String jwt = jwtTokenUtil.generateToken(userPrincipal);
+			ResponseCookie jwtCookie = createJwtCookie(jwt);
+
+			// Create response
+			LoginResponse res = new LoginResponse(null, // Token not in response body
+					userPrincipal.getUserId(), userPrincipal.getFullName(), userPrincipal.getRole(), "CANDIDATE");
+
+			System.out.println("Candidate login successful: " + loginRequest.getEmail());
+
+			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(res);
+
+		} catch (BadCredentialsException e) {
+			System.out.println("Candidate login failed: " + loginRequest.getEmail());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login error: " + e.getMessage());
+		}
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout() {
+		ResponseCookie logoutCookie = createLogoutCookie();
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, logoutCookie.toString()).body("Logout successful");
+	}
+  }
+
+  SecurityConfig : 
+  public class SecurityConfig {
+
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
+    
+    @Autowired
+    private EmployeeAuthService employeeAuthService;
+    
+    @Autowired 
+    private CandidateAuthService candidateAuthService;
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(username -> {
+            if (username.startsWith("MGS")) {
+                return employeeAuthService.loadUserByUsername(username);
+            } else {
+                return candidateAuthService.loadUserByUsername(username);
+            }
+        });
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CHANGE: Use proper CORS config
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+       
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                .requestMatchers("/api/team-leader/**").hasRole("TEAMLEAD")
+                .requestMatchers("/api/project-manager/**").hasRole("PROJECTMANAGER")
+                .requestMatchers("/api/hr/**").hasRole("HR")
+                .requestMatchers("/api/interviewer/**").hasRole("INTERVIEWER")
+                .anyRequest().authenticated()
+            );
+
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    // ADD: CORS Configuration for cookie suppor
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+    	 CorsConfiguration configuration = new CorsConfiguration();
+    	    // Use the explicit origin(s) of your frontend application(s)
+    	    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+    	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+    	    configuration.setAllowedHeaders(List.of("*"));
+    	    configuration.setAllowCredentials(true);
+    	    configuration.setExposedHeaders(List.of(HttpHeaders.SET_COOKIE));
+    	    
+    	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    	    source.registerCorsConfiguration("/**", configuration);
+    	    return source;
+    }
+}
