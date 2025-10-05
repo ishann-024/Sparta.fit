@@ -22,7 +22,20 @@ return ResponseEntity.ok("Job Request Created Successfully");
 }
 on clicking create job request button the form should appear 
 <!-- Create Job Request Button --> 
-<section class="page-header">
-	<br> <button class="btn-primary" onclick="openCreateJobRequestModal()">
-		<i class="fas fa-plus"></i> Create New Request </button> 
-</section>
+section class="page-header"
+	br button class="btn-primary" onclick="openCreateJobRequestModal()"
+		i class="fas fa-plus" /i Create New Request /button
+/section
+
+
+@Transactional(readOnly = true)
+	public String createJobRequest(CreateJobRequestDTO dto) {
+		// get project by same for TL and PM
+		int projectId = teamLeadRepository.getProjectIdForCreateJobRequest(dto.getTeamLeaderId());
+		dto.setProjectId(projectId);
+		// Get the Project Manager who created this project
+		String pmId = teamLeadRepository.findProjectManagerIdByProject(dto.getProjectId());
+		dto.setPmId(pmId);
+		
+		return teamLeadRepository.createJobRequest(dto.getTeamLeaderId(), pmId, dto);
+	}
