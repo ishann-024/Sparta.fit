@@ -1,339 +1,328 @@
-# JWT Secret Key (Generate a strong one for production!)
-jwt.secret=SuperSecretKey12345yrcftygtuyhujhiunhgyuktdkyrdxtlkckgkhccyttrjdtrjxxtjcxtrzxvbshlcvashkgvcggcgchchcchccfhfhfhfhfhbdjh
-# JWT Expiration time (e.g., 10 hours)
-jwt.expiration.ms=3000000 
+this is in our service but check if you are routing it correctly to login page.
+I am attaching app-routes.ts 
+I am also giving you my html where you can call the function
+  logout(): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/auth/logout`, 
+      {}, 
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        // Redirect to login page after successful logout
+        this.router.navigate(['/login']);
+      })
+    );
+  }
 
 
-#local
-spring.datasource.url=jdbc:oracle:thin:@localhost:1521:xe
-spring.datasource.username=ishan
-spring.datasource.password=ishan
-spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+export const routes: Routes = [
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  {
+    path: 'dashboard', component: Dashboard,
+    children: [
+      { path: 'employee-login', component: EmployeeLogin },
+      { path: 'candidate-login', component: CandidateLogin },
+      { path: 'candidate-registration', component: CandidateRegistration },
+    ]
+  },
 
-#cookie
-#app.cookie.secure = false
-app.cookie.domain = localhost
-app.cookie.same-site = Lax
+    { path: 'candidateDashboard', redirectTo: 'candidateDashboard/overview', pathMatch: 'full' },
 
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
+  {
+    path: 'candidateDashboard',
+    component: CandidateDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: Overview, // Your default dashboard
+      },
+      {
+        path: 'my-applications',
+        component: CandidateMyapplications,
+      },
+      {
+        path: 'find-jobs',
+        component: FindJobs,
+      },
+      {
+        path: 'interviews',
+        component: Interviews,
+      },
+      {
+        path: 'edit-profile',
+        component: CandidateEditProfile,
+      },
+      {
+        path: 'settings',
+        component: Settings,
+      },
+    ],
+  },
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
-    
-    @Autowired
-    private EmployeeAuthService employeeAuthService;
-    
-    @Autowired 
-    private CandidateAuthService candidateAuthService;
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(username -> {
-            if (username.startsWith("MGS")) {
-                return employeeAuthService.loadUserByUsername(username);
-            } else {
-                return candidateAuthService.loadUserByUsername(username);
-            }
-        });
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+  { path: 'tl-dashboard', redirectTo: 'tl-dashboard/overview', pathMatch: 'full' },
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  {
+    path: 'tl-dashboard',
+    component: TeamleadDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: TlOverview, // Your default dashboard
+      },
+      {
+        path: 'my-projects',
+        component: MyProject,
+      },
+      {
+        path: 'job-requests',
+        component: JobRequest,
+      },
+      {
+        path: 'team-members',
+        component: TeamMembers,
+      },
+      {
+        path: 'pending-interviews',
+        component: PendingInterviews,
+      },
+      {
+        path: 'settings',
+        component: TlSettings,
+      },
+    ],
+  },
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CHANGE: Use proper CORS config
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-       
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/team-leader/**").hasRole("TEAMLEAD")
-                .requestMatchers("/api/project-manager/**").hasRole("PROJECTMANAGER")
-                .requestMatchers("/api/hr/**").hasRole("HR")
-                .requestMatchers("/api/interviewer/**").hasRole("INTERVIEWER")
-                .anyRequest().authenticated()
-            );
 
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
-    	 CorsConfiguration configuration = new CorsConfiguration();
-    	    // Use the explicit origin(s) of your frontend application(s)
-    	    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-    	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-    	    configuration.setAllowedHeaders(List.of("*"));
-    	    configuration.setAllowCredentials(true);
-    	    configuration.setExposedHeaders(List.of(HttpHeaders.SET_COOKIE));
-    	    
-    	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    	    source.registerCorsConfiguration("/**", configuration);
-    	    return source;
-    }
-}
 
-@Component
-public class JwtAuthFilter extends OncePerRequestFilter {
+  { path: 'pm-dashboard', redirectTo: 'pm-dashboard/overview', pathMatch: 'full' },
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    private EmployeeAuthService employeeAuthService;
+  {
+    path: 'pm-dashboard',
+    component: PmDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: PmOverview, // Your default dashboard
+      },
+      {
+        path: 'assign-project',
+        component: AssignProject,
+      },
+      {
+        path: 'job-requests',
+        component: PmJobRequests,
+      },
+      {
+        path: 'bench-employees',
+        component: BenchEmployees,
+      },
+      {
+        path: 'team-members',
+        component: PmTeamMembers,
+      },
+      {
+        path: 'pending-interviews',
+        component: PmPendingInterviews,
+      },
+      {
+        path: 'settings',
+        component: PmSettings,
+      },
+    ],
+  },
 
-    @Autowired
-    private CandidateAuthService candidateAuthService;
+  { path: 'hr-dashboard', component: HrDashboard },
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            // CHANGE: Extract JWT from cookie instead of header
-            String jwt = getJwtFromCookie(request);
-            
-            if (StringUtils.hasText(jwt)) {
-                if (jwtTokenUtil.validateToken(jwt)) {
-                    String username = jwtTokenUtil.getUsernameFromToken(jwt);
-                    
-                    UserDetails userDetails = null;
-                    
-                    if (username.startsWith("MGS")) {
-                        userDetails = employeeAuthService.loadUserByUsername(username);
-                    } else {
-                        userDetails = candidateAuthService.loadUserByUsername(username);
-                    }
-                    
-                    if (userDetails != null) {
-                        UsernamePasswordAuthenticationToken authentication = 
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                        
-                        System.out.println("✅ Authenticated user: " + username + " with authorities: " + userDetails.getAuthorities());
-                    }
-                } else {
-                    System.out.println("❌ JWT token validation failed");
-                }
-            }
-        } catch (Exception ex) {
-            System.out.println("❌ JWT Filter Error: " + ex.getMessage());
-        }
+  { path: 'hr-dashboard', redirectTo: 'hr-dashboard/overview', pathMatch: 'full' },
+
+
+  {
+    path: 'hr-dashboard',
+    component: HrDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: HrOverview, 
+      },
+      {
+        path: 'job-requests',
+        component: HrJobRequests,
+      },
+      {
+        path: 'applied-candidates',
+        component: AppliedCandidates,
+      },
+      {
+        path: 'shortlisted-candidates',
+        component: ShortlistedCandidates,
+      },
+      {
+        path: 'interviews',
+        component: HrInterviews,
+      },
+      {
+        path: 'settings',
+        component: HrSettings,
+      },
+    ],
+  },
+
+  { path: '**', redirectTo: 'candidate-login' }
+
+];
+
+
+  logout(): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/auth/logout`, 
+      {}, 
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        // Redirect to login page after successful logout
+        this.router.navigate(['/login']);
+      })
+    );
+  }
+
+  Dashboard : 
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jobie - Team Lead Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
         
-        filterChain.doFilter(request, response);
-    }
 
-    // CHANGE: New method to extract JWT from cookie
-    private String getJwtFromCookie(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("jwt-token".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
+        <div class="user-profile">
+          <div class="user-avatar">SJ</div>
+          <div class="user-info">
+            <h3>Sarah Johnson</h3>
+            <p>Team Lead - Frontend</p>
+          </div>
+        </div>
 
-    // KEEP: This method for backward compatibility (if some clients still use headers)
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-}
+        <nav>
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a
+                routerLink="/tl-dashboard/overview"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="nav-link"
+              >
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                routerLink="/tl-dashboard/my-projects"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="nav-link"
+              >
+                <i class="fas fa-project-diagram"></i>
+                <span>My Projects</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                routerLink="/tl-dashboard/job-requests"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="nav-link"
+              >
+                <i class="fas fa-clipboard-list"></i>
+                <span>Job Requests</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                routerLink="/tl-dashboard/team-members"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="nav-link"
+              >
+                <i class="fas fa-user-friends"></i>
+                <span>Team Members</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                routerLink="/tl-dashboard/pending-interviews"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="nav-link"
+              >
+                <i class="fas fa-calendar-alt"></i>
+                <span>Pending Interviews</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                routerLink="/tl-dashboard/settings"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="nav-link"
+              >
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Logout" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-@Component
-public class JwtTokenUtil {
-    @Value("${jwt.secret}")
-    private String secretString;
-    @Value("${jwt.expiration.ms}")
-    private long jwtExpirationMs;
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secretString.getBytes());
-    }
-    public String generateToken(UserPrincipal userPrincipal) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userPrincipal.getUserId());
-        claims.put("role", userPrincipal.getRole());
-        claims.put("fullName", userPrincipal.getFullName());
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userPrincipal.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
-                .compact();
-    }
-    public String getUsernameFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
-    }
-    public String getUserIdFromToken(String token) {
-        return getClaimFromToken(token, claims -> claims.get("userId", String.class));
-    }
-    public String getRoleFromToken(String token) {
-        return getClaimFromToken(token, claims -> claims.get("role", String.class));
-    }
-    public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
-    }
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
-    }
-    private Claims getAllClaimsFromToken(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (Exception e) {
-            System.out.println("JWT Parsing Error: " + e.getMessage());
-            throw e;
-        }
-    }
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="welcome-section">
+            <h1 id="welcomeMessage">Welcome Back, Sarah!</h1>
+            <p>Lead your team to success and manage projects efficiently</p>
+          </div>
+         
+          <div class="header-actions">
+            <!-- <div class="search-box">
+              <input type="text" placeholder="Search projects, team members..." id="globalSearch" />
+              <i class="fas fa-search"></i>
+            </div> -->
 
-    public Boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token);
-            return !isTokenExpired(token);
-        } catch (JwtException | IllegalArgumentException e) {
-            System.out.println("JWT Validation Error: " + e.getMessage());
-            return false;
-        }
-    }
+            <div class="notification-btn" onclick="toggleNotifications()">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge">3</span>
+            </div>
+          </div>
+        </header>
 
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
-    }
-}
+        <section class="content-area">
+          <router-outlet></router-outlet>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
 
-
-@RestController
-@RequestMapping("/api/auth")
-//@CrossOrigin(origins = "*", allowCredentials = "true")
-public class AuthController {
-
-	@Autowired
-	private AuthenticationManager authenticationManager;
-
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
-
-	@Autowired
-	private EmployeeAuthService employeeAuthService;
-
-	@Autowired
-	private CandidateAuthService candidateAuthService;
-
-	@Value("${app.cookie.secure:false}")
-	private boolean cookieSecure;
-
-	@Value("${jwt.expiration.ms:86400000}") // Default 24 hours
-	private long jwtExpirationMs;
-
-	private ResponseCookie createJwtCookie(String jwt) {
-		return ResponseCookie.from("jwt-token", jwt).httpOnly(true).secure(cookieSecure).path("/")
-				.maxAge(jwtExpirationMs / 1000).sameSite("Lax").build();
-	}
-
-	private ResponseCookie createLogoutCookie() {
-		return ResponseCookie.from("jwt-token", "").httpOnly(true).secure(cookieSecure).path("/").maxAge(0)
-				.sameSite("Lax").build();
-	}
-
-	@PostMapping("/login/employee")
-	public ResponseEntity<?> loginEmployee(@RequestBody EmployeeLoginRequest loginRequest) {
-		try {
-			// Authenticate the user
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(loginRequest.getEmployeeId(), loginRequest.getPassword()));
-
-			// Set authentication in security context
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-
-			// Load user details to get UserPrincipal
-			UserPrincipal userPrincipal = (UserPrincipal) employeeAuthService
-					.loadUserByUsername(loginRequest.getEmployeeId());
-
-			// Generate JWT token
-			String jwt = jwtTokenUtil.generateToken(userPrincipal);
-			ResponseCookie jwtCookie = createJwtCookie(jwt);
-
-			// Create response
-			LoginResponse res = new LoginResponse(null, // Token not in response body
-					userPrincipal.getUserId(), userPrincipal.getFullName(), userPrincipal.getRole(), "EMPLOYEE");
-
-			System.out.println("Employee login successful: " + loginRequest.getEmployeeId());
-
-			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(res);
-
-		} catch (BadCredentialsException e) {
-			System.out.println("Employee login failed: " + loginRequest.getEmployeeId());
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login error: " + e.getMessage());
-		}
-	}
-
-	@PostMapping("/login/candidate")
-	public ResponseEntity<?> loginCandidate(@RequestBody CandidateLoginRequest loginRequest) {
-		try {
-			// Authenticate the user
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-
-			// Set authentication in security context
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-
-			// Load user details to get UserPrincipal
-			UserPrincipal userPrincipal = (UserPrincipal) candidateAuthService
-					.loadUserByUsername(loginRequest.getEmail());
-
-			// Generate JWT token
-			String jwt = jwtTokenUtil.generateToken(userPrincipal);
-			ResponseCookie jwtCookie = createJwtCookie(jwt);
-
-			// Create response
-			LoginResponse res = new LoginResponse(null, // Token not in response body
-					userPrincipal.getUserId(), userPrincipal.getFullName(), userPrincipal.getRole(), "CANDIDATE");
-
-			System.out.println("Candidate login successful: " + loginRequest.getEmail());
-
-			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(res);
-
-		} catch (BadCredentialsException e) {
-			System.out.println("Candidate login failed: " + loginRequest.getEmail());
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login error: " + e.getMessage());
-		}
-	}
-
-	@PostMapping("/logout")
-	public ResponseEntity<?> logout() {
-		ResponseCookie logoutCookie = createLogoutCookie();
-		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, logoutCookie.toString()).body("Logout successful");
-	}
-}
