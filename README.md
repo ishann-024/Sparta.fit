@@ -288,20 +288,303 @@ public class AuthController {
 
 When I put @Autowired PasswordEncoder passwordEncoder in EmployeeAuthService i am getting following error : 
 Description:
+Description:
 
 The dependencies of some of the beans in the application context form a cycle:
 
-┌─────┐
-|  jwtAuthFilter (field private com.finalproject.main.service.EmployeeAuthService com.finalproject.main.config.JwtAuthFilter.employeeAuthService)
-↑     ↓
-|  employeeAuthService (field private org.springframework.security.crypto.password.PasswordEncoder com.finalproject.main.service.EmployeeAuthService.passwordEncoder)
-↑     ↓
-|  securityConfig (field private com.finalproject.main.config.JwtAuthFilter com.finalproject.main.config.SecurityConfig.jwtAuthFilter)
-└─────┘
+???????
+|  jwtAuthFilter defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\config\JwtAuthFilter.class]
+?     ?
+|  employeeAuthService defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\service\EmployeeAuthService.class]
+?     ?
+|  securityConfig defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\config\SecurityConfig.class]
+???????
 
 
 Action:
 
 Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
+
+2025-10-06T07:28:16.313+05:30  WARN 27608 --- [FinalProject] [           main] o.s.test.context.TestContextManager      : Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener] to prepare test instance [com.finalproject.main.FinalProjectApplicationTests@6c9b44bf]
+
+
+@Service
+public class EmployeeAuthService implements UserAuthService {
+	// @Autowired
+	private final EmployeeRepository employeeRepository;
+
+	// @Autowired
+	private final PasswordEncoder passwordEncoder;
+	
+	
+
+	public EmployeeAuthService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
+		super();
+		this.employeeRepository = employeeRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
+
+
+
+	@Override
+	public UserPrincipal loadUserByUsername(String employeeId) throws UsernameNotFoundException {
+		// Find employee by employee_id (not email)
+		Employee employee = employeeRepository.findByEmployeeId(employeeId);
+		return new UserPrincipal(employee);
+	}
+	
+	@Transactional
+    public String changePassword(String employeeId, String currentPassword, String newPassword) {
+        Employee employee = employeeRepository.findByEmployeeId(employeeId);
+       
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, employee.getPasswordHash())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+       
+        // Validate new password
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new RuntimeException("New password cannot be empty");
+        }
+       
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("New password must be at least 6 characters long");
+        }
+       
+        // Check if new password is same as current password
+        if (passwordEncoder.matches(newPassword, employee.getPasswordHash())) {
+            throw new RuntimeException("New password cannot be same as current password");
+        }
+       
+        // Hash and update new password
+        String newPasswordHash = passwordEncoder.encode(newPassword);
+        employeeRepository.updatePasswordHash(employeeId, newPasswordHash);
+       
+        return "Password changed successfully";
+    }
+
+}
+
+@Service
+public class CandidateAuthService implements UserAuthService{
+	//@Autowired
+    private final CandidateRepository candidateRepository;
+	private final PasswordEncoder passwordEncoder;
+	
+	
+	
+
+	public CandidateAuthService(CandidateRepository candidateRepository, PasswordEncoder passwordEncoder) {
+		super();
+		this.candidateRepository = candidateRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
+
+
+
+
+	@Override
+    public UserPrincipal loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Find candidate by email
+        Candidate candidate = candidateRepository.findByEmail(email);
+        return new UserPrincipal(candidate);
+    }
+	
+	@Transactional
+    public String changePassword(String email, String currentPassword, String newPassword) {
+        Candidate candidate = candidateRepository.findByEmail(email);
+       
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, candidate.getPasswordHash())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+       
+        // Validate new password
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new RuntimeException("New password cannot be empty");
+        }
+       
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("New password must be at least 6 characters long");
+        }
+       
+        // Check if new password is same as current password
+        if (passwordEncoder.matches(newPassword, candidate.getPasswordHash())) {
+            throw new RuntimeException("New password cannot be same as current password");
+        }
+       
+        // Hash and update new password
+        String newPasswordHash = passwordEncoder.encode(newPassword);
+        candidateRepository.updatePasswordHash(email, newPasswordHash);
+       
+        return "Password changed successfully";
+    }
+}
+
+public class AuthController {
+
+	//@Autowired
+	private final AuthenticationManager authenticationManager;
+
+	//@Autowired
+	private final JwtTokenUtil jwtTokenUtil;
+
+	//@Autowired
+	private final EmployeeAuthService employeeAuthService;
+
+	//@Autowired
+	private final CandidateAuthService candidateAuthService;
+
+	public AuthController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil,
+			EmployeeAuthService employeeAuthService, CandidateAuthService candidateAuthService, boolean cookieSecure,
+			long jwtExpirationMs) {
+		super();
+		this.authenticationManager = authenticationManager;
+		this.jwtTokenUtil = jwtTokenUtil;
+		this.employeeAuthService = employeeAuthService;
+		this.candidateAuthService = candidateAuthService;
+		this.cookieSecure = cookieSecure;
+		this.jwtExpirationMs = jwtExpirationMs;
+	}
+
+@PostMapping("/change-password/employee")
+    public ResponseEntity<?> changeEmployeePassword(
+            @RequestBody ChangePasswordRequestDTO changePasswordRequest,
+            Authentication authentication) {
+        try {
+            String employeeId = authentication.getName();
+           
+            // Validate request
+            if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("New password and confirm password do not match");
+            }
+           
+            // Change password
+            String result = employeeAuthService.changePassword(
+                employeeId,
+                changePasswordRequest.getCurrentPassword(),
+                changePasswordRequest.getNewPassword()
+            );
+           
+            return ResponseEntity.ok(result);
+           
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/change-password/candidate")
+    public ResponseEntity<?> changeCandidatePassword(
+            @RequestBody ChangePasswordRequestDTO changePasswordRequest,
+            Authentication authentication) {
+        try {
+            String email = authentication.getName();
+           
+            // Validate request
+            if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("New password and confirm password do not match");
+            }
+           
+            // Change password
+            String result = candidateAuthService.changePassword(
+                email,
+                changePasswordRequest.getCurrentPassword(),
+                changePasswordRequest.getNewPassword()
+            );
+           
+            return ResponseEntity.ok(result);
+           
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+}
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    //@Autowired
+    private final JwtAuthFilter jwtAuthFilter;
+    
+    //@Autowired
+    private final EmployeeAuthService employeeAuthService;
+    
+    //@Autowired 
+    private final CandidateAuthService candidateAuthService;
+    
+    
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, EmployeeAuthService employeeAuthService,
+			CandidateAuthService candidateAuthService) {
+		super();
+		this.jwtAuthFilter = jwtAuthFilter;
+		this.employeeAuthService = employeeAuthService;
+		this.candidateAuthService = candidateAuthService;
+	}
+
+	@Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(username -> {
+            if (username.startsWith("MGS")) {
+                return employeeAuthService.loadUserByUsername(username);
+            } else {
+                return candidateAuthService.loadUserByUsername(username);
+            }
+        });
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CHANGE: Use proper CORS config
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+       
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                .requestMatchers("/api/team-leader/**").hasRole("TEAMLEAD")
+                .requestMatchers("/api/project-manager/**").hasRole("PROJECTMANAGER")
+                .requestMatchers("/api/hr/**").hasRole("HR")
+                .requestMatchers("/api/interviewer/**").hasRole("INTERVIEWER")
+                .anyRequest().authenticated()
+            );
+
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    // ADD: CORS Configuration for cookie support
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+    	 CorsConfiguration configuration = new CorsConfiguration();
+    	    // Use the explicit origin(s) of your frontend application(s)
+    	    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+    	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+    	    configuration.setAllowedHeaders(List.of("*"));
+    	    configuration.setAllowCredentials(true);
+    	    configuration.setExposedHeaders(List.of(HttpHeaders.SET_COOKIE));
+    	    
+    	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    	    source.registerCorsConfiguration("/**", configuration);
+    	    return source;
+    }
+}
 
 
