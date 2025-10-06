@@ -537,36 +537,105 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 
 
-***************************
-APPLICATION FAILED TO START
-***************************
-***************************
-APPLICATION FAILED TO START
-***************************
-
-Description:
-
-The dependencies of some of the beans in the application context form a cycle:
-
-   jwtAuthFilter defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\config\JwtAuthFilter.class]
-┌─────┐
-|  employeeAuthService defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\service\EmployeeAuthService.class]
-↑     ↓
-|  securityConfig defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\config\SecurityConfig.class]
-└─────┘
-
-
-Action:
-
-Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
-
-
+help me solve following error : 
 @Configuration
-public class appConfig {
-//	@Bean
-//	public BCryptPasswordEncoder getBCryptPasswordEncoder() {
-//		return new BCryptPasswordEncoder();
-//	}
+@EnableWebSecurity
+public class SecurityConfig {
+
+    //@Autowired
+    private JwtAuthFilter jwtAuthFilter;
+    
+    //@Autowired
+    private final EmployeeAuthService employeeAuthService;
+    
+    //@Autowired 
+    private final CandidateAuthService candidateAuthService;
+    
+    private final PasswordEncoder passwordEncoder;
+
+    public SecurityConfig(EmployeeAuthService employeeAuthService,
+			CandidateAuthService candidateAuthService,PasswordEncoder passwordEncoder) {
+		this.employeeAuthService = employeeAuthService;
+		this.candidateAuthService = candidateAuthService;
+		this.passwordEncoder=passwordEncoder;
+	}
+    
+    @Autowired
+    public void setJwtAuthFilter(JwtAuthFilter jwtAuthFilter) {
+    	this.jwtAuthFilter = jwtAuthFilter;
+    }
+
+	@Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(username -> {
+            if (username.startsWith("MGS")) {
+                return employeeAuthService.loadUserByUsername(username);
+            } else {
+                return candidateAuthService.loadUserByUsername(username);
+            }
+        });
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CHANGE: Use proper CORS config
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+       
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                .requestMatchers("/api/team-leader/**").hasRole("TEAMLEAD")
+                .requestMatchers("/api/project-manager/**").hasRole("PROJECTMANAGER")
+                .requestMatchers("/api/hr/**").hasRole("HR")
+                .requestMatchers("/api/interviewer/**").hasRole("INTERVIEWER")
+                .anyRequest().authenticated()
+            );
+
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    // ADD: CORS Configuration for cookie support
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOriginPatterns(List.of("*")); // Use patterns for wildcard with credentials
+//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//        configuration.setAllowedHeaders(List.of("*"));
+//        configuration.setAllowCredentials(true); // IMPORTANT: For cookies
+//        configuration.setExposedHeaders(List.of(HttpHeaders.SET_COOKIE)); // Expose Set-Cookie header
+//        
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+    	
+    	 CorsConfiguration configuration = new CorsConfiguration();
+    	    // Use the explicit origin(s) of your frontend application(s)
+    	    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+    	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+    	    configuration.setAllowedHeaders(List.of("*"));
+    	    configuration.setAllowCredentials(true);
+    	    configuration.setExposedHeaders(List.of(HttpHeaders.SET_COOKIE));
+    	    
+    	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    	    source.registerCorsConfiguration("/**", configuration);
+    	    return source;
+    }
 }
 
 
