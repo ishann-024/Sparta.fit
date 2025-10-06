@@ -540,22 +540,35 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 ***************************
 APPLICATION FAILED TO START
 ***************************
+***************************
+APPLICATION FAILED TO START
+***************************
 
 Description:
 
-Parameter 1 of constructor in com.finalproject.main.service.EmployeeAuthService required a single bean, but 2 were found:
-	- getBCryptPasswordEncoder: defined by method 'getBCryptPasswordEncoder' in class path resource [com/finalproject/main/config/appConfig.class]
-	- passwordEncoder: defined by method 'passwordEncoder' in class path resource [com/finalproject/main/config/SecurityConfig.class]
+The dependencies of some of the beans in the application context form a cycle:
 
-This may be due to missing parameter name information
+   jwtAuthFilter defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\config\JwtAuthFilter.class]
+┌─────┐
+|  employeeAuthService defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\service\EmployeeAuthService.class]
+↑     ↓
+|  securityConfig defined in file [D:\Training\Final\FinalProject\target\classes\com\finalproject\main\config\SecurityConfig.class]
+└─────┘
+
 
 Action:
 
-Consider marking one of the beans as @Primary, updating the consumer to accept multiple beans, or using @Qualifier to identify the bean that should be consumed
+Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
 
-Ensure that your compiler is configured to use the '-parameters' flag.
-You may need to update both your build tool settings as well as your IDE.
-(See https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-6.1-Release-Notes#parameter-name-retention)
+
+@Configuration
+public class appConfig {
+//	@Bean
+//	public BCryptPasswordEncoder getBCryptPasswordEncoder() {
+//		return new BCryptPasswordEncoder();
+//	}
+}
+
 
 
 
