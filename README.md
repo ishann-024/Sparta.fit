@@ -286,3 +286,22 @@ public class AuthController {
 	}
 </html>
 
+When I put @Autowired PasswordEncoder passwordEncoder in EmployeeAuthService i am getting following error : 
+Description:
+
+The dependencies of some of the beans in the application context form a cycle:
+
+┌─────┐
+|  jwtAuthFilter (field private com.finalproject.main.service.EmployeeAuthService com.finalproject.main.config.JwtAuthFilter.employeeAuthService)
+↑     ↓
+|  employeeAuthService (field private org.springframework.security.crypto.password.PasswordEncoder com.finalproject.main.service.EmployeeAuthService.passwordEncoder)
+↑     ↓
+|  securityConfig (field private com.finalproject.main.config.JwtAuthFilter com.finalproject.main.config.SecurityConfig.jwtAuthFilter)
+└─────┘
+
+
+Action:
+
+Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
+
+
