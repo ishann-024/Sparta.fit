@@ -24,6 +24,22 @@
         </div>
 
 
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
+
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
+create-job-request:1 Access to XMLHttpRequest at 'http://localhost:8082/api/team-leader//team-leader/create-job-requests' from origin 'http://localhost:4200' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+job-request-form.ts:31 Error creating job request: 
+HttpErrorResponse {headers: _HttpHeaders, status: 0, statusText: 'Unknown Error', url: 'http://localhost:8082/api/team-leader//team-leader/create-job-requests', ok: false, …}
+chunk-6J54M6DO.js?v=4fc44d6e:13384 
+ POST http://localhost:8082/api/team-leader//team-leader/create-job-requests net::ERR_FAILED
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
+
+
 
 ///-----------------------------------------------
 NG5002: Opening tag "button" not terminated.
@@ -534,3 +550,21 @@ src/app/teamlead-dashboard/job-request-form/job-request-form.html:260:4
         Cancel
     </button>
 </div>
+
+
+
+
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
+
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
+create-job-request:1 Access to XMLHttpRequest at 'http://localhost:8082/api/team-leader//team-leader/create-job-requests' from origin 'http://localhost:4200' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+job-request-form.ts:31 Error creating job request: 
+HttpErrorResponse {headers: _HttpHeaders, status: 0, statusText: 'Unknown Error', url: 'http://localhost:8082/api/team-leader//team-leader/create-job-requests', ok: false, …}
+chunk-6J54M6DO.js?v=4fc44d6e:13384 
+ POST http://localhost:8082/api/team-leader//team-leader/create-job-requests net::ERR_FAILED
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
+chunk-6J54M6DO.js?v=4fc44d6e:6486 NG0303: Can't bind to 'ngIf' since it isn't a known property of 'span' (used in the '_JobRequestForm' component template).
+If the 'ngIf' is an Angular control flow directive, please make sure that either the 'NgIf' directive or the 'CommonModule' is included in the '@Component.imports' of this component.
