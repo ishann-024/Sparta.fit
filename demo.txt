@@ -1,305 +1,202 @@
+now for your enhanced CSS give updated HTML(if changes are required) 
+Current HTMl:
+<div class="form-container">
+    <div class="form-header">
+        <h2>Create Job Request</h2>
+        <p>Fill in the details to create a new job request</p>
+    </div>
+   
+    <form (ngSubmit)="onSubmit($event)" #jobRequestForm="ngForm">
+        <div class="form-group">
+            <label>Job Request Title <span class="required">*</span></label>
+            <input
+                type="text"
+                name="title"
+                [(ngModel)]="jobRequestDTO.title"
+                placeholder="Enter Job Request Title"
+                required
+                #jobRequestTitle="ngModel"
+            />
+            <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
+                Job Request Title is required
+            </span>
+        </div>
 
-.form-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 2.5rem;
-    background: linear-gradient(145deg, #ffffff, #f8fafc);
-    border-radius: 20px;
-    box-shadow: 
-        0 10px 40px rgba(0, 0, 0, 0.08),
-        0 2px 10px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-}
+        <div class="form-group">
+            <label>Job Request Description <span class="required">*</span></label>
+            <textarea
+                name="description"
+                [(ngModel)]="jobRequestDTO.description"
+                placeholder="Enter Job Request Description"
+                required
+                rows="4"
+                #jobRequestDescription="ngModel"
+            ></textarea>
+            <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
+                Job Request Description is required
+            </span>
+        </div>
 
-.form-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #e2e8f0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
+        <div class="form-group">
+            <label>Required Skills <span class="required">*</span></label>
+            <input
+                type="text"
+                name="skills"
+                [(ngModel)]="jobRequestDTO.skills"
+                placeholder="e.g., Java, Spring Boot, SQL"
+                required
+                #skills="ngModel"
+            />
+            <span class="error" *ngIf="skills.invalid && skills.touched">
+                Skills are required
+            </span>
+        </div>
 
-.form-header h2 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.5px;
-}
+        <div class="form-row">
+            <div class="form-group">
+                <label>Head Count <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="headCount"
+                    [(ngModel)]="jobRequestDTO.headCount"
+                    placeholder="1"
+                    min="1"
+                    max="50"
+                    required
+                    #headCount="ngModel"
+                />
+                <span class="error" *ngIf="headCount.invalid && headCount.touched">
+                    Head count is required
+                </span>
+            </div>
 
-.form-header p {
-    font-size: 1.1rem;
-    color: #64748b;
-    margin: 0;
-    font-weight: 400;
-}
+            <div class="form-group">
+                <label>Job Type <span class="required">*</span></label>
+                <select
+                    name="jobType"
+                    [(ngModel)]="jobRequestDTO.jobType"
+                    required
+                >
+                    <option value="FULLTIME">Full Time</option>
+                    <option value="PART_TIME">Part Time</option>
+                    <option value="CONTRACT">Contract</option>
+                    <option value="INTERNSHIP">Internship</option>
+                </select>
+            </div>
+        </div>
 
-.form-group {
-    margin-bottom: 2rem;
-    position: relative;
-}
+        <div class="form-group">
+            <label>Priority <span class="required">*</span></label>
+            <select
+                name="priority"
+                [(ngModel)]="jobRequestDTO.priority"
+                required
+            >
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+            </select>
+        </div>
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    align-items: start;
-}
+        <div class="form-row">
+            <div class="form-group">
+                <label>Min Experience (years) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="minExperience"
+                    [(ngModel)]="jobRequestDTO.minExperience"
+                    placeholder="0"
+                    min="0"
+                    max="20"
+                    required
+                    #minExperience="ngModel"
+                />
+                <span class="error" *ngIf="minExperience.invalid && minExperience.touched">
+                    Minimum experience is required
+                </span>
+            </div>
 
-label {
-    display: block;
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-    color: #1e293b;
-    font-size: 0.95rem;
-    letter-spacing: -0.2px;
-}
+            <div class="form-group">
+                <label>Max Experience (years) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="maxExperience"
+                    [(ngModel)]="jobRequestDTO.maxExperience"
+                    placeholder="5"
+                    min="0"
+                    max="30"
+                    required
+                    #maxExperience="ngModel"
+                />
+                <span class="error" *ngIf="maxExperience.invalid && maxExperience.touched">
+                    Maximum experience is required
+                </span>
+            </div>
+        </div>
 
-.required {
-    color: #ef4444;
-    font-weight: 700;
-}
+        <div class="form-row">
+            <div class="form-group">
+                <label>Min CTC (₹ Lakhs) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="minCtc"
+                    [(ngModel)]="jobRequestDTO.minCtc"
+                    placeholder="4"
+                    min="0"
+                    max="50"
+                    step="0.01"
+                    required
+                    #minCtc="ngModel"
+                />
+                <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
+                    Minimum CTC is required
+                </span>
+            </div>
 
-input, select, textarea {
-    width: 100%;
-    padding: 1rem 1.25rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-}
+            <div class="form-group">
+                <label>Max CTC (₹ Lakhs) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="maxCtc"
+                    [(ngModel)]="jobRequestDTO.maxCtc"
+                    placeholder="20"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    required
+                    #maxCtc="ngModel"
+                />
+                <span class="error" *ngIf="maxCtc.invalid && maxCtc.touched">
+                    Maximum CTC is required
+                </span>
+            </div>
+        </div>
 
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 
-        0 0 0 4px rgba(59, 130, 246, 0.1),
-        0 4px 12px rgba(59, 130, 246, 0.15);
-    transform: translateY(-1px);
-}
+        <!-- Debug Section -->
+        <div class="debug-section">
+            <h4>Debug Info:</h4>
+            <p>isSubmitting: {{isSubmitting}}</p>
+            <p>Form Valid: {{jobRequestForm.valid}}</p>
+        </div>
 
-input:hover, select:hover, textarea:hover {
-    border-color: #cbd5e1;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 120px;
-    line-height: 1.6;
-}
-
-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 1.25rem;
-    padding-right: 3rem;
-}
-
-.error {
-    color: #ef4444;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-}
-
-.error::before {
-    content: "⚠";
-    font-size: 0.875rem;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 3rem;
-    padding-top: 2.5rem;
-    border-top: 1px solid #f1f5f9;
-    align-items: center;
-}
-
-.btn-submit, .btn-cancel {
-    padding: 1rem 2.5rem;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-width: 180px;
-    justify-content: center;
-    letter-spacing: -0.2px;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-submit {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    box-shadow: 
-        0 4px 15px rgba(59, 130, 246, 0.3),
-        0 2px 4px rgba(59, 130, 246, 0.1);
-}
-
-.btn-submit:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 
-        0 8px 25px rgba(59, 130, 246, 0.4),
-        0 4px 8px rgba(59, 130, 246, 0.15);
-    background: linear-gradient(135deg, #2563eb, #1e40af);
-}
-
-.btn-submit:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.btn-submit:disabled {
-    background: #94a3b8;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.btn-cancel {
-    background: #ffffff;
-    color: #64748b;
-    border: 2px solid #e2e8f0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.btn-cancel:hover:not(:disabled) {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: #475569;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Loading animation */
-.btn-submit:disabled::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin: -0.625rem 0 0 -0.625rem;
-    border: 2px solid transparent;
-    border-top: 2px solid #ffffff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Input placeholder styling */
-::placeholder {
-    color: #94a3b8;
-    opacity: 1;
-}
-
-/* Number input specific styling */
-input[type="number"] {
-    font-variant-numeric: tabular-nums;
-}
-
-/* Debug section styling */
-.debug-section {
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    padding: 1.5rem;
-    margin: 2rem 0;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    border-left: 4px solid #3b82f6;
-}
-
-.debug-section h4 {
-    margin: 0 0 1rem 0;
-    color: #1e293b;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.debug-section p {
-    margin: 0.5rem 0;
-    color: #475569;
-    font-family: 'Monaco', 'Consolas', monospace;
-    font-size: 0.9rem;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .form-container {
-        margin: 1rem;
-        padding: 1.5rem;
-        border-radius: 16px;
-    }
-    
-    .form-header h2 {
-        font-size: 2rem;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .form-actions {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-    }
-    
-    .btn-submit, .btn-cancel {
-        min-width: 100%;
-        width: 100%;
-    }
-    
-    input, select, textarea {
-        padding: 0.875rem 1rem;
-    }
-}
-
-/* Focus states for accessibility */
-input:focus-visible, 
-select:focus-visible, 
-textarea:focus-visible,
-button:focus-visible {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-}
-
-/* Custom scrollbar for textarea */
-textarea::-webkit-scrollbar {
-    width: 6px;
-}
-
-textarea::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 3px;
-}
-
-textarea::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
-}
-
-textarea::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button
+                type="submit"
+                class="btn-submit"
+                [disabled]="isSubmitting"
+            >
+                <span *ngIf="isSubmitting">Creating...</span>
+                <span *ngIf="!isSubmitting">Create Job Request</span>
+            </button>
+            <button
+                type="button"
+                class="btn-cancel"
+                (click)="cancel()"
+                [disabled]="isSubmitting"
+            >
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
