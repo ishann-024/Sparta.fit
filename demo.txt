@@ -29,59 +29,6 @@
 NG5002: Opening tag "button" not terminated.
 src/app/teamlead-dashboard/job-request-form/job-request-form.html:260:4
 
-<!-- <div id="assign-project-form" class="form-container">
-    <div class="form-header">
-        <h2>Assign Project</h2>
-        <p>Fill in the details to assign the project</p>
-    </div>
-    <form id="assignProjectForm">
-        <div class="form-group">
-            <label for="projectName">Project Name</label>
-            <input type="text" id="projectName" name="projectName" placeholder="Enter Project Name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="projectStatus">Project Status</label>
-            <select id="projectStatus" name="projectStatus" required>
-                <option value="READY_FOR_ASSIGNMENT">Ready for Assignment</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="budgetMin">Budget Min (in Lakhs)</label>
-            <input type="number" id="budgetMin" name="budgetMin" placeholder="Enter Budget Min" min="20" max="100" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="budgetMax">Budget Max (in Lakhs)</label>
-            <input type="number" id="budgetMax" name="budgetMax" placeholder="Enter Budget Max" min="20" max="100" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-            <label for="startDate">Project Start Date</label>
-            <input type="date" id="startDate" name="startDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="endDate">Project End Date</label>
-            <input type="date" id="endDate" name="endDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="teamLeadId">Team Lead ID</label>
-            <input type="text" id="teamLeadId" name="teamLeadId" placeholder="Enter Team Lead ID" required>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-submit">Assign Project</button>
-            <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel</button>
-        </div>
-    </form>
-</div> -->
-
-
 <!-- job-request-form.html -->
  <!-- Add this style tag at the top of your job-request-form.html -->
 <style>
