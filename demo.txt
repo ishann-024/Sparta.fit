@@ -372,3 +372,206 @@
         </form>
     </div>
 </div>
+
+
+//-------------------------------------------------------------------------------
+job-request.ts : 
+import { Component } from '@angular/core';
+import { TlService } from '../../service/tl-service';
+import { CreateJobRequestDTO } from '../../dto/CreateJobRequestDTO';
+
+@Component({
+  selector: 'app-job-request',
+  imports: [],
+  templateUrl: './job-request.html',
+  styleUrl: './job-request.css'
+})
+export class JobRequest {
+  approvedJobRequestsCount: number = 0;
+  declinedJobRequestsCount: number = 0;
+  allJobRequestCount: number = 0;
+  pendingJobRequest: number = 0;
+  errorMessage: string = '';
+
+  jobRequestDTO:CreateJobRequestDTO=new CreateJobRequestDTO();
+  showModal=false;
+
+  constructor(private tlService: TlService) {}
+
+  ngOnInit(): void {
+    this.fetchApprovedJobRequestsCount();
+    this.fetchDeclinedJobRequestsCount();
+    this.fetchAllJobRequestsCount();
+    this.fetchPendingJobRequest();
+  }
+  fetchApprovedJobRequestsCount(): void { 
+    this.tlService.getApprovedJobRequestsCount().subscribe({
+      next: (data) => {
+        this.approvedJobRequestsCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API"); 
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+
+  fetchDeclinedJobRequestsCount(): void { 
+    this.tlService.getDeclinedJobRequestsCount().subscribe({
+      next: (data) => {
+        this.declinedJobRequestsCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API"); 
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+
+  fetchAllJobRequestsCount(): void { 
+    this.tlService.getAllJobRequestCount().subscribe({
+      next: (data) => {
+        this.allJobRequestCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API"); 
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+
+  fetchPendingJobRequest(): void{
+    this.tlService.getPendingJobRequestsCount().subscribe({
+      next: (data) => {
+        this.pendingJobRequest = data;
+        console.log('Pending job request retrieved successfully:', data);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to retrieve Pending job request. Please try again later.';
+        console.error('API Error:', err);
+      }
+    });
+  }
+
+  openModal(): void {
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.resetForm();
+  }
+
+  resetForm(): void {
+    this.jobRequestDTO = new CreateJobRequestDTO();
+    
+  }
+
+  onSubmit(event: Event): void {
+    event.preventDefault();
+    
+    if (!this.validateForm()) {
+      return;
+    }
+
+
+    this.tlService.createJobRequest(this.jobRequestDTO).subscribe({
+      next: (data) => {
+        console.log( data);
+        this.closeModal();
+        alert(data);
+      },
+      error: (error) => {
+        console.error('Error assigning project:', error);
+        
+        if (error.error && error.error.message) {
+          alert(Error);
+        } else if (error.status === 400) {
+          alert('Invalid project data. Please check all fields and try again.');
+        } else if (error.status === 404) {
+          alert('Team Lead not found. Please select a valid Team Lead.');
+        } else {
+          alert('Failed to assign project. Please try again later.');
+        }
+      }
+    });
+  }
+
+  validateForm(): boolean {
+
+    if (this.jobRequestDTO.title  || this.jobRequestDTO.title.trim() === '') {
+      alert('Please Mention The Title');
+      return false;
+    }
+
+    if (this.jobRequestDTO.description  || this.jobRequestDTO.description.trim() === '') {
+      alert('Please Mention The Description');
+      return false;
+    }
+
+    if (!this.jobRequestDTO.skills || this.jobRequestDTO.skills.trim() === '') {
+      alert('Please enter the Skills required');
+      return false;
+    }
+
+    if (this.jobRequestDTO.headCount > 0) {
+      alert('Please Enter the Headcount');
+      return false;
+    }
+
+    if (this.jobRequestDTO.jobType || this.jobRequestDTO.jobType.trim() === '') {
+      alert('Please Mention The JobType');
+      return false;
+    }
+
+
+      if (this.jobRequestDTO.priority || this.jobRequestDTO.priority.trim() === '') {
+      alert('Please Mention The priority');
+      return false;
+    }
+
+    if (this.jobRequestDTO.minExperience < 20 || this.jobRequestDTO.minExperience > 1) {
+      alert('Budget Min should be between 1 and 20 years');
+      return false;
+    }
+
+    if (this.jobRequestDTO.maxExperience < 20 || this.jobRequestDTO.maxExperience > 2) {
+      alert('Budget Max should be between 2 and 20 years');
+      return false;
+    }
+
+    if (this.jobRequestDTO.minCtc < 20 || this.jobRequestDTO.minCtc > 3) {
+      alert('Budget Max should be between 3 and 20 lakhs');
+      return false;
+    }
+
+    if (this.jobRequestDTO.maxCtc < 40 || this.jobRequestDTO.maxCtc > 6) {
+      alert('Budget Max should be between 6 and 40 lakhs');
+      return false;
+    }
+    return true;
+  }
+
+}
+
+tl-service.ts : 
+
+  createJobRequest(jobRequest: CreateJobRequestDTO): Observable<string> {
+    return this.httpClient.post<string>(
+      this.baseurl+"/team-leader/create-job-requests",
+      jobRequest,
+      { withCredentials: true }
+    );
+  }
