@@ -1,884 +1,4 @@
-<!-- job-request.html -->
-<div class="applications-container">
-    <!-- Header Section -->
-    <section class="applications-header">
-        <div class="header-content">
-            <h1 class="page-title">Job Requests</h1>
-            <p class="page-subtitle">Create and manage resource requests for your projects</p>
-            <div class="applications-stats">
-                <div class="stat-item stats-total">
-                    <div class="stat-number">{{allJobRequestCount}}</div>
-                    <div class="stat-label">Total Job Requests</div>
-                </div>
-                <div class="stat-item stats-approved">
-                    <div class="stat-number">{{approvedJobRequestsCount}}</div>
-                    <div class="stat-label">Approved</div>
-                </div>
-                <div class="stat-item stats-declined">
-                    <div class="stat-number">{{declinedJobRequestsCount}}</div>
-                    <div class="stat-label">Declined</div>
-                </div>
-                <div class="stat-item stats-pending">
-                    <div class="stat-number">{{pendingJobRequest}}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Create Job Request Button -->
-    <section class="page-header">
-        <br>
-        <button class="btn-primary" (click)="openModal()">
-            <i class="fas fa-plus"></i> Create New Request
-        </button>
-    </section>
-
-    <!-- Job Requests Grid -->
-    <section class="cards-grid">
-        <!-- Example Job Request Card -->
-        <div class="card">
-            <div class="card-header"> 
-                <div>
-                    <div class="card-title">React Developer Required</div>
-                    <div class="card-subtitle">JR001 • E-commerce Platform</div>
-                </div>
-                <span class="status-badge status-approved">Approved</span>
-            </div>
-            <div class="card-content">
-                <div class="info-row">
-                    <span class="info-label">Project:</span>
-                    <span class="info-value">E-commerce Platform</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Required Skills:</span>
-                    <span class="info-value">React, Node.js, MongoDB</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Experience:</span>
-                    <span class="info-value">3+ years</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Quantity:</span>
-                    <span class="info-value">2 Developers</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Status:</span>
-                    <span class="info-value">Posted on Job Portal</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Applications:</span>
-                    <span class="info-value">15 candidates applied</span>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="btn-sm btn-primary">
-                    <i class="fas fa-users"></i> View Candidates
-                </button>
-                <button class="btn-sm btn-edit">
-                    <i class="fas fa-edit"></i> Edit Request
-                </button>
-            </div>
-        </div>
-        
-        <br>
-        
-        <div class="card"> 
-            <div class="card-header"> 
-                <div>
-                    <div class="card-title">UI/UX Designer</div>
-                    <div class="card-subtitle">JR002 • E-commerce Platform</div>
-                </div>
-                <span class="status-badge status-pending">Pending Approval</span>
-            </div>
-            <div class="card-content">
-                <div class="info-row">
-                    <span class="info-label">Project:</span>
-                    <span class="info-value">E-commerce Platform</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Required Skills:</span>
-                    <span class="info-value">Figma, Adobe XD, Prototyping</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Experience:</span>
-                    <span class="info-value">2+ years</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Quantity:</span>
-                    <span class="info-value">1 Designer</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Submitted:</span>
-                    <span class="info-value">Oct 20, 2024</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Urgency:</span>
-                    <span class="info-value">Medium</span>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="btn btn-warning btn-sm">
-                    <i class="fas fa-clock"></i> Waiting for PM Approval
-                </button>
-                <button class="btn btn-edit">
-                    <i class="fas fa-edit"></i> Edit Request
-                </button>
-            </div>
-        </div>
-    </section>
-</div>
-
-<div *ngIf="!isLoading && assignedProject" class="assigned-state">
-    <div class="card">
-        <div class="card-header">
-            <h2>Assigned Project</h2>
-            <span class="status-badge" [ngClass]="getStatusBadgeClass(assignedProject.status)">
-                {{ formatStatus(assignedProject.status) }}
-            </span>
-        </div>
-
-        <div class="card-content">
-            <div class="info-row">
-                <div class="info-group">
-                    <label>Project ID</label>
-                    <p>#{{ assignedProject.projectId }}</p>
-                </div>
-                <div class="info-group">
-                    <label>Project Name</label>
-                    <p>{{ assignedProject.name }}</p>
-                </div>
-            </div>
-            <div class="info-row">
-                <div class="info-group">
-                    <label>Lead ID</label>
-                    <p>{{ assignedProject.teamLeadId }}</p>
-                </div>
-                <div class="info-group">
-                    <label>Team Lead</label>
-                    <p>{{ assignedProject.teamLeadName }}</p>
-                </div>
-            </div>
-
-            <div class="info-group">
-                <label>Budget Range</label>
-                <p class="budget">₹{{ assignedProject.budgetBandMin }}L - ₹{{ assignedProject.budgetBandMax }}L</p>
-            </div>
-
-            <div class="info-row">
-                <div class="info-group">
-                    <label>Start Date</label>
-                    <p>{{ assignedProject.startDate }}</p>
-                </div>
-                <div class="info-group">
-                    <label>End Date</label>
-                    <p>{{ assignedProject.endDate }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="card-footer">
-            <p class="note">You have already assigned a project. Only one project can be assigned at a time.</p>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for Create Job Request Form -->
-<div class="modal" *ngIf="showModal" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-        <button class="close-btn" (click)="closeModal()">&times;</button>
-        
-        <h2>Create Job Request</h2>
-        <p class="subtitle">Fill in the details to create a new job request</p>
-
-        <form #jobRequestForm="ngForm" (ngSubmit)="onSubmit()">
-            <div class="form-group">
-                <label>Job Request Title <span class="required">*</span></label>
-                <input
-                    type="text"
-                    name="title"
-                    [(ngModel)]="jobRequestDTO.title"
-                    placeholder="Enter Job Request Title"
-                    required
-                    #jobRequestTitle="ngModel"
-                />
-                <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
-                    Job Request Title is required
-                </span>
-            </div>
-
-            <div class="form-group">
-                <label>Job Request Description <span class="required">*</span></label>
-                <textarea
-                    name="description"
-                    [(ngModel)]="jobRequestDTO.description"
-                    placeholder="Enter Job Request Description"
-                    required
-                    rows="4"
-                    #jobRequestDescription="ngModel"
-                ></textarea>
-                <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
-                    Job Request Description is required
-                </span>
-            </div>
-
-            <div class="form-group">
-                <label>Required Skills <span class="required">*</span></label>
-                <input
-                    type="text"
-                    name="skills"
-                    [(ngModel)]="jobRequestDTO.skills"
-                    placeholder="e.g., Java, Spring Boot, SQL"
-                    required
-                    #skills="ngModel"
-                />
-                <span class="error" *ngIf="skills.invalid && skills.touched">
-                    Skills are required
-                </span>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Head Count <span class="required">*</span></label>
-                    <input
-                        type="number"
-                        name="headCount"
-                        [(ngModel)]="jobRequestDTO.headCount"
-                        placeholder="1"
-                        min="1"
-                        max="50"
-                        required
-                        #headCount="ngModel"
-                    />
-                    <span class="error" *ngIf="headCount.invalid && headCount.touched">
-                        Head count is required
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label>Priority <span class="required">*</span></label>
-                    <select 
-                        name="priority" 
-                        [(ngModel)]="jobRequestDTO.priority" 
-                        required
-                    >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Job Type <span class="required">*</span></label>
-                <select 
-                    name="jobType" 
-                    [(ngModel)]="jobRequestDTO.jobType" 
-                    required
-                >
-                    <option value="FULL_TIME">Full Time</option>
-                    <option value="PART_TIME">Part Time</option>
-                    <option value="CONTRACT">Contract</option>
-                    <option value="INTERNSHIP">Internship</option>
-                </select>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Min Experience (years) <span class="required">*</span></label>
-                    <input
-                        type="number"
-                        name="minExperience"
-                        [(ngModel)]="jobRequestDTO.minExperience"
-                        placeholder="0"
-                        min="0"
-                        max="30"
-                        required
-                        #minExperience="ngModel"
-                    />
-                    <span class="error" *ngIf="minExperience.invalid && minExperience.touched">
-                        Minimum experience is required
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label>Max Experience (years) <span class="required">*</span></label>
-                    <input
-                        type="number"
-                        name="maxExperience"
-                        [(ngModel)]="jobRequestDTO.maxExperience"
-                        placeholder="5"
-                        min="0"
-                        max="30"
-                        required
-                        #maxExperience="ngModel"
-                    />
-                    <span class="error" *ngIf="maxExperience.invalid && maxExperience.touched">
-                        Maximum experience is required
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Min CTC (₹ Lakhs) <span class="required">*</span></label>
-                    <input
-                        type="number"
-                        name="minCtc"
-                        [(ngModel)]="jobRequestDTO.minCtc"
-                        placeholder="4"
-                        min="4"
-                        max="100"
-                        step="0.01"
-                        required
-                        #minCtc="ngModel"
-                    />
-                    <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
-                        Minimum CTC is required
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label>Max CTC (₹ Lakhs) <span class="required">*</span></label>
-                    <input
-                        type="number"
-                        name="maxCtc"
-                        [(ngModel)]="jobRequestDTO.maxCtc"
-                        placeholder="20"
-                        min="4"
-                        max="100"
-                        step="0.01"
-                        required
-                        #maxCtc="ngModel"
-                    />
-                    <span class="error" *ngIf="maxCtc.invalid && maxCtc.touched">
-                        Maximum CTC is required
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button 
-                    type="submit" 
-                    class="btn-submit"
-                    [disabled]="jobRequestForm.invalid"
-                >
-                    Create Job Request
-                </button>
-                <button type="button" class="btn-cancel" (click)="closeModal()">
-                    Cancel
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-//-------------------------------------------------------------------------------
-job-request.ts : 
-import { Component } from '@angular/core';
-import { TlService } from '../../service/tl-service';
-import { CreateJobRequestDTO } from '../../dto/CreateJobRequestDTO';
-
-@Component({
-  selector: 'app-job-request',
-  imports: [],
-  templateUrl: './job-request.html',
-  styleUrl: './job-request.css'
-})
-export class JobRequest {
-  approvedJobRequestsCount: number = 0;
-  declinedJobRequestsCount: number = 0;
-  allJobRequestCount: number = 0;
-  pendingJobRequest: number = 0;
-  errorMessage: string = '';
-
-  jobRequestDTO:CreateJobRequestDTO=new CreateJobRequestDTO();
-  showModal=false;
-
-  constructor(private tlService: TlService) {}
-
-  ngOnInit(): void {
-    this.fetchApprovedJobRequestsCount();
-    this.fetchDeclinedJobRequestsCount();
-    this.fetchAllJobRequestsCount();
-    this.fetchPendingJobRequest();
-  }
-  fetchApprovedJobRequestsCount(): void { 
-    this.tlService.getApprovedJobRequestsCount().subscribe({
-      next: (data) => {
-        this.approvedJobRequestsCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API"); 
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchDeclinedJobRequestsCount(): void { 
-    this.tlService.getDeclinedJobRequestsCount().subscribe({
-      next: (data) => {
-        this.declinedJobRequestsCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API"); 
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchAllJobRequestsCount(): void { 
-    this.tlService.getAllJobRequestCount().subscribe({
-      next: (data) => {
-        this.allJobRequestCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API"); 
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchPendingJobRequest(): void{
-    this.tlService.getPendingJobRequestsCount().subscribe({
-      next: (data) => {
-        this.pendingJobRequest = data;
-        console.log('Pending job request retrieved successfully:', data);
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to retrieve Pending job request. Please try again later.';
-        console.error('API Error:', err);
-      }
-    });
-  }
-
-  openModal(): void {
-    this.showModal = true;
-  }
-
-  closeModal(): void {
-    this.showModal = false;
-    this.resetForm();
-  }
-
-  resetForm(): void {
-    this.jobRequestDTO = new CreateJobRequestDTO();
-    
-  }
-
-  onSubmit(event: Event): void {
-    event.preventDefault();
-    
-    if (!this.validateForm()) {
-      return;
-    }
-
-
-    this.tlService.createJobRequest(this.jobRequestDTO).subscribe({
-      next: (data) => {
-        console.log( data);
-        this.closeModal();
-        alert(data);
-      },
-      error: (error) => {
-        console.error('Error assigning project:', error);
-        
-        if (error.error && error.error.message) {
-          alert(Error);
-        } else if (error.status === 400) {
-          alert('Invalid project data. Please check all fields and try again.');
-        } else if (error.status === 404) {
-          alert('Team Lead not found. Please select a valid Team Lead.');
-        } else {
-          alert('Failed to assign project. Please try again later.');
-        }
-      }
-    });
-  }
-
-  validateForm(): boolean {
-
-    if (this.jobRequestDTO.title  || this.jobRequestDTO.title.trim() === '') {
-      alert('Please Mention The Title');
-      return false;
-    }
-
-    if (this.jobRequestDTO.description  || this.jobRequestDTO.description.trim() === '') {
-      alert('Please Mention The Description');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.skills || this.jobRequestDTO.skills.trim() === '') {
-      alert('Please enter the Skills required');
-      return false;
-    }
-
-    if (this.jobRequestDTO.headCount > 0) {
-      alert('Please Enter the Headcount');
-      return false;
-    }
-
-    if (this.jobRequestDTO.jobType || this.jobRequestDTO.jobType.trim() === '') {
-      alert('Please Mention The JobType');
-      return false;
-    }
-
-
-      if (this.jobRequestDTO.priority || this.jobRequestDTO.priority.trim() === '') {
-      alert('Please Mention The priority');
-      return false;
-    }
-
-    if (this.jobRequestDTO.minExperience < 20 || this.jobRequestDTO.minExperience > 1) {
-      alert('Budget Min should be between 1 and 20 years');
-      return false;
-    }
-
-    if (this.jobRequestDTO.maxExperience < 20 || this.jobRequestDTO.maxExperience > 2) {
-      alert('Budget Max should be between 2 and 20 years');
-      return false;
-    }
-
-    if (this.jobRequestDTO.minCtc < 20 || this.jobRequestDTO.minCtc > 3) {
-      alert('Budget Max should be between 3 and 20 lakhs');
-      return false;
-    }
-
-    if (this.jobRequestDTO.maxCtc < 40 || this.jobRequestDTO.maxCtc > 6) {
-      alert('Budget Max should be between 6 and 40 lakhs');
-      return false;
-    }
-    return true;
-  }
-
-}
-
---------------------------------JobRequest.html----------------------------
-<div class="applications-container">
-        <!-- Header Section -->
-        <section class="applications-header">
-            <div class="header-content">
-                <h1 class="page-title">Job Requests</h1>
-                <p class="page-subtitle">Create and manage resource requests for your projects</p>
-                <div class="applications-stats">
-                    <div class="stat-item stats-total">
-                        <div class="stat-number">{{allJobRequestCount}}</div>
-                        <div class="stat-label">Total Job Requests</div>
-                    </div>
-                    <div class="stat-item stats-approved">
-                        <div class="stat-number">{{approvedJobRequestsCount}}</div>
-                        <div class="stat-label">Approved</div>
-                    </div>
-                    <div class="stat-item stats-declined">
-                        <div class="stat-number">{{declinedJobRequestsCount}}</div>
-                        <div class="stat-label">Declined</div>
-                    </div>
-                    <div class="stat-item stats-pending">
-                        <div class="stat-number">{{pendingJobRequest}}</div>
-                        <div class="stat-label">Pending</div>
-                    </div>
-                </div>
-            </div>
-        </section> -->
-
-        <!-- Create Job Request Button -->
-        <section class="page-header">
-            <br>
-            <button class="btn-primary" (click)="openModal()">
-                <i class="fas fa-plus"></i> Create New Request
-            </button>
-        </section>
-
-        <!-- Job Requests Grid -->
-        <section class="cards-grid">
-            <!-- Example Job Request Card -->
-            <div class="card">
-                 <div class="card-header"> 
-                    <div>
-                        <div class="card-title">React Developer Required</div>
-                        <div class="card-subtitle">JR001 • E-commerce Platform</div>
-                    </div>
-                    <span class="status-badge status-approved">Approved</span>
-                </div>
-                <div class="card-content">
-                    <div class="info-row">
-                        <span class="info-label">Project:</span>
-                        <span class="info-value">E-commerce Platform</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Required Skills:</span>
-                        <span class="info-value">React, Node.js, MongoDB</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Experience:</span>
-                        <span class="info-value">3+ years</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Quantity:</span>
-                        <span class="info-value">2 Developers</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Status:</span>
-                        <span class="info-value">Posted on Job Portal</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Applications:</span>
-                        <span class="info-value">15 candidates applied</span>
-                    </div>
-                </div> 
-                <div class="card-actions">
-                    <button class="btn-sm btn-primary">
-                        <i class="fas fa-users"></i> View Candidates
-                    </button>
-                    <button class="btn-sm btn-edit" onclick="editJobRequest('JR001')">
-                        <i class="fas fa-edit"></i> Edit Request
-                    </button>
-                </div> -->
-             </div> -->
-             <br> 
-             <div class="card"> 
-                 <div class="card-header"> 
-                     <div>
-                         <div class="card-title">UI/UX Designer</div>
-                        <div class="card-subtitle">JR002 • E-commerce Platform</div>
-                    </div> 
-                     <span class="status-badge status-pending">Pending Approval</span>
-                </div>
-                <div class="card-content">
-                    <div class="info-row">
-                        <span class="info-label">Project:</span>
-                        <span class="info-value">E-commerce Platform</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Required Skills:</span> -->
-                         <span class="info-value">Figma, Adobe XD, Prototyping</span> 
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Experience:</span>
-                        <span class="info-value">2+ years</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Quantity:</span>
-                        <span class="info-value">1 Designer</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Submitted:</span>
-                        <span class="info-value">Oct 20, 2024</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Urgency:</span>
-                        <span class="info-value">Medium</span>
-                    </div> 
-                </div>
-                <div class="card-actions">
-                    <button class="btn btn-warning btn-sm">
-                        <i class="fas fa-clock"></i> Waiting for PM Approval
-                    </button>
-                    <button class="btn btn-edit" onclick="editJobRequest('JR002')">
-                        <i class="fas fa-edit"></i> Edit Request
-                    </button>
-                </div>
-            </div>
-        </section>
-    </div> -->
-
-
-
-
-    <div *ngIf="!isLoading && assignedProject" class="assigned-state">
-    <div class="card">
-      <div class="card-header">
-        <h2>Assigned Project</h2>
-        <span class="status-badge" [ngClass]="getStatusBadgeClass(assignedProject.status)">
-          {{ formatStatus(assignedProject.status) }}
-        </span>
-      </div>
-
-      <div class="card-content">
-                <div class="info-row">
-          <div class="info-group">
-          <label>Project ID</label>
-          <p>#{{ assignedProject.projectId }}</p>
-        </div> -->
-        <div class="info-group">
-          <label>Project Name</label>
-          <p>{{ assignedProject.name }}</p>
-        </div>
-        </div>
-         <div class="info-row">
-          <div class="info-group">
-            <label>Lead ID</label>
-            <p>{{ assignedProject.teamLeadId }}</p>
-          </div> 
-
-           <div class="info-group">
-            <label>Team Lead</label>
-            <p>{{ assignedProject.teamLeadName }}</p>
-          </div>  
-        </div>
-
-        <div class="info-group">
-          <label>Budget Range</label>
-          <p class="budget">₹{{ assignedProject.budgetBandMin }}L - ₹{{ assignedProject.budgetBandMax }}L</p>
-        </div> -->
-
-        <div class="info-row">
-          <div class="info-group">
-            <label>Start Date</label>
-            <p>{{assignedProject.startDate }}</p>
-          </div>
-          <div class="info-group">
-            <label>End Date</label>
-            <p>{{ assignedProject.endDate }}</p>
-          </div>
-        </div>
-      </div>
-
-       <div class="card-footer">
-        <p class="note">You have already assigned a project. Only one project can be assigned at a time.</p>
-      </div>
-    </div>
-  </div> 
-
-  <!-- Modal for Assign Project Form -->
-   <div class="modal" *ngIf="showModal" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <button class="close-btn" (click)="closeModal()">&times;</button>
-      
-      <h2>Raise Job Request</h2>
-      <p class="subtitle">Fill in the details to create job request to </p> -->
-
-       <form #assignForm="ngForm" (ngSubmit)="onSubmit($event)"> -->
-         <div class="form-group">
-          <label>Job Request Title <span class="required">*</span></label>
-          <input
-            type="text"
-            name="name"
-            [(ngModel)]="jobRequestDTO.title"
-            placeholder="Enter Job Request Title"
-            required
-            #jobRequestTitle="ngModel"
-          />
-          <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
-            Job Request Title is required
-          </span>
-        </div> 
-
-
-         <div class="form-group">
-          <label>Job Request Description <span class="required">*</span></label>
-          <input
-            type="text"
-            name="name"
-            [(ngModel)]="jobRequestDTO.description"
-            placeholder="Enter Job Request Description"
-            required
-            #jobRequestDescription="ngModel"
-          />
-          <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
-            Job Request Description is required
-          </span>
-        </div> -->
-
-        <div class="form-group">
-          <label>Priority <span class="required">*</span></label>
-          <select 
-            name="status" 
-            [(ngModel)]="jobRequestDTO.priority" 
-            required
-          >
-            <option value="PENDING">HIGH</option>
-            <option value="ONHOLD">MEDIUM</option>
-            <option value="CLOSED">LOW</option>
-          </select>
-        </div>
-
-
-
-        <div class="form-group">
-          <label>JobType <span class="required">*</span></label>
-          <select 
-            name="status" 
-            [(ngModel)]="jobRequestDTO.jobType" 
-            required
-          >
-            <option value="PENDING">Full Time</option>
-            <option value="ONHOLD">Part Time</option>
-            <option value="CLOSED">Freelance</option>
-          </select>
-        </div>
-
-
-         <div class="form-row">
-          <div class="form-group">
-            <label>Min Ctc (₹ Lakhs) <span class="required">*</span></label>
-            <input
-              type="number"
-              name="minCtc"
-              [(ngModel)]="jobRequestDTO.minCtc"
-              placeholder="20"
-              min="4"
-              max="100"
-              step="0.01"
-              required
-              #minCtc="ngModel"
-            />
-            <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
-              Should Be Greator than Zero
-            </span>
-          </div>
-
-          <div class="form-group">
-            <label>Max Ctc<span class="required">*</span></label>
-            <input
-              type="number"
-              name="budgetBandMax"
-              [(ngModel)]="projectRequest.budgetBandMax"
-              placeholder="100"
-              min="20"
-              max="100"
-              step="0.01"
-              required
-              #budgetMax="ngModel"
-            />
-            <span class="error" *ngIf="budgetMax.invalid && budgetMax.touched">
-              Between 20-100 Lakhs
-            </span>
-          </div>
-        </div> 
-
-        <div class="form-row">
-        <div class="form-actions">
-          <button 
-            type="submit" 
-            class="btn-submit"
-            [disabled]="assignForm.invalid 
-          >
-          Submit
-          </button>
-          <button type="button" class="btn-cancel" (click)="closeModal()">
-            Cancel
-          </button>
-        </div> 
-      </form> 
-    </div>
-    </div>
------------------------------------------------job-request-form-------------------------
-HTML:
-<div id="assign-project-form" class="form-container">
+<!-- <div id="assign-project-form" class="form-container">
     <div class="form-header">
         <h2>Assign Project</h2>
         <p>Fill in the details to assign the project</p>
@@ -928,218 +48,194 @@ HTML:
             <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel</button>
         </div>
     </form>
+</div> -->
+
+
+<!-- job-request-form.html -->
+<div class="form-container">
+    <div class="form-header">
+        <h2>Create Job Request</h2>
+        <p>Fill in the details to create a new job request</p>
+    </div>
+   
+    <form (ngSubmit)="onSubmit($event)" #jobRequestForm="ngForm">
+        <div class="form-group">
+            <label>Job Request Title <span class="required">*</span></label>
+            <input
+                type="text"
+                name="title"
+                [(ngModel)]="jobRequestDTO.title"
+                placeholder="Enter Job Request Title"
+                required
+                #jobRequestTitle="ngModel"
+            />
+            <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
+                Job Request Title is required
+            </span>
+        </div>
+
+        <div class="form-group">
+            <label>Job Request Description <span class="required">*</span></label>
+            <textarea
+                name="description"
+                [(ngModel)]="jobRequestDTO.description"
+                placeholder="Enter Job Request Description"
+                required
+                rows="4"
+                #jobRequestDescription="ngModel"
+            ></textarea>
+            <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
+                Job Request Description is required
+            </span>
+        </div>
+
+        <div class="form-group">
+            <label>Required Skills <span class="required">*</span></label>
+            <input
+                type="text"
+                name="skills"
+                [(ngModel)]="jobRequestDTO.skills"
+                placeholder="e.g., Java, Spring Boot, SQL"
+                required
+                #skills="ngModel"
+            />
+            <span class="error" *ngIf="skills.invalid && skills.touched">
+                Skills are required
+            </span>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Head Count <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="headCount"
+                    [(ngModel)]="jobRequestDTO.headCount"
+                    placeholder="1"
+                    min="1"
+                    max="50"
+                    required
+                    #headCount="ngModel"
+                />
+                <span class="error" *ngIf="headCount.invalid && headCount.touched">
+                    Head count is required
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Job Type <span class="required">*</span></label>
+                <select
+                    name="jobType"
+                    [(ngModel)]="jobRequestDTO.jobType"
+                    required
+                >
+                    <option value="FULLTIME">Full Time</option>
+                    <option value="PART_TIME">Part Time</option>
+                    <option value="CONTRACT">Contract</option>
+                    <option value="INTERNSHIP">Internship</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Priority <span class="required">*</span></label>
+            <select
+                name="priority"
+                [(ngModel)]="jobRequestDTO.priority"
+                required
+            >
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Min Experience (years) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="minExperience"
+                    [(ngModel)]="jobRequestDTO.minExperience"
+                    placeholder="0"
+                    min="0"
+                    max="20"
+                    required
+                    #minExperience="ngModel"
+                />
+                <span class="error" *ngIf="minExperience.invalid && minExperience.touched">
+                    Minimum experience is required
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Max Experience (years) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="maxExperience"
+                    [(ngModel)]="jobRequestDTO.maxExperience"
+                    placeholder="5"
+                    min="0"
+                    max="30"
+                    required
+                    #maxExperience="ngModel"
+                />
+                <span class="error" *ngIf="maxExperience.invalid && maxExperience.touched">
+                    Maximum experience is required
+                </span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Min CTC (₹ Lakhs) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="minCtc"
+                    [(ngModel)]="jobRequestDTO.minCtc"
+                    placeholder="4"
+                    min="0"
+                    max="50"
+                    step="0.01"
+                    required
+                    #minCtc="ngModel"
+                />
+                <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
+                    Minimum CTC is required
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Max CTC (₹ Lakhs) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="maxCtc"
+                    [(ngModel)]="jobRequestDTO.maxCtc"
+                    placeholder="20"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    required
+                    #maxCtc="ngModel"
+                />
+                <span class="error" *ngIf="maxCtc.invalid && maxCtc.touched">
+                    Maximum CTC is required
+                </span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button
+                type="submit"
+                class="btn-submit"
+                [disabled]="isSubmitting"
+            >
+                <span *ngIf="isSubmitting">Creating...</span>
+                <span *ngIf="!isSubmitting">Create Job Request</span>
+            </button>
+            <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="isSubmitting">
+                Cancel
+            </button>
+        </div>
+    </form>
 </div>
-
-ts:
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-job-request-form',
-  imports: [],
-  templateUrl: './job-request-form.html',
-  styleUrl: './job-request-form.css'
-})
-export class JobRequestForm {
-
-}
-
-
---------------------------------------------------------------------------------------
-import { Routes } from '@angular/router';
-import { EmployeeLogin } from './dashboard/employee-login/employee-login';
-import { CandidateLogin } from './dashboard/candidate-login/candidate-login';
-import { Dashboard } from './dashboard/dashboard';
-
-import { CandidateDashboard } from './candidate-dashboard/candidate-dashboard';
-import { CandidateMyapplications } from './candidate-dashboard/candidate-myapplications/candidate-myapplications';
-import { CandidateRegistration } from './dashboard/candidate-registration/candidate-registration';
-import { Overview } from './candidate-dashboard/overview/overview';
-import { FindJobs } from './candidate-dashboard/find-jobs/find-jobs';
-import { Interviews } from './candidate-dashboard/interviews/interviews';
-import { CandidateEditProfile } from './candidate-dashboard/candidate-edit-profile/candidate-edit-profile';
-import { Settings } from './candidate-dashboard/settings/settings';
-import { PmDashboard } from './pm-dashboard/pm-dashboard';
-import { TeamleadDashboard } from './teamlead-dashboard/teamlead-dashboard';
-import { TlOverview } from './teamlead-dashboard/tl-overview/tl-overview';
-import { MyProject } from './teamlead-dashboard/my-project/my-project';
-import { JobRequest } from './teamlead-dashboard/job-request/job-request';
-import { PendingInterviews } from './teamlead-dashboard/pending-interviews/pending-interviews';
-import { TeamMembers } from './teamlead-dashboard/team-members/team-members';
-import { TlSettings } from './teamlead-dashboard/tl-settings/tl-settings';
-import { HrDashboard } from './hr-dashboard/hr-dashboard';
-import { PmOverview } from './pm-dashboard/pm-overview/pm-overview';
-import { AssignProject } from './pm-dashboard/assign-project/assign-project';
-import { PmJobRequests } from './pm-dashboard/pm-job-requests/pm-job-requests';
-import { PmTeamMembers } from './pm-dashboard/pm-team-members/pm-team-members';
-import { PmPendingInterviews } from './pm-dashboard/pm-pending-interviews/pm-pending-interviews';
-import { PmSettings } from './pm-dashboard/pm-settings/pm-settings';
-import { BenchEmployees } from './pm-dashboard/bench-employees/bench-employees';
-import { HrOverview } from './hr-dashboard/hr-overview/hr-overview';
-import { HrJobRequests } from './hr-dashboard/hr-job-requests/hr-job-requests';
-import { HrSettings } from './hr-dashboard/hr-settings/hr-settings';
-import { ShortlistedCandidates } from './hr-dashboard/shortlisted-candidates/shortlisted-candidates';
-import { HrInterviews } from './hr-dashboard/hr-interviews/hr-interviews';
-import { AppliedCandidates } from './hr-dashboard/applied-candidates/applied-candidates';
-//import { CandidateMyapplications } from './candidate-dashboard/candidate-myapplications/candidate-myapplications';
-//import { CandidateEditProfile } from './candidate-dashboard/candidate-edit-profile/candidate-edit-profile';
-
-export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  {
-    path: 'dashboard', component: Dashboard,
-    children: [
-      { path: 'employee-login', component: EmployeeLogin },
-      { path: 'candidate-login', component: CandidateLogin },
-      { path: 'candidate-registration', component: CandidateRegistration },
-    ]
-  },
-
-    { path: 'candidateDashboard', redirectTo: 'candidateDashboard/overview', pathMatch: 'full' },
-
-  {
-    path: 'candidateDashboard',
-    component: CandidateDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: Overview, // Your default dashboard
-      },
-      {
-        path: 'my-applications',
-        component: CandidateMyapplications,
-      },
-      {
-        path: 'find-jobs',
-        component: FindJobs,
-      },
-      {
-        path: 'interviews',
-        component: Interviews,
-      },
-      {
-        path: 'edit-profile',
-        component: CandidateEditProfile,
-      },
-      {
-        path: 'settings',
-        component: Settings,
-      },
-    ],
-  },
-
-
-  { path: 'tl-dashboard', redirectTo: 'tl-dashboard/overview', pathMatch: 'full' },
-
-
-  {
-    path: 'tl-dashboard',
-    component: TeamleadDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: TlOverview, // Your default dashboard
-      },
-      {
-        path: 'my-projects',
-        component: MyProject,
-      },
-      {
-        path: 'job-requests',
-        component: JobRequest,
-      },
-      {
-        path: 'team-members',
-        component: TeamMembers,
-      },
-      {
-        path: 'pending-interviews',
-        component: PendingInterviews,
-      },
-      {
-        path: 'settings',
-        component: TlSettings,
-      },
-    ],
-  },
-
-
-
-  { path: 'pm-dashboard', redirectTo: 'pm-dashboard/overview', pathMatch: 'full' },
-
-
-  {
-    path: 'pm-dashboard',
-    component: PmDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: PmOverview, // Your default dashboard
-      },
-      {
-        path: 'assign-project',
-        component: AssignProject,
-      },
-      {
-        path: 'job-requests',
-        component: PmJobRequests,
-      },
-      {
-        path: 'bench-employees',
-        component: BenchEmployees,
-      },
-      {
-        path: 'team-members',
-        component: PmTeamMembers,
-      },
-      {
-        path: 'pending-interviews',
-        component: PmPendingInterviews,
-      },
-      {
-        path: 'settings',
-        component: PmSettings,
-      },
-    ],
-  },
-
-  { path: 'hr-dashboard', component: HrDashboard },
-
-  { path: 'hr-dashboard', redirectTo: 'hr-dashboard/overview', pathMatch: 'full' },
-
-
-  {
-    path: 'hr-dashboard',
-    component: HrDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: HrOverview, 
-      },
-      {
-        path: 'job-requests',
-        component: HrJobRequests,
-      },
-      {
-        path: 'applied-candidates',
-        component: AppliedCandidates,
-      },
-      {
-        path: 'shortlisted-candidates',
-        component: ShortlistedCandidates,
-      },
-      {
-        path: 'interviews',
-        component: HrInterviews,
-      },
-      {
-        path: 'settings',
-        component: HrSettings,
-      },
-    ],
-  },
-
-  { path: '**', redirectTo: 'candidate-login' }
-
-];
-
-
