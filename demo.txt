@@ -566,12 +566,380 @@ export class JobRequest {
 
 }
 
-tl-service.ts : 
+--------------------------------JobRequest.html----------------------------
+<div class="applications-container">
+        <!-- Header Section -->
+        <section class="applications-header">
+            <div class="header-content">
+                <h1 class="page-title">Job Requests</h1>
+                <p class="page-subtitle">Create and manage resource requests for your projects</p>
+                <div class="applications-stats">
+                    <div class="stat-item stats-total">
+                        <div class="stat-number">{{allJobRequestCount}}</div>
+                        <div class="stat-label">Total Job Requests</div>
+                    </div>
+                    <div class="stat-item stats-approved">
+                        <div class="stat-number">{{approvedJobRequestsCount}}</div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                    <div class="stat-item stats-declined">
+                        <div class="stat-number">{{declinedJobRequestsCount}}</div>
+                        <div class="stat-label">Declined</div>
+                    </div>
+                    <div class="stat-item stats-pending">
+                        <div class="stat-number">{{pendingJobRequest}}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+            </div>
+        </section> -->
 
-  createJobRequest(jobRequest: CreateJobRequestDTO): Observable<string> {
-    return this.httpClient.post<string>(
-      this.baseurl+"/team-leader/create-job-requests",
-      jobRequest,
-      { withCredentials: true }
-    );
-  }
+        <!-- Create Job Request Button -->
+        <section class="page-header">
+            <br>
+            <button class="btn-primary" (click)="openModal()">
+                <i class="fas fa-plus"></i> Create New Request
+            </button>
+        </section>
+
+        <!-- Job Requests Grid -->
+        <section class="cards-grid">
+            <!-- Example Job Request Card -->
+            <div class="card">
+                 <div class="card-header"> 
+                    <div>
+                        <div class="card-title">React Developer Required</div>
+                        <div class="card-subtitle">JR001 • E-commerce Platform</div>
+                    </div>
+                    <span class="status-badge status-approved">Approved</span>
+                </div>
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">Project:</span>
+                        <span class="info-value">E-commerce Platform</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Required Skills:</span>
+                        <span class="info-value">React, Node.js, MongoDB</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Experience:</span>
+                        <span class="info-value">3+ years</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Quantity:</span>
+                        <span class="info-value">2 Developers</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">Posted on Job Portal</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Applications:</span>
+                        <span class="info-value">15 candidates applied</span>
+                    </div>
+                </div> 
+                <div class="card-actions">
+                    <button class="btn-sm btn-primary">
+                        <i class="fas fa-users"></i> View Candidates
+                    </button>
+                    <button class="btn-sm btn-edit" onclick="editJobRequest('JR001')">
+                        <i class="fas fa-edit"></i> Edit Request
+                    </button>
+                </div> -->
+             </div> -->
+             <br> 
+             <div class="card"> 
+                 <div class="card-header"> 
+                     <div>
+                         <div class="card-title">UI/UX Designer</div>
+                        <div class="card-subtitle">JR002 • E-commerce Platform</div>
+                    </div> 
+                     <span class="status-badge status-pending">Pending Approval</span>
+                </div>
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">Project:</span>
+                        <span class="info-value">E-commerce Platform</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Required Skills:</span> -->
+                         <span class="info-value">Figma, Adobe XD, Prototyping</span> 
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Experience:</span>
+                        <span class="info-value">2+ years</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Quantity:</span>
+                        <span class="info-value">1 Designer</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Submitted:</span>
+                        <span class="info-value">Oct 20, 2024</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Urgency:</span>
+                        <span class="info-value">Medium</span>
+                    </div> 
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-warning btn-sm">
+                        <i class="fas fa-clock"></i> Waiting for PM Approval
+                    </button>
+                    <button class="btn btn-edit" onclick="editJobRequest('JR002')">
+                        <i class="fas fa-edit"></i> Edit Request
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div> -->
+
+
+
+
+    <div *ngIf="!isLoading && assignedProject" class="assigned-state">
+    <div class="card">
+      <div class="card-header">
+        <h2>Assigned Project</h2>
+        <span class="status-badge" [ngClass]="getStatusBadgeClass(assignedProject.status)">
+          {{ formatStatus(assignedProject.status) }}
+        </span>
+      </div>
+
+      <div class="card-content">
+                <div class="info-row">
+          <div class="info-group">
+          <label>Project ID</label>
+          <p>#{{ assignedProject.projectId }}</p>
+        </div> -->
+        <div class="info-group">
+          <label>Project Name</label>
+          <p>{{ assignedProject.name }}</p>
+        </div>
+        </div>
+         <div class="info-row">
+          <div class="info-group">
+            <label>Lead ID</label>
+            <p>{{ assignedProject.teamLeadId }}</p>
+          </div> 
+
+           <div class="info-group">
+            <label>Team Lead</label>
+            <p>{{ assignedProject.teamLeadName }}</p>
+          </div>  
+        </div>
+
+        <div class="info-group">
+          <label>Budget Range</label>
+          <p class="budget">₹{{ assignedProject.budgetBandMin }}L - ₹{{ assignedProject.budgetBandMax }}L</p>
+        </div> -->
+
+        <div class="info-row">
+          <div class="info-group">
+            <label>Start Date</label>
+            <p>{{assignedProject.startDate }}</p>
+          </div>
+          <div class="info-group">
+            <label>End Date</label>
+            <p>{{ assignedProject.endDate }}</p>
+          </div>
+        </div>
+      </div>
+
+       <div class="card-footer">
+        <p class="note">You have already assigned a project. Only one project can be assigned at a time.</p>
+      </div>
+    </div>
+  </div> 
+
+  <!-- Modal for Assign Project Form -->
+   <div class="modal" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+      
+      <h2>Raise Job Request</h2>
+      <p class="subtitle">Fill in the details to create job request to </p> -->
+
+       <form #assignForm="ngForm" (ngSubmit)="onSubmit($event)"> -->
+         <div class="form-group">
+          <label>Job Request Title <span class="required">*</span></label>
+          <input
+            type="text"
+            name="name"
+            [(ngModel)]="jobRequestDTO.title"
+            placeholder="Enter Job Request Title"
+            required
+            #jobRequestTitle="ngModel"
+          />
+          <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
+            Job Request Title is required
+          </span>
+        </div> 
+
+
+         <div class="form-group">
+          <label>Job Request Description <span class="required">*</span></label>
+          <input
+            type="text"
+            name="name"
+            [(ngModel)]="jobRequestDTO.description"
+            placeholder="Enter Job Request Description"
+            required
+            #jobRequestDescription="ngModel"
+          />
+          <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
+            Job Request Description is required
+          </span>
+        </div> -->
+
+        <div class="form-group">
+          <label>Priority <span class="required">*</span></label>
+          <select 
+            name="status" 
+            [(ngModel)]="jobRequestDTO.priority" 
+            required
+          >
+            <option value="PENDING">HIGH</option>
+            <option value="ONHOLD">MEDIUM</option>
+            <option value="CLOSED">LOW</option>
+          </select>
+        </div>
+
+
+
+        <div class="form-group">
+          <label>JobType <span class="required">*</span></label>
+          <select 
+            name="status" 
+            [(ngModel)]="jobRequestDTO.jobType" 
+            required
+          >
+            <option value="PENDING">Full Time</option>
+            <option value="ONHOLD">Part Time</option>
+            <option value="CLOSED">Freelance</option>
+          </select>
+        </div>
+
+
+         <div class="form-row">
+          <div class="form-group">
+            <label>Min Ctc (₹ Lakhs) <span class="required">*</span></label>
+            <input
+              type="number"
+              name="minCtc"
+              [(ngModel)]="jobRequestDTO.minCtc"
+              placeholder="20"
+              min="4"
+              max="100"
+              step="0.01"
+              required
+              #minCtc="ngModel"
+            />
+            <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
+              Should Be Greator than Zero
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label>Max Ctc<span class="required">*</span></label>
+            <input
+              type="number"
+              name="budgetBandMax"
+              [(ngModel)]="projectRequest.budgetBandMax"
+              placeholder="100"
+              min="20"
+              max="100"
+              step="0.01"
+              required
+              #budgetMax="ngModel"
+            />
+            <span class="error" *ngIf="budgetMax.invalid && budgetMax.touched">
+              Between 20-100 Lakhs
+            </span>
+          </div>
+        </div> 
+
+        <div class="form-row">
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn-submit"
+            [disabled]="assignForm.invalid 
+          >
+          Submit
+          </button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">
+            Cancel
+          </button>
+        </div> 
+      </form> 
+    </div>
+    </div>
+-----------------------------------------------job-request-form-------------------------
+HTML:
+<div id="assign-project-form" class="form-container">
+    <div class="form-header">
+        <h2>Assign Project</h2>
+        <p>Fill in the details to assign the project</p>
+    </div>
+    <form id="assignProjectForm">
+        <div class="form-group">
+            <label for="projectName">Project Name</label>
+            <input type="text" id="projectName" name="projectName" placeholder="Enter Project Name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="projectStatus">Project Status</label>
+            <select id="projectStatus" name="projectStatus" required>
+                <option value="READY_FOR_ASSIGNMENT">Ready for Assignment</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="budgetMin">Budget Min (in Lakhs)</label>
+            <input type="number" id="budgetMin" name="budgetMin" placeholder="Enter Budget Min" min="20" max="100" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="budgetMax">Budget Max (in Lakhs)</label>
+            <input type="number" id="budgetMax" name="budgetMax" placeholder="Enter Budget Max" min="20" max="100" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="startDate">Project Start Date</label>
+            <input type="date" id="startDate" name="startDate" required>
+        </div>
+
+        <div class="form-group">
+            <label for="endDate">Project End Date</label>
+            <input type="date" id="endDate" name="endDate" required>
+        </div>
+
+        <div class="form-group">
+            <label for="teamLeadId">Team Lead ID</label>
+            <input type="text" id="teamLeadId" name="teamLeadId" placeholder="Enter Team Lead ID" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-submit">Assign Project</button>
+            <button type="button" class="btn btn-cancel" onclick="resetForm()">Cancel</button>
+        </div>
+    </form>
+</div>
+
+ts:
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-job-request-form',
+  imports: [],
+  templateUrl: './job-request-form.html',
+  styleUrl: './job-request-form.css'
+})
+export class JobRequestForm {
+
+}
+
