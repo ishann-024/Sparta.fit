@@ -239,3 +239,56 @@
         </div>
     </form>
 </div>
+
+
+
+
+<!-- Add this style tag at the top of your job-request-form.html -->
+<style>
+    .btn-submit {
+        background: #007bff !important;
+        color: white !important;
+        padding: 12px 24px !important;
+        border: 2px solid red !important; /* Temporary border to see it */
+        border-radius: 6px !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        margin: 10px !important;
+        display: block !important;
+    }
+    
+    .form-actions {
+        display: flex !important;
+        gap: 15px !important;
+        justify-content: flex-end !important;
+        margin-top: 30px !important;
+        padding: 20px !important;
+        border: 2px solid green !important; /* To see the container */
+    }
+</style>
+
+
+
+
+<!-- Add this debug section right before the form-actions -->
+<div style="background: #f8f9fa; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">
+    <h4>Debug Info:</h4>
+    <p>isSubmitting: {{isSubmitting}}</p>
+    <p>Form Valid: {{jobRequestForm.valid}}</p>
+</div>
+
+<div class="form-actions">
+    <button
+        type="submit"
+        class="btn-submit"
+        [disabled]="isSubmitting"
+        style="background: blue; color: white; padding: 15px; border: 2px solid yellow;" <!-- Force visibility -->
+    >
+        <span *ngIf="isSubmitting">Creating...</span>
+        <span *ngIf="!isSubmitting">CREATE JOB REQUEST - VISIBLE BUTTON</span>
+    </button>
+    <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="isSubmitting">
+        Cancel
+    </button>
+</div>
