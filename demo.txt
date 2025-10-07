@@ -1,39 +1,293 @@
-job-request-form.ts:34 Full Error Details: 
-HttpErrorResponse {headers: _HttpHeaders, status: 200, statusText: 'OK', url: 'http://localhost:8082/api/team-leader/create-job-requests', ok: false, …}
-error
-: 
-{error: SyntaxError: Unexpected token 'J', "Job Reques"... is not valid JSON at JSON.parse (<anonymous>…, text: 'Job Request Created Successfully'}
-headers
-: 
-_HttpHeaders {headers: undefined, normalizedNames: Map(0), lazyUpdate: null, lazyInit: ƒ}
-message
-: 
-"Http failure during parsing for http://localhost:8082/api/team-leader/create-job-requests"
-name
-: 
-"HttpErrorResponse"
-ok
-: 
-false
-redirected
-: 
-undefined
-status
-: 
-200
-statusText
-: 
-"OK"
-type
-: 
-undefined
-url
-: 
-"http://localhost:8082/api/team-leader/create-job-requests"
-[[Prototype]]
-: 
-HttpResponseBase
+Improve the CSS of following : 
+form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-job-request-form.ts:35 Error URL: http://localhost:8082/api/team-leader/create-job-requests
-job-request-form.ts:36 Error Status: 200
-﻿
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.required {
+    color: #dc3545;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-submit {
+    background: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-submit:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+This is the HTML :
+<div class="form-container">
+    <div class="form-header">
+        <h2>Create Job Request</h2>
+        <p>Fill in the details to create a new job request</p>
+    </div>
+   
+    <form (ngSubmit)="onSubmit($event)" #jobRequestForm="ngForm">
+        <div class="form-group">
+            <label>Job Request Title <span class="required">*</span></label>
+            <input
+                type="text"
+                name="title"
+                [(ngModel)]="jobRequestDTO.title"
+                placeholder="Enter Job Request Title"
+                required
+                #jobRequestTitle="ngModel"
+            />
+            <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
+                Job Request Title is required
+            </span>
+        </div>
+
+        <div class="form-group">
+            <label>Job Request Description <span class="required">*</span></label>
+            <textarea
+                name="description"
+                [(ngModel)]="jobRequestDTO.description"
+                placeholder="Enter Job Request Description"
+                required
+                rows="4"
+                #jobRequestDescription="ngModel"
+            ></textarea>
+            <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
+                Job Request Description is required
+            </span>
+        </div>
+
+        <div class="form-group">
+            <label>Required Skills <span class="required">*</span></label>
+            <input
+                type="text"
+                name="skills"
+                [(ngModel)]="jobRequestDTO.skills"
+                placeholder="e.g., Java, Spring Boot, SQL"
+                required
+                #skills="ngModel"
+            />
+            <span class="error" *ngIf="skills.invalid && skills.touched">
+                Skills are required
+            </span>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Head Count <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="headCount"
+                    [(ngModel)]="jobRequestDTO.headCount"
+                    placeholder="1"
+                    min="1"
+                    max="50"
+                    required
+                    #headCount="ngModel"
+                />
+                <span class="error" *ngIf="headCount.invalid && headCount.touched">
+                    Head count is required
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Job Type <span class="required">*</span></label>
+                <select
+                    name="jobType"
+                    [(ngModel)]="jobRequestDTO.jobType"
+                    required
+                >
+                    <option value="FULLTIME">Full Time</option>
+                    <option value="PART_TIME">Part Time</option>
+                    <option value="CONTRACT">Contract</option>
+                    <option value="INTERNSHIP">Internship</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Priority <span class="required">*</span></label>
+            <select
+                name="priority"
+                [(ngModel)]="jobRequestDTO.priority"
+                required
+            >
+                <option value="HIGH">HIGH</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="LOW">LOW</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Min Experience (years) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="minExperience"
+                    [(ngModel)]="jobRequestDTO.minExperience"
+                    placeholder="0"
+                    min="0"
+                    max="20"
+                    required
+                    #minExperience="ngModel"
+                />
+                <span class="error" *ngIf="minExperience.invalid && minExperience.touched">
+                    Minimum experience is required
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Max Experience (years) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="maxExperience"
+                    [(ngModel)]="jobRequestDTO.maxExperience"
+                    placeholder="5"
+                    min="0"
+                    max="30"
+                    required
+                    #maxExperience="ngModel"
+                />
+                <span class="error" *ngIf="maxExperience.invalid && maxExperience.touched">
+                    Maximum experience is required
+                </span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Min CTC (₹ Lakhs) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="minCtc"
+                    [(ngModel)]="jobRequestDTO.minCtc"
+                    placeholder="4"
+                    min="0"
+                    max="50"
+                    step="0.01"
+                    required
+                    #minCtc="ngModel"
+                />
+                <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
+                    Minimum CTC is required
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Max CTC (₹ Lakhs) <span class="required">*</span></label>
+                <input
+                    type="number"
+                    name="maxCtc"
+                    [(ngModel)]="jobRequestDTO.maxCtc"
+                    placeholder="20"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    required
+                    #maxCtc="ngModel"
+                />
+                <span class="error" *ngIf="maxCtc.invalid && maxCtc.touched">
+                    Maximum CTC is required
+                </span>
+            </div>
+        </div>
+
+        <!-- Debug Section -->
+        <div style="background: #f8f9fa; padding: 10px; margin: 20px 0; border: 1px solid #ccc; border-radius: 4px;">
+            <h4 style="margin: 0 0 10px 0; color: #333;">Debug Info:</h4>
+            <p style="margin: 5px 0;">isSubmitting: {{isSubmitting}}</p>
+            <p style="margin: 5px 0;">Form Valid: {{jobRequestForm.valid}}</p>
+        </div>
+
+        <!-- Form Actions with Visible Buttons -->
+        <div class="form-actions" style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px; padding: 20px; border: 2px solid green; background: #f9f9f9;">
+            <button
+                type="submit"
+                class="btn-submit"
+                [disabled]="isSubmitting"
+                style="background: #007bff; color: white; padding: 12px 24px; border: 2px solid red; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; min-width: 200px;"
+            >
+                <span *ngIf="isSubmitting">Creating...</span>
+                <span *ngIf="!isSubmitting">CREATE JOB REQUEST</span>
+            </button>
+            <button
+                type="button"
+                class="btn-cancel"
+                (click)="cancel()"
+                [disabled]="isSubmitting"
+                style="background: #6c757d; color: white; padding: 12px 24px; border: 2px solid #5a6268; border-radius: 6px; font-size: 16px; cursor: pointer; min-width: 100px;"
+            >
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
