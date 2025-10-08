@@ -1,80 +1,32 @@
-<div class="login-page">
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
-    
-    <div class="form-container">
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Sign in to your candidate account</p>
+I have this controller in my springBoot which works in backend i.e it successfully saves data in database 
+@PatchMapping("/update-interview/details/{applicationId}")
+public ResponseEntity<String>updateInterviewDetails(@RequestBody SaveInterviewDTO saveInterviewDTO,@PathVariable ("applicationId") int  applicationId){
+    return ResponseEntity.ok(hrService.updateInterviewDetails(saveInterviewDTO,applicationId));
 
-        <div class="img-container">
-            <div class="avatar">👤</div>
-        </div>
+}
+I also tested it in postman data is getting updated in DB 
+But when i test this API in DB i am gettting successful message i.e API hit successfully but Data is  not getting saved in DB so where does the issue lie I am giving you Angular service and Component check why this happens 
+
+Service : 
+saveMeetingLinkAndNotify(saveInterviewDTO:SaveInterviewDTO,applicationId:number):Observable<string>{
+        return this.httpClient.patch(this.baseurl+"update-interview/details/"+applicationId,{InterviewRequest},{responseType:'text'});
+  }
+
+Component : 
+this.hrService.saveMeetingLinkAndNotify(this.saveInterviewDTO,this.applicationId).subscribe({
+      next: (response) => {
+
+        console.log('Notification sent successfully:', response);
+        console.log(this.saveInterviewDTO);
+        console.log(response);
         
-        <div *ngIf="errorMessage" class="error-message">
-            {{ errorMessage }}
-        </div>
-
-        <form #loginForm="ngForm" (ngSubmit)="loginCandidates(loginForm)">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="email"
-                        placeholder="Enter your email address" 
-                        name="email" 
-                        [(ngModel)]="loginDto.email" 
-                        required
-                        #emailModel="ngModel">
-                    <div class="input-icon">👤</div>
-                </div>
-            </div>
-            
-            @if (checkIfError("email")) {
-            <p style="color: red; margin-top: -20px; margin-bottom: 10px;">{{ getValidationErrorMessage('email') }}</p>
-            }
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-wrapper">
-                    <input 
-                        type="password" 
-                        id="password"
-                        placeholder="Enter your password" 
-                        name="password" 
-                        [(ngModel)]="loginDto.password" 
-                        required
-                        #passwordModel="ngModel">
-                    <div class="input-icon">🔒</div>
-                </div>
-            </div>
-            
-            @if (checkIfError("password")) {
-            <p style="color: red; margin-top: -20px; margin-bottom: 10px;">{{ getValidationErrorMessage('password') }}</p>
-            }
-
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember" />
-                    <span>Remember me</span>
-                </label>
-                <a href="#" class="forgot-password">Forgot password?</a>
-            </div>
-
-            <button type="submit" class="login-button" id="loginBtn">Sign In</button>
-        </form>
-
-        <div class="create-account">
-            <p>Don't have an account? <a routerLink="/dashboard/candidate-registration">Create Account</a></p>
-        </div>
-    </div>
-</div>
+        alert('Meeting link saved and candidate notified successfully!');
+        this.closeScheduleModal();
+        this.getAllShortlistedCandidates(this.loginHrId);
+      },
+      error: (err) => {
+        console.error('Error sending notification:', err);
+        alert('Failed to send notification. Please try again.');
+      }
+    });
+  }
