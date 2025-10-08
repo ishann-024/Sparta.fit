@@ -1,62 +1,244 @@
-package com.finalproject.main.domain;
-
-import java.time.LocalDateTime;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Employee {
-	private String employeeId;
-	private String email;
-	private String passwordHash;
-	private String fullName;
-	private String gender;
-	private String roleKey;
-	private Double ctc;
-	private boolean isActive;
-	private Integer projectId;
-	private String skills;
-	private Double experience;
-	private String profileRole;
-	private String otp;
-    private LocalDateTime otpGeneratedAt;
-	//private LocalDate createdAt;
-	//private LocalDate updatedAt;
-	private String createdAt;
-	private String updatedAt;
-}
-
-package com.finalproject.main.domain;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Candidate {
-	private Integer candidateId;
+public class ForgotPasswordRequest {
+    
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please provide a valid email address")
     private String email;
-    private String passwordHash;
-    private String fullName;
-    private String gender;
-    private Double expectedCtc;
-    private String resumePath;
-    private Double totalExperience;
-    private Integer noticePeriod;
-    private String currentCompany;
-    private String skills;
-    private String status;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
-	private String otp;
-    private LocalDateTime otpGeneratedAt;
+    
+    // constructors, getters, setters
+    public ForgotPasswordRequest() {}
+    public ForgotPasswordRequest(String email) { this.email = email; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }
+
+public class EmployeeDetailsRowMapper implements RowMapper<Employee>{
+	 @Override
+	    public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
+	        Employee employee = new Employee();
+	       
+	        employee.setEmployeeId(rs.getString("employee_id"));
+	        employee.setEmail(rs.getString("email"));
+	        employee.setPasswordHash(rs.getString("password_hash"));
+	        employee.setFullName(rs.getString("full_name"));
+	        employee.setGender(rs.getString("gender"));
+	        employee.setRoleKey(rs.getString("role_key"));
+	       
+	        // Handle Double fields with null checks
+	        Double ctc = rs.getDouble("ctc");
+	        employee.setCtc(rs.wasNull() ? null : ctc);
+	       
+	        employee.setActive(rs.getBoolean("is_active"));
+	       
+	        Integer projectId = rs.getInt("project_id");
+	        employee.setProjectId(rs.wasNull() ? null : projectId);
+	       
+	        employee.setSkills(rs.getString("skills"));
+	       
+	        Double experience = rs.getDouble("experience");
+	        employee.setExperience(rs.wasNull() ? null : experience);
+	       
+	        employee.setProfileRole(rs.getString("profile_role"));
+	        employee.setOtp(rs.getString("otp"));
+	       
+	        // Handle Oracle TIMESTAMP for otp_generated_at
+	        Timestamp otpTimestamp = rs.getTimestamp("otp_generated_at");
+	        if (otpTimestamp != null && !rs.wasNull()) {
+	            employee.setOtpGeneratedAt(otpTimestamp.toLocalDateTime());
+	        }
+	       
+	        // Handle String dates for created_at and updated_at
+	        employee.setCreatedAt(rs.getString("created_at"));
+	        employee.setUpdatedAt(rs.getString("updated_at"));
+	       
+	        return employee;
+	    }
+}
+
+public class EmployeeRepositoryImpl implements EmployeeRepository{
+	
+	
+	//@Autowired
+	//private final BCryptPasswordEncoder encoder;
+	
+	private final JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private EmployeeDetailsRowMapper rowMapper;
+	public EmployeeRepositoryImpl(JdbcTemplate jdbcTemplate) {
+		super();
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+
+
+	@Override
+	public Employee findByEmployeeId(String employeeId) {
+		String sql = "SELECT * from employee_details where employee_id = ?";
+		return jdbcTemplate.queryForObject(sql, new EmployeeRowMapper(), employeeId);
+	}
+	
+    public void updatePasswordHash(String employeeId, String newPasswordHash) {
+        String sql = "UPDATE employee_details SET password_hash = ? WHERE employee_id = ?";
+        jdbcTemplate.update(sql, newPasswordHash, employeeId);
+    }
+    
+    
+    public Optional<Employee> findByEmail(String email) {
+        String sql = "SELECT * FROM employee WHERE LOWER(email) = LOWER(?)";
+        try {
+            List<Employee> employees = jdbcTemplate.query(sql, rowMapper, email);
+            return employees.isEmpty() ? Optional.empty() : Optional.of(employees.get(0));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+   
+    public Optional<Employee> findByEmailAndOtp(String email, String otp) {
+        String sql = "SELECT * FROM employee WHERE LOWER(email) = LOWER(?) AND otp = ?";
+        try {
+            List<Employee> employees = jdbcTemplate.query(sql, rowMapper, email, otp);
+            return employees.isEmpty() ? Optional.empty() : Optional.of(employees.get(0));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+   
+    public void updateOtpAndTimestamp(String email, String otp, Timestamp otpGeneratedAt) {
+        String sql = "UPDATE employee SET otp = ?, otp_generated_at = ? WHERE LOWER(email) = LOWER(?)";
+        jdbcTemplate.update(sql, otp, otpGeneratedAt, email);
+    }
+   
+    public void updatePasswordAndClearOtp(String email, String passwordHash) {
+        String sql = "UPDATE employee SET password_hash = ?, otp = NULL, otp_generated_at = NULL WHERE LOWER(email) = LOWER(?)";
+        jdbcTemplate.update(sql, passwordHash, email);
+    }
+   
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM employee WHERE LOWER(email) = LOWER(?)";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return count != null && count > 0;
+    }
+
+}
+
+public class CandidateRowMapper implements RowMapper<Candidate>{
+@Override
+    public Candidate mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Candidate candidate = new Candidate();
+       
+        candidate.setCandidateId(rs.getInt("candidate_id"));
+        candidate.setEmail(rs.getString("email"));
+        candidate.setPasswordHash(rs.getString("password_hash"));
+        candidate.setFullName(rs.getString("full_name"));
+        candidate.setGender(rs.getString("gender"));
+       
+        // Handle Double fields with null checks
+        Double expectedCtc = rs.getDouble("expected_ctc");
+        candidate.setExpectedCtc(rs.wasNull() ? null : expectedCtc);
+       
+        candidate.setResumePath(rs.getString("resume_path"));
+       
+        Double totalExperience = rs.getDouble("total_experience");
+        candidate.setTotalExperience(rs.wasNull() ? null : totalExperience);
+       
+        Integer noticePeriod = rs.getInt("notice_period");
+        candidate.setNoticePeriod(rs.wasNull() ? null : noticePeriod);
+       
+        candidate.setCurrentCompany(rs.getString("current_company"));
+        candidate.setSkills(rs.getString("skills"));
+        candidate.setStatus(rs.getString("status"));
+       
+        // Handle LocalDate fields
+        java.sql.Date createdDate = rs.getDate("created_at");
+        if (createdDate != null && !rs.wasNull()) {
+            candidate.setCreatedAt(createdDate.toLocalDate());
+        }
+       
+        java.sql.Date updatedDate = rs.getDate("updated_at");
+        if (updatedDate != null && !rs.wasNull()) {
+            candidate.setUpdatedAt(updatedDate.toLocalDate());
+        }
+       
+        candidate.setOtp(rs.getString("otp"));
+       
+        // Handle Oracle TIMESTAMP for otp_generated_at
+        Timestamp otpTimestamp = rs.getTimestamp("otp_generated_at");
+        if (otpTimestamp != null && !rs.wasNull()) {
+            candidate.setOtpGeneratedAt(otpTimestamp.toLocalDateTime());
+        }
+       
+        return candidate;
+    }
+}
+
+public class ApiResponse {
+    private boolean success;
+    private String message;
+    private Object data;
+    private String userType;
+    
+    // constructors
+    public ApiResponse() {}
+    public ApiResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
+    public ApiResponse(boolean success, String message, Object data) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+    }
+    public ApiResponse(boolean success, String message, String userType) {
+        this.success = success;
+        this.message = message;
+        this.userType = userType;
+    }
+    
+    // getters and setters
+    public boolean isSuccess() { return success; }
+    public void setSuccess(boolean success) { this.success = success; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    public Object getData() { return data; }
+    public void setData(Object data) { this.data = data; }
+    public String getUserType() { return userType; }
+    public void setUserType(String userType) { this.userType = userType; }
+    
+    // static helper methods
+    public static ApiResponse success(String message) {
+        return new ApiResponse(true, message);
+    }
+    public static ApiResponse success(String message, Object data) {
+        return new ApiResponse(true, message, data);
+    }
+    public static ApiResponse success(String message, String userType) {
+        return new ApiResponse(true, message, userType);
+    }
+    public static ApiResponse error(String message) {
+        return new ApiResponse(false, message);
+    }
+}
+
+public class VerifyOtpRequest {
+	@NotBlank(message = "Email is required")
+    @Email(message = "Please provide a valid email address")
+    private String email;
+    
+    @NotBlank(message = "OTP is required")
+    @Size(min = 6, max = 6, message = "OTP must be 6 digits")
+    private String otp;
+    
+    // constructors, getters, setters
+    public VerifyOtpRequest() {}
+    public VerifyOtpRequest(String email, String otp) { 
+        this.email = email; 
+        this.otp = otp; 
+    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getOtp() { return otp; }
+    public void setOtp(String otp) { this.otp = otp; }
+}
+
+
 
