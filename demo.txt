@@ -1,348 +1,62 @@
-Give professional CSS for following :
-Component : export class JobRequestForm {
-jobRequestDTO: CreateJobRequestDTO = new CreateJobRequestDTO();
-  isSubmitting = false;
-   // Notification properties
-  showNotification = false;
-  isSuccess = false;
-  notificationMessage = '';
-  constructor(private tlService: TlService, private router: Router) {}
+package com.finalproject.main.domain;
 
-  onSubmit(event: Event): void {
-    event.preventDefault();
-    
-    if (this.validateForm()) {
-      this.isSubmitting = true;
-      
-      this.tlService.createJobRequest(this.jobRequestDTO).subscribe({
-        next: (response) => {
-          console.log('✅ SUCCESS:', response);
-          this.showSuccess('Job Request Created Successfully!');
-          this.isSubmitting = false;
-          // Optional: Reset form after success
-          // this.resetForm();
-        },
-        error: (error) => {
-          console.error('❌ ERROR:', error);
-          
-          // Handle 200 status with text response
-          if (error.status === 200 && error.error && error.error.text) {
-            this.showSuccess(error.error.text);
-          } else {
-            this.showError('Failed to create job request. Please try again.');
-          }
-          this.isSubmitting = false;
-        }
-      });
-    }
-  }
+import java.time.LocalDateTime;
 
-  // Notification methods
-  showSuccess(message: string): void {
-    this.isSuccess = true;
-    this.notificationMessage = message;
-    this.showNotification = true;
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-      this.hideNotification();
-      // Navigate after notification disappears
-      setTimeout(() => {
-        this.router.navigate(['/tl-dashboard/job-requests']);
-      }, 500);
-    }, 5000);
-  }
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  showError(message: string): void {
-    this.isSuccess = false;
-    this.notificationMessage = message;
-    this.showNotification = true;
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-      this.hideNotification();
-    }, 5000);
-  }
-
-  hideNotification(): void {
-    this.showNotification = false;
-  }
-
-  cancel(): void {
-    this.router.navigate(['/tl-dashboard/job-requests']);
-  }
-  validateForm(): boolean {
-    if (!this.jobRequestDTO.title || this.jobRequestDTO.title.trim() === '') {
-      alert('Please enter a job title');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.description || this.jobRequestDTO.description.trim() === '') {
-      alert('Please enter a job description');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.skills || this.jobRequestDTO.skills.trim() === '') {
-      alert('Please enter required skills');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.headCount || this.jobRequestDTO.headCount <= 0) {
-      alert('Please enter a valid head count');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.jobType || this.jobRequestDTO.jobType.trim() === '') {
-      alert('Please select a job type');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.priority || this.jobRequestDTO.priority.trim() === '') {
-      alert('Please select a priority level');
-      return false;
-    }
-
-    if (this.jobRequestDTO.minExperience === null || this.jobRequestDTO.minExperience < 0) {
-      alert('Please enter a valid minimum experience');
-      return false;
-    }
-
-    if (this.jobRequestDTO.maxExperience === null || this.jobRequestDTO.maxExperience < this.jobRequestDTO.minExperience) {
-      alert('Maximum experience must be greater than or equal to minimum experience');
-      return false;
-    }
-
-    if (this.jobRequestDTO.minCtc === null || this.jobRequestDTO.minCtc < 0) {
-      alert('Please enter a valid minimum CTC');
-      return false;
-    }
-
-    if (this.jobRequestDTO.maxCtc === null || this.jobRequestDTO.maxCtc < this.jobRequestDTO.minCtc) {
-      alert('Maximum CTC must be greater than or equal to minimum CTC');
-      return false;
-    }
-    return true;
-  }
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Employee {
+	private String employeeId;
+	private String email;
+	private String passwordHash;
+	private String fullName;
+	private String gender;
+	private String roleKey;
+	private Double ctc;
+	private boolean isActive;
+	private Integer projectId;
+	private String skills;
+	private Double experience;
+	private String profileRole;
+	private String otp;
+    private LocalDateTime otpGeneratedAt;
+	//private LocalDate createdAt;
+	//private LocalDate updatedAt;
+	private String createdAt;
+	private String updatedAt;
 }
 
-HTML : 
-<div class="form-container">
-    <div class="form-header">
-        <h2>Create Job Request</h2>
-        <p>Fill in the details to create a new job request</p>
-    </div>
-   
-    <!-- Success/Failure Notification -->
-    <div *ngIf="showNotification" class="notification" [class.success]="isSuccess" [class.error]="!isSuccess" [class.hiding]="!showNotification">
-        <div class="notification-content">
-            <div class="notification-icon">
-                <i *ngIf="isSuccess" class="fas fa-check-circle"></i>
-                <i *ngIf="!isSuccess" class="fas fa-exclamation-circle"></i>
-            </div>
-            <div class="notification-text">
-                <h4>{{ isSuccess ? 'Success!' : 'Error!' }}</h4>
-                <p>{{ notificationMessage }}</p>
-            </div>
-            <button class="notification-close" (click)="hideNotification()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="notification-progress" [class.active]="showNotification"></div>
-    </div>
+package com.finalproject.main.domain;
 
-    <form (ngSubmit)="onSubmit($event)" #jobRequestForm="ngForm">
-        <div class="form-group">
-            <label>Job Request Title <span class="required">*</span></label>
-            <input
-                type="text"
-                name="title"
-                [(ngModel)]="jobRequestDTO.title"
-                placeholder="Enter Job Request Title"
-                required
-                #jobRequestTitle="ngModel"
-            />
-            <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
-                Job Request Title is required
-            </span>
-        </div>
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-        <div class="form-group">
-            <label>Job Request Description <span class="required">*</span></label>
-            <textarea
-                name="description"
-                [(ngModel)]="jobRequestDTO.description"
-                placeholder="Enter Job Request Description"
-                required
-                rows="4"
-                #jobRequestDescription="ngModel"
-            ></textarea>
-            <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
-                Job Request Description is required
-            </span>
-        </div>
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Candidate {
+	private Integer candidateId;
+    private String email;
+    private String passwordHash;
+    private String fullName;
+    private String gender;
+    private Double expectedCtc;
+    private String resumePath;
+    private Double totalExperience;
+    private Integer noticePeriod;
+    private String currentCompany;
+    private String skills;
+    private String status;
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+	private String otp;
+    private LocalDateTime otpGeneratedAt;
+}
 
-        <div class="form-group">
-            <label>Required Skills <span class="required">*</span></label>
-            <input
-                type="text"
-                name="skills"
-                [(ngModel)]="jobRequestDTO.skills"
-                placeholder="e.g., Java, Spring Boot, SQL"
-                required
-                #skills="ngModel"
-            />
-            <span class="error" *ngIf="skills.invalid && skills.touched">
-                Skills are required
-            </span>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label>Head Count <span class="required">*</span></label>
-                <input
-                    type="number"
-                    name="headCount"
-                    [(ngModel)]="jobRequestDTO.headCount"
-                    placeholder="1"
-                    min="1"
-                    max="50"
-                    required
-                    #headCount="ngModel"
-                />
-                <span class="error" *ngIf="headCount.invalid && headCount.touched">
-                    Head count is required
-                </span>
-            </div>
-
-            <div class="form-group">
-                <label>Job Type <span class="required">*</span></label>
-                <select
-                    name="jobType"
-                    [(ngModel)]="jobRequestDTO.jobType"
-                    required
-                >
-                    <option value="">Select Job Type</option>
-                    <option value="FULLTIME">Full Time</option>
-                    <option value="PART_TIME">Part Time</option>
-                    <option value="CONTRACT">Contract</option>
-                    <option value="INTERNSHIP">Internship</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>Priority <span class="required">*</span></label>
-            <select
-                name="priority"
-                [(ngModel)]="jobRequestDTO.priority"
-                required
-            >
-                <option value="">Select Priority</option>
-                <option value="HIGH">HIGH</option>
-                <option value="MEDIUM">MEDIUM</option>
-                <option value="LOW">LOW</option>
-            </select>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label>Min Experience (years) <span class="required">*</span></label>
-                <input
-                    type="number"
-                    name="minExperience"
-                    [(ngModel)]="jobRequestDTO.minExperience"
-                    placeholder="0"
-                    min="0"
-                    max="20"
-                    required
-                    #minExperience="ngModel"
-                />
-                <span class="error" *ngIf="minExperience.invalid && minExperience.touched">
-                    Minimum experience is required
-                </span>
-            </div>
-
-            <div class="form-group">
-                <label>Max Experience (years) <span class="required">*</span></label>
-                <input
-                    type="number"
-                    name="maxExperience"
-                    [(ngModel)]="jobRequestDTO.maxExperience"
-                    placeholder="5"
-                    min="0"
-                    max="30"
-                    required
-                    #maxExperience="ngModel"
-                />
-                <span class="error" *ngIf="maxExperience.invalid && maxExperience.touched">
-                    Maximum experience is required
-                </span>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label>Min CTC (₹ Lakhs) <span class="required">*</span></label>
-                <input
-                    type="number"
-                    name="minCtc"
-                    [(ngModel)]="jobRequestDTO.minCtc"
-                    placeholder="4"
-                    min="0"
-                    max="50"
-                    step="0.01"
-                    required
-                    #minCtc="ngModel"
-                />
-                <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
-                    Minimum CTC is required
-                </span>
-            </div>
-
-            <div class="form-group">
-                <label>Max CTC (₹ Lakhs) <span class="required">*</span></label>
-                <input
-                    type="number"
-                    name="maxCtc"
-                    [(ngModel)]="jobRequestDTO.maxCtc"
-                    placeholder="20"
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    required
-                    #maxCtc="ngModel"
-                />
-                <span class="error" *ngIf="maxCtc.invalid && maxCtc.touched">
-                    Maximum CTC is required
-                </span>
-            </div>
-        </div>
-
-        <!-- Debug Section -->
-        <div class="debug-section">
-            <h4>Debug Info:</h4>
-            <p>isSubmitting: {{isSubmitting}}</p>
-            <p>Form Valid: {{jobRequestForm.valid}}</p>
-        </div>
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-            <button
-                type="submit"
-                class="btn-submit"
-                [disabled]="isSubmitting"
-            >
-                <span *ngIf="isSubmitting">Creating...</span>
-                <span *ngIf="!isSubmitting">Create Job Request</span>
-            </button>
-            <button
-                type="button"
-                class="btn-cancel"
-                (click)="cancel()"
-                [disabled]="isSubmitting"
-            >
-                Cancel
-            </button>
-        </div>
-    </form>
-</div>
