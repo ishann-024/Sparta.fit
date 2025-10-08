@@ -1,4 +1,4 @@
-ts:
+GIve updated ts : 
 export class CandidateLogin {
   
   loginDto: CandidateLoginRequestDto = new CandidateLoginRequestDto();
