@@ -1,66 +1,80 @@
-GIve updated ts : 
-export class CandidateLogin {
-  
-  loginDto: CandidateLoginRequestDto = new CandidateLoginRequestDto();
-  candidateResponseDto: CandidateLoginResponseDto = new CandidateLoginResponseDto();
-  isLoading: boolean = false;
-  errorMessage: string = '';
-  validationErrors: {[key:string]:string}={};
-
-  constructor(
-    private candidateLoginService: CandidateLoginService, 
-    private router: Router
-  ) {}
-
-  checkIfError(fieldName:string){
-    return fieldName in this.validationErrors;
-  }
-  getValidationErrorMessage(fieldName:string){
-    return this.validationErrors[fieldName];
-
-  }
-
-
-  loginCandidates(loginForm: NgForm) {
-    if (loginForm.invalid) {
-      this.errorMessage = 'Please fill out all required fields.';
-      return;
-    }
+<div class="login-page">
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
     
-    this.isLoading = true;
-    this.errorMessage = ''; // Clear previous API error
+    <div class="form-container">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to your candidate account</p>
 
-    this.candidateLoginService.candidatelogin(this.loginDto).subscribe({
-      next: (data) => {
-        console.log(data);
-        this.candidateResponseDto = data;
-        sessionStorage.setItem("candidateId", this.candidateResponseDto.userId);
-        this.router.navigate(['candidateDashboard']);
-      },
-      error: (err) => {
-        console.error("Exception Occurred While Calling API", err);
-        this.isLoading = false;
-        // Display a user-friendly error message from the API
-        this.errorMessage = err.error?.message || 'Login failed. Please check your credentials.';
-         console.log(err.error);
-        this.validationErrors=err.error;
-      },
-      complete: () => {
-        console.log("Data completed Successfully");
-        this.isLoading = false;
-      }
-    });
-  }
+        <div class="img-container">
+            <div class="avatar">👤</div>
+        </div>
+        
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
 
-  onLoginClick(form: NgForm, emailModel: any, passwordModel: any) {
-  if (form.invalid) {
-    // Trigger all validation messages
-    emailModel.control.markAsTouched();
-    passwordModel.control.markAsTouched();
-    return;
-  }
+        <form #loginForm="ngForm" (ngSubmit)="loginCandidates(loginForm)">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="email"
+                        placeholder="Enter your email address" 
+                        name="email" 
+                        [(ngModel)]="loginDto.email" 
+                        required
+                        #emailModel="ngModel">
+                    <div class="input-icon">👤</div>
+                </div>
+            </div>
+            
+            @if (checkIfError("email")) {
+            <p style="color: red; margin-top: -20px; margin-bottom: 10px;">{{ getValidationErrorMessage('email') }}</p>
+            }
 
-  // Call the original login method
-  this.loginCandidates(form);
-}
-}
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password"
+                        placeholder="Enter your password" 
+                        name="password" 
+                        [(ngModel)]="loginDto.password" 
+                        required
+                        #passwordModel="ngModel">
+                    <div class="input-icon">🔒</div>
+                </div>
+            </div>
+            
+            @if (checkIfError("password")) {
+            <p style="color: red; margin-top: -20px; margin-bottom: 10px;">{{ getValidationErrorMessage('password') }}</p>
+            }
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember" />
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-password">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="login-button" id="loginBtn">Sign In</button>
+        </form>
+
+        <div class="create-account">
+            <p>Don't have an account? <a routerLink="/dashboard/candidate-registration">Create Account</a></p>
+        </div>
+    </div>
+</div>
