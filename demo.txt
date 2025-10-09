@@ -1,2 +1,6 @@
-Now finaaly check if this routing is correct 
-<a routerLink="/dashboard/forgot-password" class="forgot-password">Forgot password?</a>
+Solve this 
+X [ERROR] NG2008: Could not find template file './forgot-password-dialog.component.html'. [plugin angular-compiler]
+
+    src/app/forgot-password-dialog-component/forgot-password-dialog-component.ts:21:15:
+      21 │   templateUrl: './forgot-password-dialog.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
