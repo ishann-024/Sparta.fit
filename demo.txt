@@ -1,32 +1,12 @@
-I have this controller in my springBoot which works in backend i.e it successfully saves data in database 
-@PatchMapping("/update-interview/details/{applicationId}")
-public ResponseEntity<String>updateInterviewDetails(@RequestBody SaveInterviewDTO saveInterviewDTO,@PathVariable ("applicationId") int  applicationId){
-    return ResponseEntity.ok(hrService.updateInterviewDetails(saveInterviewDTO,applicationId));
+private ResponseCookie createLogoutCookie() {
+		return ResponseCookie.from("jwt-token", "").httpOnly(true).secure(cookieSecure).path("/").maxAge(0)
+				.sameSite("Lax").build();
+	}
 
-}
-I also tested it in postman data is getting updated in DB 
-But when i test this API in DB i am gettting successful message i.e API hit successfully but Data is  not getting saved in DB so where does the issue lie I am giving you Angular service and Component check why this happens 
 
-Service : 
-saveMeetingLinkAndNotify(saveInterviewDTO:SaveInterviewDTO,applicationId:number):Observable<string>{
-        return this.httpClient.patch(this.baseurl+"update-interview/details/"+applicationId,{InterviewRequest},{responseType:'text'});
-  }
+@PostMapping("/logout")
+	public ResponseEntity<?> logout() {
+		ResponseCookie logoutCookie = createLogoutCookie();
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, logoutCookie.toString()).body("Logout successful");
+	}
 
-Component : 
-this.hrService.saveMeetingLinkAndNotify(this.saveInterviewDTO,this.applicationId).subscribe({
-      next: (response) => {
-
-        console.log('Notification sent successfully:', response);
-        console.log(this.saveInterviewDTO);
-        console.log(response);
-        
-        alert('Meeting link saved and candidate notified successfully!');
-        this.closeScheduleModal();
-        this.getAllShortlistedCandidates(this.loginHrId);
-      },
-      error: (err) => {
-        console.error('Error sending notification:', err);
-        alert('Failed to send notification. Please try again.');
-      }
-    });
-  }
