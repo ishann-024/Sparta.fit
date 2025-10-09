@@ -372,3 +372,25 @@ export class JobRequestForm {
 
 
 I am getting 403 forbidden in PostMan but in console i am gettting : jakarta.validation.UnexpectedTypeException: HV000030: No validator could be found for constraint 'jakarta.validation.constraints.NotBlank' validating type 'java.lang.Integer'. Check configuration for 'headCount'
+
+
+
+
+
+HttpErrorResponse {headers: _HttpHeaders, status: 400, statusText: 'OK', url: 'http://localhost:8082/api/team-leader/create-job-requests', ok: false, …}
+error
+: 
+"{\"skills\":\"Skills is Required!\",\"headCount\":\"Headcount must be at least 1\",\"description\":\"Description is Required!\",\"title\":\"Title is Required!\",\"priority\":\"Priority is Required!\",\"jobType\":\"JobType is Required!\"}"
+"http://localhost:8082/api/team-leader/create-job-requests"
+
+Cannot use 'in' operator to search for 'title' in {"skills":"Skills is Required!","headCount":"Headcount must be at least 1","description":"Description is Required!","title":"Title is Required!","priority":"Priority is Required!","jobType":"JobType is Required!"}
+    at _JobRequestForm.checkIfError (job-request-form.ts:256:12)
+    at JobRequestForm_Template (job-request-form.html:23:7)
+    at executeTemplate (chunk-6J54M6DO.js?v=4fc44d6e:7700:5)
+    at refreshView (chunk-6J54M6DO.js?v=4fc44d6e:8386:7)
+    at detectChangesInView (chunk-6J54M6DO.js?v=4fc44d6e:8568:5)
+    at detectChangesInViewIfAttached (chunk-6J54M6DO.js?v=4fc44d6e:8551:3)
+    at detectChangesInComponent (chunk-6J54M6DO.js?v=4fc44d6e:8544:3)
+    at detectChangesInChildComponents (chunk-6J54M6DO.js?v=4fc44d6e:8599:5)
+    at refreshView (chunk-6J54M6DO.js?v=4fc44d6e:8446:7)
+    at detectChangesInView (chunk-6J54M6DO.js?v=4fc44d6e:8568:5
