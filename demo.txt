@@ -1,14 +1,1 @@
-I am getting redirected http://localhost:4200/dashboard/employee-login link and its sowing white blank page
-
-
-
-
-X [ERROR] NG2008: Could not find template file './forgot-password-dialog.component.html'. [plugin angular-compiler]
-
-    src/app/forgot-password-dialog-component/forgot-password-dialog-component.ts:21:15:
-      21 │   templateUrl: './forgot-password-dialog.component.html',
-@Component({
-  selector: 'app-forgot-password-dialog-component',
-  templateUrl: './forgot-password-dialog.component.html',
-  styleUrls: ['./forgot-password-dialog.component.css']
-})
+On clicking forgot password in html I am getting redirected to http://localhost:4200/dashboard/forgot-password and its sowing white blank page
