@@ -1,164 +1,278 @@
-I have made a component for forgot-password-dialog-component just inside src/app as follows help me create its route in app-routes:
-App-routes.ts : 
-export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  {
-    path: 'dashboard', component: Dashboard,
-    children: [
-      { path: 'employee-login', component: EmployeeLogin },
-      { path: 'candidate-login', component: CandidateLogin },
-      { path: 'candidate-registration', component: CandidateRegistration },
-    ]
-  },
+This is my forgot password 
+Check my service , component , html One by One :
+service :
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-  { path: 'candidateDashboard', redirectTo: 'candidateDashboard/overview', pathMatch: 'full' },
+export interface ApiResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
 
-  {
-    path: 'candidateDashboard',
-    component: CandidateDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: Overview, // Your default dashboard
-      },
-      {
-        path: 'my-applications',
-        component: CandidateMyapplications,
-      },
-      {
-        path: 'find-jobs',
-        component: FindJobs,
-      },
-      {
-        path: 'interviews',
-        component: Interviews,
-      },
-      {
-        path: 'edit-profile',
-        component: CandidateEditProfile,
-      },
-      {
-        path: 'settings',
-        component: Settings,
-      },
-    ],
-  },
+export interface ForgotPasswordRequest {
+  email: string;
+}
 
-  { path: 'tl-dashboard', redirectTo: 'tl-dashboard/overview', pathMatch: 'full' },
+export interface VerifyOtpRequest {
+  email: string;
+  otp: string;
+}
 
-  {
-    path: 'tl-dashboard',
-    component: TeamleadDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: TlOverview, // Your default dashboard
-      },
-      {
-        path: 'my-projects',
-        component: MyProject,
-      },
-      {
-        path: 'job-requests',
-        component: JobRequest,
-      },
-      {
-        path: 'create-job-request', // ← ADDED THIS ROUTE
-        component: JobRequestForm,
-      },
-      {
-        path: 'team-members',
-        component: TeamMembers,
-      },
-      {
-        path: 'pending-interviews',
-        component: PendingInterviews,
-      },
-      {
-        path: 'settings',
-        component: TlSettings,
-      },
-       {
-        path: 'tl-logout',
-        component: TeamleadLogout,
-      },
-    ],
-  },
+export interface ResetPasswordRequest {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
 
-  { path: 'pm-dashboard', redirectTo: 'pm-dashboard/overview', pathMatch: 'full' },
+@Injectable({
+  providedIn: 'root'
+})
+export class ForgotPasswordService {
+  private baseUrl = 'http://localhost:8080/api/auth'; // Update with your API URL
 
-  {
-    path: 'pm-dashboard',
-    component: PmDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: PmOverview, // Your default dashboard
-      },
-      {
-        path: 'assign-project',
-        component: AssignProject,
-      },
-      {
-        path: 'job-requests',
-        component: PmJobRequests,
-      },
-      {
-        path: 'bench-employees',
-        component: BenchEmployees,
-      },
-      {
-        path: 'team-members',
-        component: PmTeamMembers,
-      },
-      {
-        path: 'pending-interviews',
-        component: PmPendingInterviews,
-      },
-      {
-        path: 'settings',
-        component: PmSettings,
-      },
-    ],
-  },
+  constructor(private http: HttpClient) {}
 
-  { path: 'hr-dashboard', component: HrDashboard },
+  forgotPassword(request: ForgotPasswordRequest): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(this.baseUrl+"/forgot-password", request);
+  }
 
-  { path: 'hr-dashboard', redirectTo: 'hr-dashboard/overview', pathMatch: 'full' },
+  verifyOtp(request: VerifyOtpRequest): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(this.baseUrl+"/verify-otp", request);
+  }
 
-  {
-    path: 'hr-dashboard',
-    component: HrDashboard,
-    children: [
-      {
-        path: 'overview',
-        component: HrOverview,
-      },
-      {
-        path: 'job-requests',
-        component: HrJobRequests,
-      },
-      {
-        path: 'applied-candidates',
-        component: AppliedCandidates,
-      },
-      {
-        path: 'shortlisted-candidates',
-        component: ShortlistedCandidates,
-      },
-      {
-        path: 'interviews',
-        component: HrInterviews,
-      },
-      {
-        path: 'settings',
-        component: HrSettings,
-      },
-    ],
-  },
+  resetPassword(request: ResetPasswordRequest): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(this.baseUrl+"/reset-password", request);
+  }
+}
 
-  { path: '**', redirectTo: 'candidate-login' }
+export class ForgotPasswordDialogComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
+  
+  currentStep: 'email' | 'otp' | 'reset' = 'email';
+  
+  emailForm!: FormGroup;
+  otpForm!: FormGroup;
+  resetForm!: FormGroup;
+  
+  email: string = '';
+  otp: string = '';
+  
+  loading: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
+  
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
 
-];
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private forgotPasswordService : ForgotPasswordService
+  ) {}
 
+  ngOnInit(): void {
+    this.initializeForms();
+  }
 
+  // private get forgotPasswordService(): ForgotPasswordService {
+  //   return new ForgotPasswordService(this.http);
+  // }
+
+  initializeForms(): void {
+    this.emailForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.otpForm = this.fb.group({
+      otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern(/^\d{6}$/)]]
+    });
+
+    this.resetForm = this.fb.group({
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  passwordMatchValidator(group: FormGroup): { [key: string]: boolean } | null {
+    const password = group.get('newPassword')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordMismatch: true };
+  }
+
+  onSubmitEmail(): void {
+    if (this.emailForm.invalid) {
+      this.markFormGroupTouched(this.emailForm);
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.email = this.emailForm.value.email;
+
+    this.forgotPasswordService.forgotPassword({ email: this.email }).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = response.message || 'OTP sent successfully to your email!';
+          setTimeout(() => {
+            this.currentStep = 'otp';
+            this.successMessage = '';
+          }, 1500);
+        } else {
+          this.errorMessage = response.message || 'Failed to send OTP. Please try again.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'An error occurred. Please try again.';
+      }
+    });
+  }
+
+  onSubmitOtp(): void {
+    if (this.otpForm.invalid) {
+      this.markFormGroupTouched(this.otpForm);
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.otp = this.otpForm.value.otp;
+
+    this.forgotPasswordService.verifyOtp({ email: this.email, otp: this.otp }).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = response.message || 'OTP verified successfully!';
+          setTimeout(() => {
+            this.currentStep = 'reset';
+            this.successMessage = '';
+          }, 1500);
+        } else {
+          this.errorMessage = response.message || 'Invalid OTP. Please try again.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'Invalid OTP. Please try again.';
+      }
+    });
+  }
+
+  onSubmitReset(): void {
+    if (this.resetForm.invalid) {
+      this.markFormGroupTouched(this.resetForm);
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const resetData = {
+      email: this.email,
+      otp: this.otp,
+      newPassword: this.resetForm.value.newPassword
+    };
+
+    this.forgotPasswordService.resetPassword(resetData).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = response.message || 'Password reset successfully!';
+          setTimeout(() => {
+            this.closeDialog();
+          }, 2000);
+        } else {
+          this.errorMessage = response.message || 'Failed to reset password. Please try again.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'An error occurred. Please try again.';
+      }
+    });
+  }
+
+  resendOtp(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.forgotPasswordService.forgotPassword({ email: this.email }).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = 'OTP resent successfully!';
+          setTimeout(() => this.successMessage = '', 3000);
+        } else {
+          this.errorMessage = response.message || 'Failed to resend OTP.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'Failed to resend OTP.';
+      }
+    });
+  }
+
+  goBack(): void {
+    if (this.currentStep === 'otp') {
+      this.currentStep = 'email';
+      this.otpForm.reset();
+    } else if (this.currentStep === 'reset') {
+      this.currentStep = 'otp';
+      this.resetForm.reset();
+    }
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  closeDialog(): void {
+    this.currentStep = 'email';
+    this.emailForm.reset();
+    this.otpForm.reset();
+    this.resetForm.reset();
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.close.emit();
+  }
+
+  togglePasswordVisibility(field: 'password' | 'confirm'): void {
+    if (field === 'password') {
+      this.showPassword = !this.showPassword;
+    } else {
+      this.showConfirmPassword = !this.showConfirmPassword;
+    }
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  get emailControl() {
+    return this.emailForm.get('email');
+  }
+
+  get otpControl() {
+    return this.otpForm.get('otp');
+  }
+
+  get newPasswordControl() {
+    return this.resetForm.get('newPassword');
+  }
+
+  get confirmPasswordControl() {
+    return this.resetForm.get('confirmPassword');
+  }
+}
