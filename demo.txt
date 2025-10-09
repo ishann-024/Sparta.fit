@@ -394,3 +394,97 @@ Cannot use 'in' operator to search for 'title' in {"skills":"Skills is Required!
     at detectChangesInChildComponents (chunk-6J54M6DO.js?v=4fc44d6e:8599:5)
     at refreshView (chunk-6J54M6DO.js?v=4fc44d6e:8446:7)
     at detectChangesInView (chunk-6J54M6DO.js?v=4fc44d6e:8568:5
+
+
+
+jobRequestDTO: CreateJobRequestDTO = new CreateJobRequestDTO();
+  isSubmitting = false;
+  validationErrors: { [key: string]: string } = {};
+  
+  // Notification properties
+  showNotification = false;
+  isSuccess = false;
+  notificationMessage = '';
+
+  constructor(private tlService: TlService, private router: Router) {}
+
+  // Validation helper methods
+  checkIfError(fieldName: string): boolean {
+    return fieldName in this.validationErrors;
+  }
+
+  getValidationErrorMessage(fieldName: string): string {
+    return this.validationErrors[fieldName];
+  }
+
+  onSubmit(event: Event): void {
+    event.preventDefault();
+    this.validationErrors = {}; // Clear previous validation errors
+    
+    // Remove frontend validation - let backend handle it
+    this.isSubmitting = true;
+    
+    this.tlService.createJobRequest(this.jobRequestDTO).subscribe({
+      next: (response) => {
+        console.log('✅ SUCCESS:', response);
+        this.showSuccess('Job Request Created Successfully!');
+        this.isSubmitting = false;
+        // Optional: Reset form after success
+        // this.resetForm();
+      },
+      error: (error) => {
+        console.error('❌ ERROR:', error);
+        this.isSubmitting = false;
+        
+        // Handle validation errors from backend
+        if (error.status === 400 && error.error) {
+          // This is a validation error from backend
+          this.validationErrors = error.error;
+          this.showError('Please fix the validation errors below.');
+        } 
+        // Handle 200 status with text response
+        else if (error.status === 200 && error.error && error.error.text) {
+          this.showSuccess(error.error.text);
+        } else {
+          this.showError('Failed to create job request. Please try again.');
+        }
+      }
+    });
+  }
+
+  // Notification methods
+  showSuccess(message: string): void {
+    this.isSuccess = true;
+    this.notificationMessage = message;
+    this.showNotification = true;
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      this.hideNotification();
+      // Navigate after notification disappears
+      setTimeout(() => {
+        this.router.navigate(['/tl-dashboard/job-requests']);
+      }, 500);
+    }, 5000);
+  }
+
+  showError(message: string): void {
+    this.isSuccess = false;
+    this.notificationMessage = message;
+    this.showNotification = true;
+    
+    setTimeout(() => {
+      this.hideNotification();
+    }, 5000);
+  }
+
+  hideNotification(): void {
+    this.showNotification = false;
+  }
+
+  cancel(): void {
+    this.router.navigate(['/tl-dashboard/job-requests']);
+  }
+
+  // Remove the validateForm() method since we're using backend validation
+}
