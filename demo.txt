@@ -1,117 +1,58 @@
-private ResponseCookie createLogoutCookie() {
-		return ResponseCookie.from("jwt-token", "").httpOnly(true).secure(cookieSecure).path("/").maxAge(0)
-				.sameSite("Lax").build();
-	}
-
-
-@PostMapping("/logout")
-	public ResponseEntity<?> logout() {
-		ResponseCookie logoutCookie = createLogoutCookie();
-		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, logoutCookie.toString()).body("Logout successful");
-	}
-
-I have added these Validations in my DTO backend and i have also added @Valid in the create create Job request API now I want that these validations should go to the front end.How do i do it ?
-public class CreateJobRequestDTO {
-    
-	private int projectId;
-	
-	@NotBlank(message="Skills is Required!")
-	private String skills;
-	
-	@NotBlank(message="Headcount is Required!")
-	@Min(value = 1, message = "Headcount must be at least 1")
-	private int headCount;
-	
-	@NotBlank(message="JobType is Required!")
-	private String jobType;
-	
-	private String pmId;
-	
-    private String teamLeaderId;           // TL who is creating the request
-    
-    @NotBlank(message="Title is Required!")
-    private String title;
-
-    @NotBlank(message="Description is Required!")
-    private String description;
-    
-    @NotBlank(message="Priority is Required!")
-    private String priority;
-
-    @NotBlank(message="MinExperience is Required!")
-    @Min(value = 0, message = "MinExperience must be non-negative")
-    private int minExperience;
- 
-    @NotBlank(message="MaxExperience is Required!")
-    private int maxExperience;    
-    
-    @NotBlank(message="Min CTC is Required!")
-    @Min(value = 0, message = "Min CTC must be non-negative")
-    private double minCtc;
-
-    @NotBlank(message="Max CTC is Required!")
-    private double maxCtc;
-}
-Controller :
-@PostMapping("/create-job-requests")
-	public ResponseEntity<String> createJobRequest(@Valid @RequestBody CreateJobRequestDTO dto,Authentication authentication) {
-		dto.setTeamLeaderId(authentication.getName());
-		teamLeadService.createJobRequest(dto);
-		return ResponseEntity.ok("Job Request Created Successfully");
-	}
-
-
-
-//-----------------------------------------
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TlService } from '../../service/tl-service';
-import { CreateJobRequestDTO } from '../../dto/CreateJobRequestDTO';
-
-@Component({
-  selector: 'app-job-request-form',
-  imports: [CommonModule, FormsModule], 
-  templateUrl: './job-request-form.html',
-  styleUrl: './job-request-form.css'
-})
+-----------------------------------------------------AFTER VALIDATION_________________________________
 export class JobRequestForm {
   jobRequestDTO: CreateJobRequestDTO = new CreateJobRequestDTO();
   isSubmitting = false;
-   // Notification properties
+  validationErrors: { [key: string]: string } = {};
+  
+  // Notification properties
   showNotification = false;
   isSuccess = false;
   notificationMessage = '';
+
   constructor(private tlService: TlService, private router: Router) {}
+
+  // Validation helper methods
+  checkIfError(fieldName: string): boolean {
+    return fieldName in this.validationErrors;
+  }
+
+  getValidationErrorMessage(fieldName: string): string {
+    return this.validationErrors[fieldName];
+  }
 
   onSubmit(event: Event): void {
     event.preventDefault();
+    this.validationErrors = {}; // Clear previous validation errors
     
-    if (this.validateForm()) {
-      this.isSubmitting = true;
-      
-      this.tlService.createJobRequest(this.jobRequestDTO).subscribe({
-        next: (response) => {
-          console.log('✅ SUCCESS:', response);
-          this.showSuccess('Job Request Created Successfully!');
-          this.isSubmitting = false;
-          // Optional: Reset form after success
-          // this.resetForm();
-        },
-        error: (error) => {
-          console.error('❌ ERROR:', error);
-          
-          // Handle 200 status with text response
-          if (error.status === 200 && error.error && error.error.text) {
-            this.showSuccess(error.error.text);
-          } else {
-            this.showError('Failed to create job request. Please try again.');
-          }
-          this.isSubmitting = false;
+    // Remove frontend validation - let backend handle it
+    this.isSubmitting = true;
+    
+    this.tlService.createJobRequest(this.jobRequestDTO).subscribe({
+      next: (response) => {
+        console.log('✅ SUCCESS:', response);
+        this.showSuccess('Job Request Created Successfully!');
+        this.isSubmitting = false;
+        // Optional: Reset form after success
+        // this.resetForm();
+      },
+      error: (error) => {
+        console.error('❌ ERROR:', error);
+        this.isSubmitting = false;
+        
+        // Handle validation errors from backend
+        if (error.status === 400 && error.error) {
+          // This is a validation error from backend
+          this.validationErrors = error.error;
+          this.showError('Please fix the validation errors below.');
+        } 
+        // Handle 200 status with text response
+        else if (error.status === 200 && error.error && error.error.text) {
+          this.showSuccess(error.error.text);
+        } else {
+          this.showError('Failed to create job request. Please try again.');
         }
-      });
-    }
+      }
+    });
   }
 
   // Notification methods
@@ -148,65 +89,12 @@ export class JobRequestForm {
     this.router.navigate(['/tl-dashboard/job-requests']);
   }
 
-  validateForm(): boolean {
-    if (!this.jobRequestDTO.title || this.jobRequestDTO.title.trim() === '') {
-      alert('Please enter a job title');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.description || this.jobRequestDTO.description.trim() === '') {
-      alert('Please enter a job description');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.skills || this.jobRequestDTO.skills.trim() === '') {
-      alert('Please enter required skills');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.headCount || this.jobRequestDTO.headCount <= 0) {
-      alert('Please enter a valid head count');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.jobType || this.jobRequestDTO.jobType.trim() === '') {
-      alert('Please select a job type');
-      return false;
-    }
-
-    if (!this.jobRequestDTO.priority || this.jobRequestDTO.priority.trim() === '') {
-      alert('Please select a priority level');
-      return false;
-    }
-
-    if (this.jobRequestDTO.minExperience === null || this.jobRequestDTO.minExperience < 0) {
-      alert('Please enter a valid minimum experience');
-      return false;
-    }
-
-    if (this.jobRequestDTO.maxExperience === null || this.jobRequestDTO.maxExperience < this.jobRequestDTO.minExperience) {
-      alert('Maximum experience must be greater than or equal to minimum experience');
-      return false;
-    }
-
-    if (this.jobRequestDTO.minCtc === null || this.jobRequestDTO.minCtc < 0) {
-      alert('Please enter a valid minimum CTC');
-      return false;
-    }
-
-    if (this.jobRequestDTO.maxCtc === null || this.jobRequestDTO.maxCtc < this.jobRequestDTO.minCtc) {
-      alert('Maximum CTC must be greater than or equal to minimum CTC');
-      return false;
-    }
-
-    return true;
-  }
+  // Remove the validateForm() method since we're using backend validation
 }
 
 
 
-
-
+	HTML VALIDATED :
 <div class="form-container">
     <div class="form-header">
         <h2>Create Job Request</h2>
@@ -214,6 +102,7 @@ export class JobRequestForm {
     </div>
 
     <form (ngSubmit)="onSubmit($event)" #jobRequestForm="ngForm">
+        <!-- Title -->
         <div class="form-group">
             <label>Job Request Title <span class="required">*</span></label>
             <input
@@ -222,13 +111,18 @@ export class JobRequestForm {
                 [(ngModel)]="jobRequestDTO.title"
                 placeholder="Enter Job Request Title"
                 required
-                #jobRequestTitle="ngModel"
             />
-            <span class="error" *ngIf="jobRequestTitle.invalid && jobRequestTitle.touched">
+            <!-- Frontend validation -->
+            <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.title">
                 Job Request Title is required
             </span>
+            <!-- Backend validation -->
+            @if (checkIfError("title")) {
+            <span class="error">{{ getValidationErrorMessage('title') }}</span>
+            }
         </div>
 
+        <!-- Description -->
         <div class="form-group">
             <label>Job Request Description <span class="required">*</span></label>
             <textarea
@@ -237,13 +131,18 @@ export class JobRequestForm {
                 placeholder="Enter Job Request Description"
                 required
                 rows="4"
-                #jobRequestDescription="ngModel"
             ></textarea>
-            <span class="error" *ngIf="jobRequestDescription.invalid && jobRequestDescription.touched">
+            <!-- Frontend validation -->
+            <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.description">
                 Job Request Description is required
             </span>
+            <!-- Backend validation -->
+            @if (checkIfError("description")) {
+            <span class="error">{{ getValidationErrorMessage('description') }}</span>
+            }
         </div>
 
+        <!-- Skills -->
         <div class="form-group">
             <label>Required Skills <span class="required">*</span></label>
             <input
@@ -252,14 +151,19 @@ export class JobRequestForm {
                 [(ngModel)]="jobRequestDTO.skills"
                 placeholder="e.g., Java, Spring Boot, SQL"
                 required
-                #skills="ngModel"
             />
-            <span class="error" *ngIf="skills.invalid && skills.touched">
+            <!-- Frontend validation -->
+            <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.skills">
                 Skills are required
             </span>
+            <!-- Backend validation -->
+            @if (checkIfError("skills")) {
+            <span class="error">{{ getValidationErrorMessage('skills') }}</span>
+            }
         </div>
 
         <div class="form-row">
+            <!-- Head Count -->
             <div class="form-group">
                 <label>Head Count <span class="required">*</span></label>
                 <input
@@ -270,13 +174,18 @@ export class JobRequestForm {
                     min="1"
                     max="50"
                     required
-                    #headCount="ngModel"
                 />
-                <span class="error" *ngIf="headCount.invalid && headCount.touched">
-                    Head count is required
+                <!-- Frontend validation -->
+                <span class="error" *ngIf="jobRequestForm.submitted && (!jobRequestDTO.headCount || jobRequestDTO.headCount <= 0)">
+                    Head count is required and must be at least 1
                 </span>
+                <!-- Backend validation -->
+                @if (checkIfError("headCount")) {
+                <span class="error">{{ getValidationErrorMessage('headCount') }}</span>
+                }
             </div>
 
+            <!-- Job Type -->
             <div class="form-group">
                 <label>Job Type <span class="required">*</span></label>
                 <select
@@ -290,9 +199,18 @@ export class JobRequestForm {
                     <option value="CONTRACT">Contract</option>
                     <option value="INTERNSHIP">Internship</option>
                 </select>
+                <!-- Frontend validation -->
+                <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.jobType">
+                    Job Type is required
+                </span>
+                <!-- Backend validation -->
+                @if (checkIfError("jobType")) {
+                <span class="error">{{ getValidationErrorMessage('jobType') }}</span>
+                }
             </div>
         </div>
 
+        <!-- Priority -->
         <div class="form-group">
             <label>Priority <span class="required">*</span></label>
             <select
@@ -305,9 +223,18 @@ export class JobRequestForm {
                 <option value="MEDIUM">MEDIUM</option>
                 <option value="LOW">LOW</option>
             </select>
+            <!-- Frontend validation -->
+            <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.priority">
+                Priority is required
+                </span>
+            <!-- Backend validation -->
+            @if (checkIfError("priority")) {
+            <span class="error">{{ getValidationErrorMessage('priority') }}</span>
+            }
         </div>
 
         <div class="form-row">
+            <!-- Min Experience -->
             <div class="form-group">
                 <label>Min Experience (years) <span class="required">*</span></label>
                 <input
@@ -318,13 +245,18 @@ export class JobRequestForm {
                     min="0"
                     max="20"
                     required
-                    #minExperience="ngModel"
                 />
-                <span class="error" *ngIf="minExperience.invalid && minExperience.touched">
-                    Minimum experience is required
+                <!-- Frontend validation -->
+                <span class="error" *ngIf="jobRequestForm.submitted && (jobRequestDTO.minExperience === null || jobRequestDTO.minExperience < 0)">
+                    Minimum experience is required and must be non-negative
                 </span>
+                <!-- Backend validation -->
+                @if (checkIfError("minExperience")) {
+                <span class="error">{{ getValidationErrorMessage('minExperience') }}</span>
+                }
             </div>
 
+            <!-- Max Experience -->
             <div class="form-group">
                 <label>Max Experience (years) <span class="required">*</span></label>
                 <input
@@ -335,15 +267,20 @@ export class JobRequestForm {
                     min="0"
                     max="30"
                     required
-                    #maxExperience="ngModel"
                 />
-                <span class="error" *ngIf="maxExperience.invalid && maxExperience.touched">
-                    Maximum experience is required
+                <!-- Frontend validation -->
+                <span class="error" *ngIf="jobRequestForm.submitted && (jobRequestDTO.maxExperience === null || jobRequestDTO.maxExperience < 0)">
+                    Maximum experience is required and must be non-negative
                 </span>
+                <!-- Backend validation -->
+                @if (checkIfError("maxExperience")) {
+                <span class="error">{{ getValidationErrorMessage('maxExperience') }}</span>
+                }
             </div>
         </div>
 
         <div class="form-row">
+            <!-- Min CTC -->
             <div class="form-group">
                 <label>Min CTC (₹ Lakhs) <span class="required">*</span></label>
                 <input
@@ -355,13 +292,18 @@ export class JobRequestForm {
                     max="50"
                     step="0.01"
                     required
-                    #minCtc="ngModel"
                 />
-                <span class="error" *ngIf="minCtc.invalid && minCtc.touched">
-                    Minimum CTC is required
+                <!-- Frontend validation -->
+                <span class="error" *ngIf="jobRequestForm.submitted && (jobRequestDTO.minCtc === null || jobRequestDTO.minCtc < 0)">
+                    Minimum CTC is required and must be non-negative
                 </span>
+                <!-- Backend validation -->
+                @if (checkIfError("minCtc")) {
+                <span class="error">{{ getValidationErrorMessage('minCtc') }}</span>
+                }
             </div>
 
+            <!-- Max CTC -->
             <div class="form-group">
                 <label>Max CTC (₹ Lakhs) <span class="required">*</span></label>
                 <input
@@ -373,11 +315,15 @@ export class JobRequestForm {
                     max="100"
                     step="0.01"
                     required
-                    #maxCtc="ngModel"
                 />
-                <span class="error" *ngIf="maxCtc.invalid && maxCtc.touched">
-                    Maximum CTC is required
+                <!-- Frontend validation -->
+                <span class="error" *ngIf="jobRequestForm.submitted && (jobRequestDTO.maxCtc === null || jobRequestDTO.maxCtc < 0)">
+                    Maximum CTC is required and must be non-negative
                 </span>
+                <!-- Backend validation -->
+                @if (checkIfError("maxCtc")) {
+                <span class="error">{{ getValidationErrorMessage('maxCtc') }}</span>
+                }
             </div>
         </div>
 
@@ -404,19 +350,19 @@ export class JobRequestForm {
 </div>
 
 <!-- Success/Failure Notification -->
-    <div *ngIf="showNotification" class="notification" [class.success]="isSuccess" [class.error]="!isSuccess" [class.hiding]="!showNotification">
-        <div class="notification-content">
-            <div class="notification-icon">
-                <i *ngIf="isSuccess" class="fas fa-check-circle"></i>
-                <i *ngIf="!isSuccess" class="fas fa-exclamation-circle"></i>
-            </div>
-            <div class="notification-text">
-                <h4>{{ isSuccess ? 'Success!' : 'Error!' }}</h4>
-                <p>{{ notificationMessage }}</p>
-            </div>
-            <button class="notification-close" (click)="hideNotification()">
-                <i class="fas fa-times"></i>
-            </button>
+<div *ngIf="showNotification" class="notification" [class.success]="isSuccess" [class.error]="!isSuccess">
+    <div class="notification-content">
+        <div class="notification-icon">
+            <i *ngIf="isSuccess" class="fas fa-check-circle"></i>
+            <i *ngIf="!isSuccess" class="fas fa-exclamation-circle"></i>
         </div>
-        <div class="notification-progress" [class.active]="showNotification"></div>
+        <div class="notification-text">
+            <h4>{{ isSuccess ? 'Success!' : 'Error!' }}</h4>
+            <p>{{ notificationMessage }}</p>
+        </div>
+        <button class="notification-close" (click)="hideNotification()">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
+    <div class="notification-progress" [class.active]="showNotification"></div>
+</div>
