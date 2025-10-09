@@ -1,4 +1,3 @@
-Remove front end validations as I am seeing double notifications :
 <div class="form-container">
   <div class="form-header">
     <h2>Create Job Request</h2>
@@ -16,11 +15,7 @@ Remove front end validations as I am seeing double notifications :
         placeholder="Enter Job Request Title"
         required
       />
-      <!-- Frontend validation -->
-      <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.title">
-        Job Request Title is required
-      </span>
-      <!-- Backend validation -->
+      <!-- Backend validation only -->
       @if (checkIfError("title")) {
       <span class="error">{{ getValidationErrorMessage('title') }}</span>
       }
@@ -36,11 +31,7 @@ Remove front end validations as I am seeing double notifications :
         required
         rows="4"
       ></textarea>
-      <!-- Frontend validation -->
-      <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.description">
-        Job Request Description is required
-      </span>
-      <!-- Backend validation -->
+      <!-- Backend validation only -->
       @if (checkIfError("description")) {
       <span class="error">{{ getValidationErrorMessage('description') }}</span>
       }
@@ -56,11 +47,7 @@ Remove front end validations as I am seeing double notifications :
         placeholder="e.g., Java, Spring Boot, SQL"
         required
       />
-      <!-- Frontend validation -->
-      <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.skills">
-        Skills are required
-      </span>
-      <!-- Backend validation -->
+      <!-- Backend validation only -->
       @if (checkIfError("skills")) {
       <span class="error">{{ getValidationErrorMessage('skills') }}</span>
       }
@@ -79,16 +66,7 @@ Remove front end validations as I am seeing double notifications :
           max="50"
           required
         />
-        <!-- Frontend validation -->
-        <span
-          class="error"
-          *ngIf="
-            jobRequestForm.submitted && (!jobRequestDTO.headCount || jobRequestDTO.headCount <= 0)
-          "
-        >
-          Head count is required and must be at least 1
-        </span>
-        <!-- Backend validation -->
+        <!-- Backend validation only -->
         @if (checkIfError("headCount")) {
         <span class="error">{{ getValidationErrorMessage('headCount') }}</span>
         }
@@ -104,11 +82,7 @@ Remove front end validations as I am seeing double notifications :
           <option value="CONTRACT">Contract</option>
           <option value="INTERNSHIP">Internship</option>
         </select>
-        <!-- Frontend validation -->
-        <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.jobType">
-          Job Type is required
-        </span>
-        <!-- Backend validation -->
+        <!-- Backend validation only -->
         @if (checkIfError("jobType")) {
         <span class="error">{{ getValidationErrorMessage('jobType') }}</span>
         }
@@ -124,11 +98,7 @@ Remove front end validations as I am seeing double notifications :
         <option value="MEDIUM">MEDIUM</option>
         <option value="LOW">LOW</option>
       </select>
-      <!-- Frontend validation -->
-      <span class="error" *ngIf="jobRequestForm.submitted && !jobRequestDTO.priority">
-        Priority is required
-      </span>
-      <!-- Backend validation -->
+      <!-- Backend validation only -->
       @if (checkIfError("priority")) {
       <span class="error">{{ getValidationErrorMessage('priority') }}</span>
       }
@@ -147,17 +117,7 @@ Remove front end validations as I am seeing double notifications :
           max="20"
           required
         />
-        <!-- Frontend validation -->
-        <span
-          class="error"
-          *ngIf="
-            jobRequestForm.submitted &&
-            (jobRequestDTO.minExperience === null || jobRequestDTO.minExperience < 0)
-          "
-        >
-          Minimum experience is required and must be non-negative
-        </span>
-        <!-- Backend validation -->
+        <!-- Backend validation only -->
         @if (checkIfError("minExperience")) {
         <span class="error">{{ getValidationErrorMessage('minExperience') }}</span>
         }
@@ -175,17 +135,7 @@ Remove front end validations as I am seeing double notifications :
           max="30"
           required
         />
-        <!-- Frontend validation -->
-        <span
-          class="error"
-          *ngIf="
-            jobRequestForm.submitted &&
-            (jobRequestDTO.maxExperience === null || jobRequestDTO.maxExperience < 0)
-          "
-        >
-          Maximum experience is required and must be non-negative
-        </span>
-        <!-- Backend validation -->
+        <!-- Backend validation only -->
         @if (checkIfError("maxExperience")) {
         <span class="error">{{ getValidationErrorMessage('maxExperience') }}</span>
         }
@@ -206,16 +156,7 @@ Remove front end validations as I am seeing double notifications :
           step="0.01"
           required
         />
-        <!-- Frontend validation -->
-        <span
-          class="error"
-          *ngIf="
-            jobRequestForm.submitted && (jobRequestDTO.minCtc === null || jobRequestDTO.minCtc < 0)
-          "
-        >
-          Minimum CTC is required and must be non-negative
-        </span>
-        <!-- Backend validation -->
+        <!-- Backend validation only -->
         @if (checkIfError("minCtc")) {
         <span class="error">{{ getValidationErrorMessage('minCtc') }}</span>
         }
@@ -234,16 +175,7 @@ Remove front end validations as I am seeing double notifications :
           step="0.01"
           required
         />
-        <!-- Frontend validation -->
-        <span
-          class="error"
-          *ngIf="
-            jobRequestForm.submitted && (jobRequestDTO.maxCtc === null || jobRequestDTO.maxCtc < 0)
-          "
-        >
-          Maximum CTC is required and must be non-negative
-        </span>
-        <!-- Backend validation -->
+        <!-- Backend validation only -->
         @if (checkIfError("maxCtc")) {
         <span class="error">{{ getValidationErrorMessage('maxCtc') }}</span>
         }
@@ -285,120 +217,6 @@ Remove front end validations as I am seeing double notifications :
   </div>
   <div class="notification-progress" [class.active]="showNotification"></div>
 </div>
-
-ts :
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TlService } from '../../service/tl-service';
-import { CreateJobRequestDTO } from '../../dto/CreateJobRequestDTO';
-
-@Component({
-  selector: 'app-job-request-form',
-  imports: [CommonModule, FormsModule], 
-  templateUrl: './job-request-form.html',
-  styleUrl: './job-request-form.css'
-})
-export class JobRequestForm {
-  //Latest with validations 
-  //-----------------------------------------------------AFTER VALIDATION_________________________________
-  jobRequestDTO: CreateJobRequestDTO = new CreateJobRequestDTO();
-  isSubmitting = false;
-  validationErrors: { [key: string]: string } = {};
-  
-  // Notification properties
-  showNotification = false;
-  isSuccess = false;
-  notificationMessage = '';
-
-  constructor(private tlService: TlService, private router: Router) {}
-
-  // Validation helper methods
-  checkIfError(fieldName: string): boolean {
-    return fieldName in this.validationErrors;
-  }
-
-  getValidationErrorMessage(fieldName: string): string {
-    return this.validationErrors[fieldName];
-  }
-
-  onSubmit(event: Event): void {
-    event.preventDefault();
-    this.validationErrors = {}; // Clear previous validation errors
-    
-    this.isSubmitting = true;
-    
-    this.tlService.createJobRequest(this.jobRequestDTO).subscribe({
-      next: (response) => {
-        console.log('✅ SUCCESS:', response);
-        this.showSuccess('Job Request Created Successfully!');
-        this.isSubmitting = false;
-      },
-      error: (error) => {
-        console.error('❌ ERROR:', error);
-        this.isSubmitting = false;
-        
-        // Handle validation errors from backend - FIXED VERSION
-        if (error.status === 400 && error.error) {
-          try {
-            // Parse the JSON string to object if it's a string
-            if (typeof error.error === 'string') {
-              this.validationErrors = JSON.parse(error.error);
-            } else {
-              this.validationErrors = error.error;
-            }
-            this.showError('Please fix the validation errors below.');
-          } catch (parseError) {
-            console.error('Error parsing validation errors:', parseError);
-            this.showError('Validation failed. Please check your inputs.');
-          }
-        } 
-        // Handle 200 status with text response
-        else if (error.status === 200 && error.error && error.error.text) {
-          this.showSuccess(error.error.text);
-        } else {
-          this.showError('Failed to create job request. Please try again.');
-        }
-      }
-    });
-  }
-
-  // Notification methods
-  showSuccess(message: string): void {
-    this.isSuccess = true;
-    this.notificationMessage = message;
-    this.showNotification = true;
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-      this.hideNotification();
-      // Navigate after notification disappears
-      setTimeout(() => {
-        this.router.navigate(['/tl-dashboard/job-requests']);
-      }, 500);
-    }, 5000);
-  }
-
-  showError(message: string): void {
-    this.isSuccess = false;
-    this.notificationMessage = message;
-    this.showNotification = true;
-    
-    setTimeout(() => {
-      this.hideNotification();
-    }, 5000);
-  }
-
-  hideNotification(): void {
-    this.showNotification = false;
-  }
-
-  cancel(): void {
-    this.router.navigate(['/tl-dashboard/job-requests']);
-  }
-}
-
 
 
 
