@@ -221,7 +221,16 @@
 
 
 
+Now when i am passing valid its not making a new request i am getting :
+project_id, skills, head_count,job_type,title, description, status, priority, min_ctc, max_ctc, min_experience,max_experience)
+VALUES (job_request_id_seq.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]; SQL state [72000]; error code [12899]; ORA-12899: value too large for column "ISHAN"."JOB_REQUESTS"."PROJECT_MANAGER_ID" (actual: 43, maximum: 40)
 
+https://docs.oracle.com/error-help/db/ora-12899/] with root cause
+
+oracle.jdbc.OracleDatabaseException: ORA-12899: value too large for column "ISHAN"."JOB_REQUESTS"."PROJECT_MANAGER_ID" (actual: 43, maximum: 40)
+
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:723) ~[ojdbc11-23.7.0.25.01.jar:23.7.0.25.01]
+	at oracle.jdbc.dr
 
 
 
