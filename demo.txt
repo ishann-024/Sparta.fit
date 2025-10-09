@@ -613,3 +613,9 @@ export class ForgotPasswordDialogComponent implements OnInit {
     return this.resetForm.get('confirmPassword');
   }
 }
+
+
+Employee.html : 
+I have to route the forgot-password-dialog-component to this in employee login html : 
+<a href="#" class="forgot-password">Forgot password?</a>
+      </div>
