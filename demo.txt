@@ -1,6 +1,206 @@
-Solve this 
-X [ERROR] NG2008: Could not find template file './forgot-password-dialog.component.html'. [plugin angular-compiler]
+import { Routes } from '@angular/router';
+import { EmployeeLogin } from './dashboard/employee-login/employee-login';
+import { CandidateLogin } from './dashboard/candidate-login/candidate-login';
+import { Dashboard } from './dashboard/dashboard';
 
-    src/app/forgot-password-dialog-component/forgot-password-dialog-component.ts:21:15:
-      21 │   templateUrl: './forgot-password-dialog.component.html',
-         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+import { CandidateDashboard } from './candidate-dashboard/candidate-dashboard';
+import { CandidateMyapplications } from './candidate-dashboard/candidate-myapplications/candidate-myapplications';
+import { CandidateRegistration } from './dashboard/candidate-registration/candidate-registration';
+import { Overview } from './candidate-dashboard/overview/overview';
+import { FindJobs } from './candidate-dashboard/find-jobs/find-jobs';
+import { Interviews } from './candidate-dashboard/interviews/interviews';
+import { CandidateEditProfile } from './candidate-dashboard/candidate-edit-profile/candidate-edit-profile';
+import { Settings } from './candidate-dashboard/settings/settings';
+import { PmDashboard } from './pm-dashboard/pm-dashboard';
+import { TeamleadDashboard } from './teamlead-dashboard/teamlead-dashboard';
+import { TlOverview } from './teamlead-dashboard/tl-overview/tl-overview';
+import { MyProject } from './teamlead-dashboard/my-project/my-project';
+import { JobRequest } from './teamlead-dashboard/job-request/job-request';
+import { PendingInterviews } from './teamlead-dashboard/pending-interviews/pending-interviews';
+import { TeamMembers } from './teamlead-dashboard/team-members/team-members';
+import { TlSettings } from './teamlead-dashboard/tl-settings/tl-settings';
+import { HrDashboard } from './hr-dashboard/hr-dashboard';
+import { PmOverview } from './pm-dashboard/pm-overview/pm-overview';
+import { AssignProject } from './pm-dashboard/assign-project/assign-project';
+import { PmJobRequests } from './pm-dashboard/pm-job-requests/pm-job-requests';
+import { PmTeamMembers } from './pm-dashboard/pm-team-members/pm-team-members';
+import { PmPendingInterviews } from './pm-dashboard/pm-pending-interviews/pm-pending-interviews';
+import { PmSettings } from './pm-dashboard/pm-settings/pm-settings';
+import { BenchEmployees } from './pm-dashboard/bench-employees/bench-employees';
+import { HrOverview } from './hr-dashboard/hr-overview/hr-overview';
+import { HrJobRequests } from './hr-dashboard/hr-job-requests/hr-job-requests';
+import { HrSettings } from './hr-dashboard/hr-settings/hr-settings';
+import { ShortlistedCandidates } from './hr-dashboard/shortlisted-candidates/shortlisted-candidates';
+import { HrInterviews } from './hr-dashboard/hr-interviews/hr-interviews';
+import { AppliedCandidates } from './hr-dashboard/applied-candidates/applied-candidates';
+import { JobRequestForm } from './teamlead-dashboard/job-request-form/job-request-form';
+import { TeamleadLogout } from './teamlead-dashboard/teamlead-logout/teamlead-logout';
+import { ForgotPasswordDialogComponent } from './forgot-password-dialog-component/forgot-password-dialog-component';
+
+//----------------------------
+export const routes: Routes = [
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+        
+  {
+    path: 'dashboard', component: Dashboard,
+    children: [
+      { path: 'employee-login', component: EmployeeLogin,
+        children:[
+          { path: 'forgot-password', component: ForgotPasswordDialogComponent },
+                  ]
+       },
+      { path: 'candidate-login', component: CandidateLogin },
+      { path: 'candidate-registration', component: CandidateRegistration },
+      
+    ]
+  },
+
+  { path: 'candidateDashboard', redirectTo: 'candidateDashboard/overview', pathMatch: 'full' },
+
+  {
+    path: 'candidateDashboard',
+    component: CandidateDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: Overview, // Your default dashboard
+      },
+      {
+        path: 'my-applications',
+        component: CandidateMyapplications,
+      },
+      {
+        path: 'find-jobs',
+        component: FindJobs,
+      },
+      {
+        path: 'interviews',
+        component: Interviews,
+      },
+      {
+        path: 'edit-profile',
+        component: CandidateEditProfile,
+      },
+      {
+        path: 'settings',
+        component: Settings,
+      },
+    ],
+  },
+
+  { path: 'tl-dashboard', redirectTo: 'tl-dashboard/overview', pathMatch: 'full' },
+
+  {
+    path: 'tl-dashboard',
+    component: TeamleadDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: TlOverview, // Your default dashboard
+      },
+      {
+        path: 'my-projects',
+        component: MyProject,
+      },
+      {
+        path: 'job-requests',
+        component: JobRequest,
+      },
+      {
+        path: 'create-job-request', // ← ADDED THIS ROUTE
+        component: JobRequestForm,
+      },
+      {
+        path: 'team-members',
+        component: TeamMembers,
+      },
+      {
+        path: 'pending-interviews',
+        component: PendingInterviews,
+      },
+      {
+        path: 'settings',
+        component: TlSettings,
+      },
+       {
+        path: 'tl-logout',
+        component: TeamleadLogout,
+      },
+    ],
+  },
+
+  { path: 'pm-dashboard', redirectTo: 'pm-dashboard/overview', pathMatch: 'full' },
+
+  {
+    path: 'pm-dashboard',
+    component: PmDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: PmOverview, // Your default dashboard
+      },
+      {
+        path: 'assign-project',
+        component: AssignProject,
+      },
+      {
+        path: 'job-requests',
+        component: PmJobRequests,
+      },
+      {
+        path: 'bench-employees',
+        component: BenchEmployees,
+      },
+      {
+        path: 'team-members',
+        component: PmTeamMembers,
+      },
+      {
+        path: 'pending-interviews',
+        component: PmPendingInterviews,
+      },
+      {
+        path: 'settings',
+        component: PmSettings,
+      },
+    ],
+  },
+
+  { path: 'hr-dashboard', component: HrDashboard },
+
+  { path: 'hr-dashboard', redirectTo: 'hr-dashboard/overview', pathMatch: 'full' },
+
+  {
+    path: 'hr-dashboard',
+    component: HrDashboard,
+    children: [
+      {
+        path: 'overview',
+        component: HrOverview,
+      },
+      {
+        path: 'job-requests',
+        component: HrJobRequests,
+      },
+      {
+        path: 'applied-candidates',
+        component: AppliedCandidates,
+      },
+      {
+        path: 'shortlisted-candidates',
+        component: ShortlistedCandidates,
+      },
+      {
+        path: 'interviews',
+        component: HrInterviews,
+      },
+      {
+        path: 'settings',
+        component: HrSettings,
+      },
+    ],
+  },
+
+  { path: '**', redirectTo: 'candidate-login' }
+
+]; 
