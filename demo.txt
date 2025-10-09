@@ -1,19 +1,2 @@
+I am getting redirected http://localhost:4200/dashboard/employee-login link and its sowing white blank page
 
-export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-        
-  {
-    path: 'dashboard', component: Dashboard,
-    children: [
-      { path: 'employee-login', component: EmployeeLogin },
-      { path: 'candidate-login', component: CandidateLogin },
-      { path: 'candidate-registration', component: CandidateRegistration },
-      { path: 'forgot-password', component: ForgotPasswordDialogComponent }, // ← Sibling route
-    ]
-  },
-  // ... rest unchanged
-];
-
-<a routerLink="/dashboard/forgot-password" class="forgot-password">
-  Forgot password?
-</a>
