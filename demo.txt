@@ -10,3 +10,52 @@ private ResponseCookie createLogoutCookie() {
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, logoutCookie.toString()).body("Logout successful");
 	}
 
+I have added these Validations in my DTO backend and i have also added @Valid in the create create Job request API now I want that these validations should go to the front end.How do i do it ?
+public class CreateJobRequestDTO {
+    
+	private int projectId;
+	
+	@NotBlank(message="Skills is Required!")
+	private String skills;
+	
+	@NotBlank(message="Headcount is Required!")
+	@Min(value = 1, message = "Headcount must be at least 1")
+	private int headCount;
+	
+	@NotBlank(message="JobType is Required!")
+	private String jobType;
+	
+	private String pmId;
+	
+    private String teamLeaderId;           // TL who is creating the request
+    
+    @NotBlank(message="Title is Required!")
+    private String title;
+
+    @NotBlank(message="Description is Required!")
+    private String description;
+    
+    @NotBlank(message="Priority is Required!")
+    private String priority;
+
+    @NotBlank(message="MinExperience is Required!")
+    @Min(value = 0, message = "MinExperience must be non-negative")
+    private int minExperience;
+ 
+    @NotBlank(message="MaxExperience is Required!")
+    private int maxExperience;    
+    
+    @NotBlank(message="Min CTC is Required!")
+    @Min(value = 0, message = "Min CTC must be non-negative")
+    private double minCtc;
+
+    @NotBlank(message="Max CTC is Required!")
+    private double maxCtc;
+}
+Controller :
+@PostMapping("/create-job-requests")
+	public ResponseEntity<String> createJobRequest(@Valid @RequestBody CreateJobRequestDTO dto,Authentication authentication) {
+		dto.setTeamLeaderId(authentication.getName());
+		teamLeadService.createJobRequest(dto);
+		return ResponseEntity.ok("Job Request Created Successfully");
+	}
