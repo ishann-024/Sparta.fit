@@ -1,8 +1,11 @@
+I am not able to see forgot-password-dialog-component on clicking :
+<a href="/dashboard/employee-login/forgot-password" class="forgot-password" >Forgot password?</a>
+My folder structure is src - > app -> forgot-password-dialog-component , src->app->dashboard->employee-login    
+Check why is it not working this is my app-routes.ts : 
 import { Routes } from '@angular/router';
 import { EmployeeLogin } from './dashboard/employee-login/employee-login';
 import { CandidateLogin } from './dashboard/candidate-login/candidate-login';
 import { Dashboard } from './dashboard/dashboard';
-
 import { CandidateDashboard } from './candidate-dashboard/candidate-dashboard';
 import { CandidateMyapplications } from './candidate-dashboard/candidate-myapplications/candidate-myapplications';
 import { CandidateRegistration } from './dashboard/candidate-registration/candidate-registration';
@@ -54,6 +57,7 @@ export const routes: Routes = [
       
     ]
   },
+  // {path:'dashboard/employee-login/forgot-password', component:ForgotPasswordDialogComponent,pathMatch:'full'},
 
   { path: 'candidateDashboard', redirectTo: 'candidateDashboard/overview', pathMatch: 'full' },
 
@@ -203,4 +207,4 @@ export const routes: Routes = [
 
   { path: '**', redirectTo: 'candidate-login' }
 
-]; 
+];
