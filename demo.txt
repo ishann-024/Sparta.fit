@@ -1,1 +1,496 @@
-On clicking forgot password in html I am getting redirected to http://localhost:4200/dashboard/forgot-password and its sowing white blank page
+X [ERROR] NG8002: Can't bind to 'formGroup' since it isn't a known property of 'form'. [plugin angular-compiler]
+
+    src/app/forgot-password-dialog-component/forgot-password-dialog-component.html:27:12:
+      27 │       <form [formGroup]="emailForm" (ngSubmit)="onSubmitEmail()">
+         ╵             ~~~~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component ForgotPasswordDialogComponent.
+
+    src/app/forgot-password-dialog-component/forgot-password-dialog-component.ts:23:15:
+      23 │   templateUrl: './forgot-password-dialog-component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8002: Can't bind to 'formGroup' since it isn't a known property of 'form'. [plugin angular-compiler]
+
+    src/app/forgot-password-dialog-component/forgot-password-dialog-component.html:73:12:
+      73 │       <form [formGroup]="otpForm" (ngSubmit)="onSubmitOtp()">
+         ╵             ~~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component ForgotPasswordDialogComponent.
+
+    src/app/forgot-password-dialog-component/forgot-password-dialog-component.ts:23:15:
+      23 │   templateUrl: './forgot-password-dialog-component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8002: Can't bind to 'formGroup' since it isn't a known property of 'form'. [plugin angular-compiler]
+
+    src/app/forgot-password-dialog-component/forgot-password-dialog-component.html:134:12:
+      134 │       <form [formGroup]="resetForm" (ngSubmit)="onSubmitReset()">
+          ╵             ~~~~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component ForgotPasswordDialogComponent.
+
+    src/app/forgot-password-dialog-component/forgot-password-dialog-component.ts:23:15:
+      23 │   templateUrl: './forgot-password-dialog-component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+HTML :
+<div class="dialog-overlay">
+  <div class="dialog-container">
+    <!-- Close Button -->
+    <button class="close-btn" (click)="closeDialog()" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- ================================ -->
+    <!-- Step 1: Email Input -->
+    <!-- ================================ -->
+    <div class="dialog-content" *ngIf="currentStep === 'email'">
+      <div class="dialog-header">
+        <div class="icon-container">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h2>Forgot Password?</h2>
+        <p>Enter your email address and we'll send you an OTP to reset your password.</p>
+      </div>
+
+      <form [formGroup]="emailForm" (ngSubmit)="onSubmitEmail()">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            placeholder="Enter your email"
+            [class.error]="emailControl?.invalid && emailControl?.touched"
+            autocomplete="email">
+          <div class="error-message" *ngIf="emailControl?.invalid && emailControl?.touched">
+            <span *ngIf="emailControl?.errors?.['required']">Email is required</span>
+            <span *ngIf="emailControl?.errors?.['email']">Please enter a valid email address</span>
+          </div>
+        </div>
+
+        <div class="alert alert-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <div class="alert alert-success" *ngIf="successMessage">
+          {{ successMessage }}
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          <span *ngIf="!loading">Send OTP</span>
+          <span *ngIf="loading" class="loading-spinner"></span>
+        </button>
+      </form>
+    </div>
+
+    <!-- ================================ -->
+    <!-- Step 2: OTP Verification -->
+    <!-- ================================ -->
+    <div class="dialog-content" *ngIf="currentStep === 'otp'">
+      <div class="dialog-header">
+        <div class="icon-container">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+        </div>
+        <h2>Verify OTP</h2>
+        <p>Enter the 6-digit code sent to <strong>{{ email }}</strong></p>
+      </div>
+
+      <form [formGroup]="otpForm" (ngSubmit)="onSubmitOtp()">
+        <div class="form-group">
+          <label for="otp">OTP Code</label>
+          <input 
+            type="text" 
+            id="otp" 
+            formControlName="otp"
+            placeholder="Enter 6-digit OTP"
+            maxlength="6"
+            inputmode="numeric"
+            [class.error]="otpControl?.invalid && otpControl?.touched"
+            autocomplete="one-time-code">
+          <div class="error-message" *ngIf="otpControl?.invalid && otpControl?.touched">
+            <span *ngIf="otpControl?.errors?.['required']">OTP is required</span>
+            <span *ngIf="otpControl?.errors?.['minlength'] || otpControl?.errors?.['maxlength']">OTP must be 6 digits</span>
+            <span *ngIf="otpControl?.errors?.['pattern']">OTP must contain only numbers</span>
+          </div>
+        </div>
+
+        <div class="resend-section">
+          <span>Didn't receive the code?</span>
+          <button type="button" class="btn-link" (click)="resendOtp()" [disabled]="loading">
+            Resend OTP
+          </button>
+        </div>
+
+        <div class="alert alert-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <div class="alert alert-success" *ngIf="successMessage">
+          {{ successMessage }}
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn-secondary" (click)="goBack()" [disabled]="loading">
+            Back
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading">
+            <span *ngIf="!loading">Verify OTP</span>
+            <span *ngIf="loading" class="loading-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================================ -->
+    <!-- Step 3: Reset Password -->
+    <!-- ================================ -->
+    <div class="dialog-content" *ngIf="currentStep === 'reset'">
+      <div class="dialog-header">
+        <div class="icon-container">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m8.66-13.66l-4.24 4.24m-4.84 4.84l-4.24 4.24M23 12h-6m-6 0H1m19.66 8.66l-4.24-4.24m-4.84-4.84l-4.24-4.24"></path>
+          </svg>
+        </div>
+        <h2>Reset Password</h2>
+        <p>Create a new password for your account</p>
+      </div>
+
+      <form [formGroup]="resetForm" (ngSubmit)="onSubmitReset()">
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <div class="password-input-wrapper">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="newPassword" 
+              formControlName="newPassword"
+              placeholder="Enter new password"
+              [class.error]="newPasswordControl?.invalid && newPasswordControl?.touched"
+              autocomplete="new-password">
+            <button 
+              type="button" 
+              class="toggle-password" 
+              (click)="togglePasswordVisibility('password')"
+              tabindex="-1"
+              aria-label="Toggle password visibility">
+              <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="newPasswordControl?.invalid && newPasswordControl?.touched">
+            <span *ngIf="newPasswordControl?.errors?.['required']">Password is required</span>
+            <span *ngIf="newPasswordControl?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="password-input-wrapper">
+            <input 
+              [type]="showConfirmPassword ? 'text' : 'password'" 
+              id="confirmPassword" 
+              formControlName="confirmPassword"
+              placeholder="Confirm new password"
+              [class.error]="(confirmPasswordControl?.invalid && confirmPasswordControl?.touched) || (resetForm.errors?.['passwordMismatch'] && confirmPasswordControl?.touched)"
+              autocomplete="new-password">
+            <button 
+              type="button" 
+              class="toggle-password" 
+              (click)="togglePasswordVisibility('confirm')"
+              tabindex="-1"
+              aria-label="Toggle password visibility">
+              <svg *ngIf="!showConfirmPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg *ngIf="showConfirmPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="confirmPasswordControl?.invalid && confirmPasswordControl?.touched">
+            <span *ngIf="confirmPasswordControl?.errors?.['required']">Please confirm your password</span>
+          </div>
+          <div class="error-message" *ngIf="resetForm.errors?.['passwordMismatch'] && confirmPasswordControl?.touched">
+            <span>Passwords do not match</span>
+          </div>
+        </div>
+
+        <div class="alert alert-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <div class="alert alert-success" *ngIf="successMessage">
+          {{ successMessage }}
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn-secondary" (click)="goBack()" [disabled]="loading">
+            Back
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading">
+            <span *ngIf="!loading">Reset Password</span>
+            <span *ngIf="loading" class="loading-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+Ts : 
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ForgotPasswordService } from '../service/forgot-password-service';
+import { CommonModule } from '@angular/common';
+export class ForgotPasswordDialogComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
+  
+  currentStep: 'email' | 'otp' | 'reset' = 'email';
+  
+  emailForm!: FormGroup;
+  otpForm!: FormGroup;
+  resetForm!: FormGroup;
+  
+  email: string = '';
+  otp: string = '';
+  
+  loading: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
+  
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private forgotPasswordService : ForgotPasswordService
+  ) {}
+
+  ngOnInit(): void {
+    this.initializeForms();
+  }
+
+  // private get forgotPasswordService(): ForgotPasswordService {
+  //   return new ForgotPasswordService(this.http);
+  // }
+
+  initializeForms(): void {
+    this.emailForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.otpForm = this.fb.group({
+      otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern(/^\d{6}$/)]]
+    });
+
+    this.resetForm = this.fb.group({
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  passwordMatchValidator(group: FormGroup): { [key: string]: boolean } | null {
+    const password = group.get('newPassword')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordMismatch: true };
+  }
+
+  onSubmitEmail(): void {
+    if (this.emailForm.invalid) {
+      this.markFormGroupTouched(this.emailForm);
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.email = this.emailForm.value.email;
+
+    this.forgotPasswordService.forgotPassword({ email: this.email }).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = response.message || 'OTP sent successfully to your email!';
+          setTimeout(() => {
+            this.currentStep = 'otp';
+            this.successMessage = '';
+          }, 1500);
+        } else {
+          this.errorMessage = response.message || 'Failed to send OTP. Please try again.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'An error occurred. Please try again.';
+      }
+    });
+  }
+
+  onSubmitOtp(): void {
+    if (this.otpForm.invalid) {
+      this.markFormGroupTouched(this.otpForm);
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.otp = this.otpForm.value.otp;
+
+    this.forgotPasswordService.verifyOtp({ email: this.email, otp: this.otp }).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = response.message || 'OTP verified successfully!';
+          setTimeout(() => {
+            this.currentStep = 'reset';
+            this.successMessage = '';
+          }, 1500);
+        } else {
+          this.errorMessage = response.message || 'Invalid OTP. Please try again.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'Invalid OTP. Please try again.';
+      }
+    });
+  }
+
+  onSubmitReset(): void {
+    if (this.resetForm.invalid) {
+      this.markFormGroupTouched(this.resetForm);
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const resetData = {
+      email: this.email,
+      otp: this.otp,
+      newPassword: this.resetForm.value.newPassword
+    };
+
+    this.forgotPasswordService.resetPassword(resetData).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = response.message || 'Password reset successfully!';
+          setTimeout(() => {
+            this.closeDialog();
+          }, 2000);
+        } else {
+          this.errorMessage = response.message || 'Failed to reset password. Please try again.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'An error occurred. Please try again.';
+      }
+    });
+  }
+
+  resendOtp(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.forgotPasswordService.forgotPassword({ email: this.email }).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = 'OTP resent successfully!';
+          setTimeout(() => this.successMessage = '', 3000);
+        } else {
+          this.errorMessage = response.message || 'Failed to resend OTP.';
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error.error?.message || 'Failed to resend OTP.';
+      }
+    });
+  }
+
+  goBack(): void {
+    if (this.currentStep === 'otp') {
+      this.currentStep = 'email';
+      this.otpForm.reset();
+    } else if (this.currentStep === 'reset') {
+      this.currentStep = 'otp';
+      this.resetForm.reset();
+    }
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  closeDialog(): void {
+    this.currentStep = 'email';
+    this.emailForm.reset();
+    this.otpForm.reset();
+    this.resetForm.reset();
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.close.emit();
+  }
+
+  togglePasswordVisibility(field: 'password' | 'confirm'): void {
+    if (field === 'password') {
+      this.showPassword = !this.showPassword;
+    } else {
+      this.showConfirmPassword = !this.showConfirmPassword;
+    }
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  get emailControl() {
+    return this.emailForm.get('email');
+  }
+
+  get otpControl() {
+    return this.otpForm.get('otp');
+  }
+
+  get newPasswordControl() {
+    return this.resetForm.get('newPassword');
+  }
+
+  get confirmPasswordControl() {
+    return this.resetForm.get('confirmPassword');
+  }
+}
