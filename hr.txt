@@ -1,0 +1,6 @@
+My both tables are as follows now i want to fetch candidate name,skills,role and from interview i want interview_date and google_meet_link
+SELECT *
+FROM interviews
+WHERE team_leader_id = 'MGS9900'
+  AND status = 'PENDING'
+  AND google_meet_link IS NULL;
