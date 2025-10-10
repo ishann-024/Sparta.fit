@@ -186,3 +186,59 @@ Here in pending interviews i want to display cards like this dynamically based o
             </div>
 And on clicking Start interview button  the google meet link should get open and on clicking fill Asssessment Form a form should open On the same Page.
 First just return appropriate number of these cards and their data coming from backend
+
+Backend Controller for fetching interview card details  :
+@GetMapping("pending-interviews-no-link")
+    public List<TeamLeadInterviewDTO> getPendingInterviewsWithoutLink(Authentication authentication) {
+        return teamLeadService.getPendingInterviewsWithoutLink(authentication.getName());
+    }
+    public class TeamLeadInterviewDTO {
+	private String candidateName;
+    private String skills;
+    private String role;
+    private Date interviewDate;
+    private String googleMeetLink;
+    private Long interviewId;
+    private Long candidateId;
+    private Long jobRequestId;
+    private String startTime;
+    private String endTime;
+    private Integer roundNumber;
+    private String status;
+    private String jobRequestTitle;
+}
+
+Sample Backend Response : 
+[
+    {
+        "candidateName": "Simran Kaur",
+        "skills": null,
+        "role": null,
+        "interviewDate": null,
+        "googleMeetLink": "kvhcvkgfcjg",
+        "interviewId": 10,
+        "candidateId": 10,
+        "jobRequestId": 39,
+        "startTime": null,
+        "endTime": null,
+        "roundNumber": 1,
+        "status": "PENDING",
+        "jobRequestTitle": "Front End Developer"
+    },
+    {
+        "candidateName": "Rahul Verma",
+        "skills": null,
+        "role": null,
+        "interviewDate": null,
+        "googleMeetLink": "kvhcvkgfcjg",
+        "interviewId": 9,
+        "candidateId": 9,
+        "jobRequestId": 38,
+        "startTime": null,
+        "endTime": null,
+        "roundNumber": 1,
+        "status": "PENDING",
+        "jobRequestTitle": "HRMS training"
+    }
+]
+Is our code correct according to response
