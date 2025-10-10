@@ -1,6 +1,77 @@
-My both tables are as follows now i want to fetch candidate name,skills,role and from interview i want interview_date and google_meet_link
-SELECT *
-FROM interviews
-WHERE team_leader_id = 'MGS9900'
-  AND status = 'PENDING'
-  AND google_meet_link IS NULL;
+GIVE UPDATED dto , rowMApper , repo , service,controller for following query output :
+SELECT 
+    c.FULL_NAME AS candidate_name,
+    c.SKILLS,
+    c.PROFILE_ROLE AS role,
+    i.INTERVIEW_DATE,
+    i.GOOGLE_MEET_LINK,
+    i.INTERVIEW_ID,
+    i.CANDIDATE_ID,
+    i.JOB_REQUEST_ID,
+    i.START_TIME,
+    i.END_TIME,
+    i.ROUND_NUMBER,
+    i.STATUS,
+    jr.TITLE AS job_request_title
+FROM INTERVIEWS i
+INNER JOIN CANDIDATES c ON i.CANDIDATE_ID = c.CANDIDATE_ID
+INNER JOIN JOB_REQUESTS jr ON i.JOB_REQUEST_ID = jr.JOB_REQUEST_ID
+WHERE i.TEAM_LEADER_ID = 'MGS9900'
+  AND i.STATUS = 'PENDING'
+  AND i.GOOGLE_MEET_LINK IS not NULL
+ORDER BY i.INTERVIEW_DATE, i.CREATED_AT;
+
+DTO :
+public class TeamLeadInterviewDTO {
+	private String candidateName;
+    private String skills;
+    private String role;
+    private Date interviewDate;
+    private String googleMeetLink;
+    private Long interviewId;
+    private Long candidateId;
+    private Long jobRequestId;
+    private Integer roundNumber;
+    private String status;
+}
+RowMapper:
+public class TeamLeadInterviewRowMapper implements RowMapper<TeamLeadInterviewDTO>{
+	@Override
+    public TeamLeadInterviewDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+        TeamLeadInterviewDTO dto = new TeamLeadInterviewDTO();
+        dto.setCandidateName(rs.getString("candidate_name"));
+        dto.setSkills(rs.getString("skills"));
+        dto.setRole(rs.getString("role"));
+        dto.setInterviewDate(rs.getDate("INTERVIEW_DATE"));
+        dto.setGoogleMeetLink(rs.getString("GOOGLE_MEET_LINK"));
+        dto.setInterviewId(rs.getLong("INTERVIEW_ID"));
+        dto.setCandidateId(rs.getLong("CANDIDATE_ID"));
+        dto.setJobRequestId(rs.getLong("JOB_REQUEST_ID"));
+        dto.setRoundNumber(rs.getInt("ROUND_NUMBER"));
+        dto.setStatus(rs.getString("STATUS"));
+        return dto;
+    }
+}
+I think service and controller won;t change but repository will change 
+Repo : 
+public List<TeamLeadInterviewDTO> getPendingInterviewsWithoutLink(String teamLeadId) {
+	        String sql = "SELECT " +
+	                    " c.FULL_NAME AS candidate_name, " +
+	                    " c.SKILLS, " +
+	                    " c.PROFILE_ROLE AS role, " +
+	                    " i.INTERVIEW_DATE, " +
+	                    " i.GOOGLE_MEET_LINK, " +
+	                    " i.INTERVIEW_ID, " +
+	                    " i.CANDIDATE_ID, " +
+	                    " i.JOB_REQUEST_ID, " +
+	                    " i.ROUND_NUMBER, " +
+	                    " i.STATUS " +
+	                    "FROM INTERVIEWS i " +
+	                    "INNER JOIN CANDIDATES c ON i.CANDIDATE_ID = c.CANDIDATE_ID " +
+	                    "WHERE i.TEAM_LEADER_ID = ? " +
+	                    " AND i.STATUS = 'PENDING' " +
+	                    " AND i.GOOGLE_MEET_LINK IS NULL " +
+	                    "ORDER BY i.INTERVIEW_DATE, i.CREATED_AT";
+	        
+	        return jdbcTemplate.query(sql, new TeamLeadInterviewRowMapper(), teamLeadId);
+	    }
