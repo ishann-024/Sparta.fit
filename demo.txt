@@ -1,282 +1,67 @@
-Help me display dynamic multiple cards in follows after create job request button right now those details are hardcoded we want them to come from backend :
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Job Requests</title>
+I am getting this errors 
+X [ERROR] NG8004: No pipe found with name 'number'.
+To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component. [plugin angular-compiler]
 
-    <!-- FontAwesome CDN for icons -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-    />
-</head>
-<body>
-    <div class="applications-container">
-    <!-- Header Section -->
-    <section class="applications-header">
-        <div class="header-content">
-            <h1 class="page-title">Job Requests</h1>
-            <p class="page-subtitle">Create and manage resource requests for your projects</p>
-            <div class="applications-stats">
-                <div class="stat-item stats-total">
-                    <div class="stat-number">{{allJobRequestCount}}</div>
-                    <div class="stat-label">Total Job Requests</div>
-                </div>
-                <div class="stat-item stats-approved">
-                    <div class="stat-number">{{approvedJobRequestsCount}}</div>
-                    <div class="stat-label">Approved</div>
-                </div>
-                <div class="stat-item stats-declined">
-                    <div class="stat-number">{{declinedJobRequestsCount}}</div>
-                    <div class="stat-label">Declined</div>
-                </div>
-                <div class="stat-item stats-pending">
-                    <div class="stat-number">{{pendingJobRequest}}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-            </div>
-        </div>
-    </section>
+    src/app/teamlead-dashboard/job-request/job-request.html:223:55:
+      223 │ ... JR{{request.jobRequestId | number:'3.0-0'}} • Project ID: {...
+          ╵                                ~~~~~~
 
-    <!-- Create Job Request Button -->
-    <section class="page-header">
-        <br>
-        <button class="btn-primary" (click)="createNewRequest()">
-            <i class="fas fa-plus"></i> Create New Request
-        </button>
-    </section>
+  Error occurs in the template of component JobRequest.
 
-    <!-- Job Requests Grid -->
-    <section class="cards-grid">
-        <!-- Example Job Request Card -->
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-title">React Developer Required</div>
-                    <div class="card-subtitle">JR001 • E-commerce Platform</div>
-                </div>
-                <span class="status-badge status-approved">Approved</span>
-            </div>
-            <div class="card-content">
-                <div class="info-row">
-                    <span class="info-label">Project:</span>
-                    <span class="info-value">E-commerce Platform</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Required Skills:</span>
-                    <span class="info-value">React, Node.js, MongoDB</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Experience:</span>
-                    <span class="info-value">3+ years</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Quantity:</span>
-                    <span class="info-value">2 Developers</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Status:</span>
-                    <span class="info-value">Posted on Job Portal</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Applications:</span>
-                    <span class="info-value">15 candidates applied</span>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="btn-sm btn-primary">
-                    <i class="fas fa-users"></i> View Candidates
-                </button>
-                <button class="btn-sm btn-edit">
-                    <i class="fas fa-edit"></i> Edit Request
-                </button>
-            </div>
-        </div>
-       
-        <br>
-       
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-title">UI/UX Designer</div>
-                    <div class="card-subtitle">JR002 • E-commerce Platform</div>
-                </div>
-                <span class="status-badge status-pending">Pending Approval</span>
-            </div>
-            <div class="card-content">
-                <div class="info-row">
-                    <span class="info-label">Project:</span>
-                    <span class="info-value">E-commerce Platform</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Required Skills:</span>
-                    <span class="info-value">Figma, Adobe XD, Prototyping</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Experience:</span>
-                    <span class="info-value">2+ years</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Quantity:</span>
-                    <span class="info-value">1 Designer</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Submitted:</span>
-                    <span class="info-value">Oct 20, 2024</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Urgency:</span>
-                    <span class="info-value">Medium</span>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="btn btn-warning btn-sm">
-                    <i class="fas fa-clock"></i> Waiting for PM Approval
-                </button>
-                <button class="btn btn-edit">
-                    <i class="fas fa-edit"></i> Edit Request
-                </button>
-            </div>
-        </div>
-    </section>
-</div>
-  </body>
-</html>
-
-Component : 
-export class JobRequest {
-  approvedJobRequestsCount: number = 0;
-  declinedJobRequestsCount: number = 0;
-  allJobRequestCount: number = 0;
-  pendingJobRequest: number = 0;
-  errorMessage: string = '';
-
-  constructor(private tlService: TlService,private router:Router) {}
-
-  ngOnInit(): void {
-    this.fetchApprovedJobRequestsCount();
-    this.fetchDeclinedJobRequestsCount();
-    this.fetchAllJobRequestsCount();
-    this.fetchPendingJobRequest();
-  }
-  fetchApprovedJobRequestsCount(): void { 
-    
-    this.tlService.getApprovedJobRequestsCount().subscribe({
-      next: (data) => {
-        this.approvedJobRequestsCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API"); 
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchDeclinedJobRequestsCount(): void { 
-    this.tlService.getDeclinedJobRequestsCount().subscribe({
-      next: (data) => {
-        this.declinedJobRequestsCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API"); 
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchAllJobRequestsCount(): void { 
-    this.tlService.getAllJobRequestCount().subscribe({
-      next: (data) => {
-        this.allJobRequestCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API"); 
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchPendingJobRequest(): void{
-    this.tlService.getPendingJobRequestsCount().subscribe({
-      next: (data) => {
-        this.pendingJobRequest = data;
-        console.log('Pending job request retrieved successfully:', data);
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to retrieve Pending job request. Please try again later.';
-        console.error('API Error:', err);
-      }
-    });
-  }
-
-  
-  createNewRequest(): void {
-    this.router.navigate(['/tl-dashboard/create-job-request']);
-  }
-
-}
+    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
+      9 │   templateUrl: './job-request.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~
 
 
-this is my backend controller :
-@GetMapping("/get-job-requests")
-		public ResponseEntity<List<JobRequest>> getJobRequestsByTeamLeader(Authentication authentication) {		 
-			List<JobRequest> jobRequests = teamLeadService.getJobRequestsByTeamLeader(authentication.getName());
-			return ResponseEntity.ok(jobRequests);
-		}
-Sample Backend response : 
-[
-    {
-        "jobRequestId": 8,
-        "teamLeaderId": "MGS9991",
-        "projectManagerId": null,
-        "hrId": "EMP1003",
-        "projectId": 9,
-        "title": "System\nAnalyst",
-        "description": "Requirement gathering",
-        "skills": null,
-        "minExperience": 1.0,
-        "maxExperience": 3.0,
-        "headCount": 0,
-        "minCtc": 60000.0,
-        "maxCtc": 75000.0,
-        "priority": "LOW",
-        "status": "SUBMITTED",
-        "createdAt": "2025-09-18",
-        "updatedAt": "2025-09-18"
-    },
-    {
-        "jobRequestId": 38,
-        "teamLeaderId": "MGS9991",
-        "projectManagerId": "MGS1006",
-        "hrId": null,
-        "projectId": 9,
-        "title": "Devops",
-        "description": "Training project for freshers",
-        "skills": "Java,SpringBoot,Js,Angular,REST API",
-        "minExperience": 1.0,
-        "maxExperience": 2.0,
-        "headCount": 0,
-        "minCtc": 4.0,
-        "maxCtc": 8.0,
-        "priority": "HIGH",
-        "status": "SUBMITTED",
-        "createdAt": "2025-10-09",
-        "updatedAt": "2025-10-09"
-    }
-]
+X [ERROR] NG8002: Can't bind to 'ngClass' since it isn't a known property of 'span'. [plugin angular-compiler]
+
+    src/app/teamlead-dashboard/job-request/job-request.html:226:47:
+      226 │ ... class="status-badge" [ngClass]="getStatusClass(request.status)">
+          ╵                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component JobRequest.
+
+    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
+      9 │   templateUrl: './job-request.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8004: No pipe found with name 'number'.
+To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component. [plugin angular-compiler]
+
+    src/app/teamlead-dashboard/job-request/job-request.html:252:48:
+      252 │ ...        ₹{{request.minCtc | number:'1.0-0'}} - ₹{{request....
+          ╵                              ~~~~~~
+
+  Error occurs in the template of component JobRequest.
+
+    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
+      9 │   templateUrl: './job-request.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8004: No pipe found with name 'number'.
+To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component. [plugin angular-compiler]
+
+    src/app/teamlead-dashboard/job-request/job-request.html:252:87:
+      252 │ ...inCtc | number:'1.0-0'}} - ₹{{request.maxCtc | number:'1.0-0'}}
+          ╵                                               ~~~~~~
+
+  Error occurs in the template of component JobRequest.
+
+    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
+      9 │   templateUrl: './job-request.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG8002: Can't bind to 'ngClass' since it isn't a known property of 'span'. [plugin angular-compiler]
+
+    src/app/teamlead-dashboard/job-request/job-request.html:257:49:
+      257 │ ...lass="info-value" [ngClass]="getPriorityClass(request.priority)">
+          ╵                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component JobRequest.
+
+    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
+      9 │   templateUrl: './job-request.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~
