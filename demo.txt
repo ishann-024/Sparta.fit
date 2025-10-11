@@ -1,244 +1,59 @@
-This is my TeamLead Dashboard :
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jobie - Team Lead Dashboard</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="dashboard-container">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        
-
-        <div class="user-profile">
-          <div class="user-avatar">{{userInitials}}</div>
-          <div class="user-info">
-            <h3>{{fullName}}</h3>
-            <p>Team Lead</p>
-          </div>
-        </div>
-
-        <nav>
-          <ul class="nav-menu">
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/overview"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/my-projects"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-project-diagram"></i>
-                <span>My Projects</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/job-requests"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-clipboard-list"></i>
-                <span>Job Requests</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/team-members"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-user-friends"></i>
-                <span>Team Members</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/pending-interviews"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-calendar-alt"></i>
-                <span>Pending Interviews</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                routerLink="/tl-dashboard/settings"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-              </a>
-            </li>
-            <!-- <li class="nav-item">
-              <a href="Logout" class="nav-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-              </a>
-            </li> -->
-
-            <li class="nav-item">
-            <a
-              routerLink="/tl-dashboard/tl-logout"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              class="nav-link"
-            >
-              <i class="fas fa-sign-out-alt"></i>
-              <span>Logout</span>
-            </a>
-          </li>
-            
-            <!-- <li class="nav-item">
-              <a (click)="onLogout()" class="nav-link" style="cursor: pointer;">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-              </a>
-            </li> -->
-          </ul>
-        </nav>
-      </aside>
-
-      <!-- Main Content -->
-      <main class="main-content">
-        <!-- Header -->
-        <header class="header">
-          <div class="welcome-section">
-            <h1 id="welcomeMessage">Welcome Back,{{fullName}}</h1>
-            <p>Lead your team to success and manage projects efficiently</p>
-          </div>
-         
-          <div class="header-actions">
-            <!-- <div class="search-box">
-              <input type="text" placeholder="Search projects, team members..." id="globalSearch" />
-              <i class="fas fa-search"></i>
-            </div> -->
-
-            <div class="notification-btn" onclick="toggleNotifications()">
-              <i class="fas fa-bell"></i>
-              <span class="notification-badge">3</span>
-            </div>
-          </div>
-        </header>
-
-        <section class="content-area">
-          <router-outlet></router-outlet>
-        </section>
-      </main>
-    </div>
-  </body>
-</html>
-
-Here in pending interviews i want to display cards like this dynamically based on how many interviews are assigned to the Team Lead who is logged In I have written a code in the backend that returns appropriate DTO from which I have to display this information:
-<div>
-                <div class="card-title">Interview Scheduled</div>
-                <div class="card-subtitle">React Developer Position</div>
-              </div>
-              <span class="status-badge status-interview">Today 2:00 PM</span>
-            </div>
-            <div class="card-content">
-              <div class="candidate-profile">
-                <div class="candidate-avatar">JS</div>
-                <div class="candidate-info">
-                  <h4>John Smith</h4>
-                  <p>4 years experience • Round 1 Interview</p>
-                </div>
-              </div>
-              <div class="skills-tags">
-                <span class="skill-tag">React</span>
-                <span class="skill-tag">Node.js</span>
-                <span class="skill-tag">MongoDB</span>
-              </div>
-            </div>
-			<div class="card-actions">
-              <button class="btn btn-success btn-sm" onclick="conductInterview('CAND001')">
-                <i class="fas fa-video"></i> Start Interview
-              </button>
-              <button class="btn btn-outline btn-sm">
-                <i class="fas fa-eye"></i> Fill Assessment Form
-              </button>
-            </div>
-And on clicking Start interview button  the google meet link should get open and on clicking fill Asssessment Form a form should open On the same Page.
-First just return appropriate number of these cards and their data coming from backend
-
-Backend Controller for fetching interview card details  :
-@GetMapping("pending-interviews-no-link")
-    public List<TeamLeadInterviewDTO> getPendingInterviewsWithoutLink(Authentication authentication) {
-        return teamLeadService.getPendingInterviewsWithoutLink(authentication.getName());
+And for fill assessment form button this is the backend controller and DTO and sample response 
+@PostMapping("/fill-assessment-form")
+    public ResponseEntity<String> submitAssessment(@RequestBody AssessmentFormDTO assessmentForm) {
+        try {
+            teamLeadService.submitAssessment(assessmentForm);
+            return ResponseEntity.ok("Assessment submitted successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error submitting assessment: " + e.getMessage());
+        }
     }
-    public class TeamLeadInterviewDTO {
-	private String candidateName;
-    private String skills;
-    private String role;
-    private Date interviewDate;
-    private String googleMeetLink;
-    private Long interviewId;
-    private Long candidateId;
-    private Long jobRequestId;
-    private String startTime;
-    private String endTime;
+
+public class AssessmentFormDTO {
+    private Integer interviewId;
+    private InterviewStatus status; 
+    private String remarks;
+    private Double score;
+    private Integer candidateId;
+    private Integer jobRequestId;
     private Integer roundNumber;
-    private String status;
-    private String jobRequestTitle;
 }
 
-Sample Backend Response : 
-[
-    {
-        "candidateName": "Simran Kaur",
-        "skills": null,
-        "role": null,
-        "interviewDate": null,
-        "googleMeetLink": "kvhcvkgfcjg",
-        "interviewId": 10,
-        "candidateId": 10,
-        "jobRequestId": 39,
-        "startTime": null,
-        "endTime": null,
-        "roundNumber": 1,
-        "status": "PENDING",
-        "jobRequestTitle": "Front End Developer"
-    },
-    {
-        "candidateName": "Rahul Verma",
-        "skills": null,
-        "role": null,
-        "interviewDate": null,
-        "googleMeetLink": "kvhcvkgfcjg",
-        "interviewId": 9,
-        "candidateId": 9,
-        "jobRequestId": 38,
-        "startTime": null,
-        "endTime": null,
-        "roundNumber": 1,
-        "status": "PENDING",
-        "jobRequestTitle": "HRMS training"
+public enum InterviewStatus {
+	PENDING,INTERVIEW1_CLEARED,INTERVIEW2_CLEARED,HR_CLEARED,
+    INTERVIEW1_REJECTED,INTERVIEW2_REJECTED,HR_REJECTED;
+    
+ // Convert String to InterviewStatus
+    public static InterviewStatus fromString(String status) {
+        if (status == null) {
+            return null;
+        }
+        try {
+            return InterviewStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid interview status: " + status);
+        }
     }
-]
-Is our code correct according to response
+
+    // Convert InterviewStatus to String for database
+    public String getDbValue() {
+        return this.name();
+    }
+
+    // Check if status indicates clearing current round
+    public boolean isCleared() {
+        return this == INTERVIEW1_CLEARED || this == INTERVIEW2_CLEARED || this == HR_CLEARED;
+    }
+
+    // Check if status indicates rejection
+    public boolean isRejected() {
+        return this == INTERVIEW1_REJECTED || this == INTERVIEW2_REJECTED || this == HR_REJECTED;
+    }
+}
+
+Response in backend  : Assessment submitted successfully
+
+We need to integrate this in our current pending-interviews component on clicking fill assessment form a dialog box should get open after submitting the form we should see the output is assessment form submitted or not.
+I don't think this will need a new component
