@@ -1,121 +1,120 @@
-Fix this update Job request method 
 @PostMapping("/job-requests/{jobRequestId}")
-	public ResponseEntity<String> updateJobRequest(@PathVariable("jobRequestId") int jobRequestId,
-			@RequestBody UpdateJobRequestDTO dto) {
-		if(teamLeadService.updateJobRequest(jobRequestId, dto)) {
-		return ResponseEntity.ok("Job Request Updated Successfully");
-		}else {
-			return ResponseEntity.ok("Job Request Failed ");
-		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(teamLeadService.updateJobRequest(jobRequestId, dto));
-	}
-
-@Override
-	public boolean updateJobRequest(int jobRequestId, UpdateJobRequestDTO dto) {
-		JobRequest jobRequest = jobRequestMapper.toEntity(dto, jobRequestId);
-		return teamLeadRepository.updateJobRequest(jobRequestId, dto);
-	}
-
-public boolean updateJobRequest(int jobRequestId, UpdateJobRequestDTO dto) {
-		String sql = "UPDATE job_requests SET description = ?, skills = ?,experience_required = ?, min_ctc = ?, max_ctc = ?,updated_at = SYSDATE WHERE job_request_id = ?";
-
-		return jdbcTemplate.update(sql, dto.getDescription(), dto.getSkills(), dto.getExperienceRequired(),
-				dto.getMinCtc(), dto.getMaxCtc(), jobRequestId) > 0;
-	}
-
-public class JobRequestMapper {
-	
-	// Update DTO to Domain
-	 public JobRequest toEntity(UpdateJobRequestDTO dto, int jobRequestId) {
-	        JobRequest jobRequest = new JobRequest();
-	        jobRequest.setJobRequestId(jobRequestId); // comes from path variable
-	        jobRequest.setTitle(dto.getTitle());
-	        jobRequest.setDescription(dto.getDescription());
-	        jobRequest.setSkills(dto.getSkills());
-	        jobRequest.setMinExperience(dto.getMinExperience());
-	        jobRequest.setMaxExperience(dto.getMaxExperience());
-	        jobRequest.setMinCtc(dto.getMinCtc());
-	        jobRequest.setMaxCtc(dto.getMaxCtc());
-	        //jobRequest.setPriority(dto.getPriority());
-
-	        // Status is optional, if you want to allow TL to update it
-	        if (dto.getStatus() != null) {
-	            jobRequest.setStatus(dto.getStatus());
-	        }
-
-	        return jobRequest;
-	    }
-
-    // Domain → Response DTO
-    public static ResponseJobRequestDTO toResponseDTO(JobRequest jobRequest) {
-        ResponseJobRequestDTO dto = new ResponseJobRequestDTO();
-        dto.setJobRequestId(jobRequest.getJobRequestId());
-        dto.setProjectId(jobRequest.getProjectId());
-        dto.setTeamLeaderId(jobRequest.getTeamLeaderId());
-        dto.setPmId(jobRequest.getProjectManagerId());
-        dto.setHrId(jobRequest.getHrId());
-        dto.setTitle(jobRequest.getTitle());
-        dto.setDescription(jobRequest.getDescription());
-        dto.setSkills(jobRequest.getSkills());
-        dto.setMaxExperience(jobRequest.getMaxExperience());
-        dto.setMinExperience(jobRequest.getMinExperience());
-        dto.setMaxCtc(jobRequest.getMaxCtc());
-        dto.setMinCtc(jobRequest.getMinCtc());
-        dto.setPriority(jobRequest.getPriority());
-        dto.setStatus(jobRequest.getStatus());
-        dto.setCreatedAt(jobRequest.getCreatedAt());
-        dto.setUpdatedAt(jobRequest.getUpdatedAt());
-        return dto;
+    public ResponseEntity<String> updateJobRequest(@PathVariable("jobRequestId") int jobRequestId,
+            @RequestBody UpdateJobRequestDTO dto) {
+        try {
+            boolean isUpdated = teamLeadService.updateJobRequest(jobRequestId, dto);
+            if (isUpdated) {
+                return ResponseEntity.ok("Job Request Updated Successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Job Request Not Found or Update Failed");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error updating job request: " + e.getMessage());
+        }
     }
-
-    // Create DTO → Domain
-    public static JobRequest fromCreateDTO(CreateJobRequestDTO dto) {
-        JobRequest jobRequest = new JobRequest();
-        jobRequest.setProjectId(dto.getProjectId());
-        jobRequest.setTeamLeaderId(dto.getTeamLeaderId());
-        jobRequest.setTitle(dto.getTitle());
-        jobRequest.setDescription(dto.getDescription());
-        jobRequest.setSkills(dto.getSkills());
-        jobRequest.setMinExperience(dto.getMinExperience());
-        jobRequest.setMaxExperience(dto.getMaxExperience());
-        jobRequest.setMinCtc(dto.getMinCtc());
-        jobRequest.setMaxCtc(dto.getMaxCtc());
-        jobRequest.setPriority(dto.getPriority());
-        jobRequest.setStatus(JobRequestStatus.DRAFT); // default
-        return jobRequest;
-    }
-}
-
 public class UpdateJobRequestDTO {
 	private String title;
 	private String description;
 	private double minCtc;
 	private double maxCtc;
 	private String skills;
-	private int minExperience;
-	private int maxExperience;
+	private double minExperience;
+	private double maxExperience;
 	private JobRequestStatus status;
-	private String experienceRequired;
 }
+Sample response backend  : Job Request Updated Successfully
+Following is a part of jobRequest component 
+In this we have a edit job request button on clicking it should open a form in same component no need of new component and on submit we should get approppriate response 
+<!-- Loading Spinner -->
+        <div *ngIf="isLoading" class="loading-container">
+            <i class="fas fa-spinner fa-spin"></i> Loading job requests...
+        </div>
 
-public class JobRequest {
-    private int jobRequestId;
-    private String teamLeaderId;
-    private String projectManagerId;
-    private String hrId;
-    private int projectId;
-    private String title;
-    private String description;
-    private String skills;
-    //private int minExperience;
-    //private int maxExperience;
-    private double minExperience;
-    private double maxExperience;
-    private int headCount;
-    private double minCtc;
-    private double maxCtc;
-    private String priority;  // HIGH, MEDIUM, LOW
-    private JobRequestStatus status; // Enum: DRAFT, SUBMITTED, PM_REVIEWED, FORWARDED_TO_HR, CLOSED
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
-}
+        <!-- Error Message -->
+        <div *ngIf="errorMessage && !isLoading" class="error-message">
+            <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
+        </div>
+
+        <!-- No Job Requests Message -->
+        <div *ngIf="!isLoading && jobRequests.length === 0 && !errorMessage" class="no-data-message">
+            <i class="fas fa-inbox"></i>
+            <p>No job requests found. Create your first request to get started!</p>
+        </div>
+
+        <!-- Job Requests Grid -->
+        <section class="cards-grid" *ngIf="!isLoading && jobRequests.length > 0">
+            <!-- Dynamic Job Request Cards -->
+            <div class="card" *ngFor="let request of jobRequests">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">{{request.title}}</div>
+                        <div class="card-subtitle">
+                            JR{{request.jobRequestId | number:'3.0-0'}} • Project ID: {{request.projectId}}
+                        </div>
+                    </div>
+                    <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+                        {{getStatusLabel(request.status)}}
+                    </span>
+                </div>
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">Description:</span>
+                        <span class="info-value">{{request.description}}</span>
+                    </div>
+                    <div class="info-row" *ngIf="request.skills">
+                        <span class="info-label">Required Skills:</span>
+                        <span class="info-value">{{request.skills}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Experience:</span>
+                        <span class="info-value">
+                            {{request.minExperience}} - {{request.maxExperience}} years
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Head Count:</span>
+                        <span class="info-value">{{request.headCount}} Position(s)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">CTC Range:</span>
+                        <span class="info-value">
+                            ₹{{request.minCtc | number:'1.0-0'}} - ₹{{request.maxCtc | number:'1.0-0'}}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Priority:</span>
+                        <span class="info-value" [ngClass]="getPriorityClass(request.priority)">
+                            {{request.priority}}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Created:</span>
+                        <span class="info-value">{{request.createdAt}}</span>
+                    </div>
+                    <div class="info-row" *ngIf="request.updatedAt !== request.createdAt">
+                        <span class="info-label">Updated:</span>
+                        <span class="info-value">{{request.updatedAt}}</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-sm btn-primary"
+                            *ngIf="request.status === 'APPROVED'"
+                            (click)="viewCandidates(request.jobRequestId)">
+                        <i class="fas fa-users"></i> View Candidates
+                    </button>
+                    <button class="btn-sm btn-warning"
+                            *ngIf="request.status === 'SUBMITTED'"
+                            disabled>
+                        <i class="fas fa-clock"></i> Waiting for Approval
+                    </button>
+                    <button class="btn-sm btn-edit" (click)="editRequest(request.jobRequestId)">
+                        <i class="fas fa-edit"></i> Edit Request
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
