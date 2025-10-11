@@ -1,304 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Job Requests</title>
+Help me create a form that helps in candidate registration , the backend details as follows  
+I have already created a form just configure it 
+Backend : 
+public class CreateCandidateDTO {
+	@Email
+	@NotBlank
+	private String email;
+	@NotBlank
+	private String password;
+	@NotBlank
+	private String confirmPassword;
+	@NotBlank
+	private String fullName;
+	@NotBlank
+	private String phoneNumber;
+	@NotBlank
+	private String previousRole;
+}
+Sample Response from Backend: 
+{
+    "candidateId": null,
+    "email": "joeyspizza@example.com",
+    "phoneNumber": "0099999999",
+    "profileRole": null,
+    "imagePath": null,
+    "passwordHash": "$2a$10$xph4RbjaDoFqccszvVt3Ruv..lRS89CGwuO1i44p2Sv.Zerm2z9eC",
+    "fullName": "Johnny Doe",
+    "gender": null,
+    "expectedCtc": null,
+    "resumePath": null,
+    "totalExperience": null,
+    "noticePeriod": null,
+    "currentCompany": null,
+    "skills": null,
+    "status": "PENDING_VERIFICATION",
+    "createdAt": "2025-10-11",
+    "updatedAt": "2025-10-11",
+    "otp": null,
+    "otpGeneratedAt": null
+}
 
-    <!-- FontAwesome CDN for icons -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-    />
-</head>
+Controller :
+@PostMapping("/create/candidate")
+    public ResponseEntity<Candidate> createCandidate(@RequestBody CreateCandidateDTO createCandidateDTO) {
+		if(!createCandidateDTO.getConfirmPassword().equals(createCandidateDTO.getPassword())) {
+			return new ResponseEntity<>(new Candidate(), HttpStatus.BAD_REQUEST);
+		}
+        Candidate newCandidate = candidateService.createCandidate(createCandidateDTO);
+        return new ResponseEntity<>(newCandidate, HttpStatus.OK);
+}
+
+Candidate - registration component : 
+HTML :
 <body>
-    <div class="applications-container">
-        <!-- Header Section -->
-        <section class="applications-header">
-            <div class="header-content">
-                <h1 class="page-title">Job Requests</h1>
-                <p class="page-subtitle">Create and manage resource requests for your projects</p>
-                <div class="applications-stats">
-                    <div class="stat-item stats-total">
-                        <div class="stat-number">{{allJobRequestCount}}</div>
-                        <div class="stat-label">Total Job Requests</div>
-                    </div>
-                    <div class="stat-item stats-approved">
-                        <div class="stat-number">{{approvedJobRequestsCount}}</div>
-                        <div class="stat-label">Approved</div>
-                    </div>
-                    <div class="stat-item stats-declined">
-                        <div class="stat-number">{{declinedJobRequestsCount}}</div>
-                        <div class="stat-label">Declined</div>
-                    </div>
-                    <div class="stat-item stats-pending">
-                        <div class="stat-number">{{pendingJobRequest}}</div>
-                        <div class="stat-label">Pending</div>
-                    </div>
-                </div>
+    <div class="form-container">
+        <h2>Candidate Registration</h2>
+
+        <div id="successMessage" class="message success-message"></div>
+        <div id="errorMessage" class="message error-message"></div>
+
+        <form id="registrationForm">
+            <div class="input-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
             </div>
-        </section>
 
-        <!-- ============ EDIT FORM MODAL ============ -->
-        <section class="edit-form-section" *ngIf="isEditMode">
-            <div class="edit-form-container">
-                <div class="edit-form-header">
-                    <h2><i class="fas fa-edit"></i> Edit Job Request #{{editingRequestId}}</h2>
-                    <button class="close-btn" (click)="cancelEdit()" [disabled]="isSubmitting">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <!-- Success Message -->
-                <div *ngIf="successMessage" class="success-message">
-                    <i class="fas fa-check-circle"></i> {{successMessage}}
-                </div>
-
-                <!-- Error Message in Form -->
-                <div *ngIf="errorMessage && isEditMode" class="error-message">
-                    <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
-                </div>
-
-                <form [formGroup]="editForm" (ngSubmit)="submitEditForm()">
-                    <div class="form-grid">
-                        <!-- Title -->
-                        <div class="form-group full-width">
-                            <label for="title">Job Title <span class="required">*</span></label>
-                            <input
-                                type="text"
-                                id="title"
-                                formControlName="title"
-                                class="form-control"
-                                placeholder="e.g., Senior React Developer"
-                                [class.invalid]="editForm.get('title')?.invalid && editForm.get('title')?.touched"
-                            />
-                            <span class="error-text" *ngIf="editForm.get('title')?.invalid && editForm.get('title')?.touched">
-                                Title is required (min 3 characters)
-                            </span>
-                        </div>
-
-                        <!-- Description -->
-                        <div class="form-group full-width">
-                            <label for="description">Description <span class="required">*</span></label>
-                            <textarea
-                                id="description"
-                                formControlName="description"
-                                class="form-control"
-                                rows="4"
-                                placeholder="Describe the job requirements..."
-                                [class.invalid]="editForm.get('description')?.invalid && editForm.get('description')?.touched"
-                            ></textarea>
-                            <span class="error-text" *ngIf="editForm.get('description')?.invalid && editForm.get('description')?.touched">
-                                Description is required (min 10 characters)
-                            </span>
-                        </div>
-
-                        <!-- Skills -->
-                        <div class="form-group full-width">
-                            <label for="skills">Required Skills</label>
-                            <input
-                                type="text"
-                                id="skills"
-                                formControlName="skills"
-                                class="form-control"
-                                placeholder="e.g., Java, Spring Boot, Angular (comma-separated)"
-                            />
-                        </div>
-
-                        <!-- Experience Range -->
-                        <div class="form-group">
-                            <label for="minExperience">Min Experience (years) <span class="required">*</span></label>
-                            <input
-                                type="number"
-                                id="minExperience"
-                                formControlName="minExperience"
-                                class="form-control"
-                                min="0"
-                                step="0.5"
-                                [class.invalid]="editForm.get('minExperience')?.invalid && editForm.get('minExperience')?.touched"
-                            />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="maxExperience">Max Experience (years) <span class="required">*</span></label>
-                            <input
-                                type="number"
-                                id="maxExperience"
-                                formControlName="maxExperience"
-                                class="form-control"
-                                min="0"
-                                step="0.5"
-                                [class.invalid]="editForm.get('maxExperience')?.invalid && editForm.get('maxExperience')?.touched"
-                            />
-                        </div>
-
-                        <!-- CTC Range -->
-                        <div class="form-group">
-                            <label for="minCtc">Min CTC (₹) <span class="required">*</span></label>
-                            <input
-                                type="number"
-                                id="minCtc"
-                                formControlName="minCtc"
-                                class="form-control"
-                                min="0"
-                                step="1000"
-                                [class.invalid]="editForm.get('minCtc')?.invalid && editForm.get('minCtc')?.touched"
-                            />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="maxCtc">Max CTC (₹) <span class="required">*</span></label>
-                            <input
-                                type="number"
-                                id="maxCtc"
-                                formControlName="maxCtc"
-                                class="form-control"
-                                min="0"
-                                step="1000"
-                                [class.invalid]="editForm.get('maxCtc')?.invalid && editForm.get('maxCtc')?.touched"
-                            />
-                        </div>
-
-                        <!-- Status -->
-                        <div class="form-group full-width">
-                            <label for="status">Status</label>
-                            <select id="status" formControlName="status" class="form-control">
-                                <option value="SUBMITTED">Submitted</option>
-                                <option value="APPROVED">Approved</option>
-                                <option value="DECLINED">Declined</option>
-                                <option value="REJECTED">Rejected</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Form Actions -->
-                    <div class="form-actions">
-                        <button
-                            type="button"
-                            class="btn-secondary"
-                            (click)="cancelEdit()"
-                            [disabled]="isSubmitting"
-                        >
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            class="btn-primary"
-                            [disabled]="editForm.invalid || isSubmitting"
-                        >
-                            <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
-                            <i class="fas fa-save" *ngIf="!isSubmitting"></i>
-                            {{ isSubmitting ? 'Updating...' : 'Update Request' }}
-                        </button>
-                    </div>
-                </form>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
             </div>
-        </section>
-        <!-- ============ END EDIT FORM MODAL ============ -->
 
-        <!-- Create Job Request Button -->
-        <section class="page-header">
-            <br>
-            <button class="btn-primary" (click)="createNewRequest()">
-                <i class="fas fa-plus"></i> Create New Request
+            <div class="input-group">
+                <label for="passwordHash">Password</label>
+                <input type="password" id="passwordHash" name="passwordHash" placeholder="Create a strong password" required>
+            </div>
+
+            <div class="input-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+            </div>
+
+            <div class="input-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" pattern="[0-9]{10}" placeholder="e.g., 9876543210" required>
+            </div>
+
+            <div class="input-group">
+                <label for="candidateRole">Previous Role</label>
+                <input type="text" id="candidateRole" name="candidateRole" placeholder="Enter your previous role" required>
+            </div>
+
+            <button type="submit" class="register-btn" id="registerBtn">
+                Create Account
             </button>
-        </section>
 
-        <!-- Loading Spinner -->
-        <div *ngIf="isLoading" class="loading-container">
-            <i class="fas fa-spinner fa-spin"></i> Loading job requests...
-        </div>
-
-        <!-- Error Message -->
-        <div *ngIf="errorMessage && !isLoading && !isEditMode" class="error-message">
-            <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
-        </div>
-
-        <!-- No Job Requests Message -->
-        <div *ngIf="!isLoading && jobRequests.length === 0 && !errorMessage" class="no-data-message">
-            <i class="fas fa-inbox"></i>
-            <p>No job requests found. Create your first request to get started!</p>
-        </div>
-
-        <!-- Job Requests Grid -->
-        <section class="cards-grid" *ngIf="!isLoading && jobRequests.length > 0">
-            <!-- Dynamic Job Request Cards -->
-            <div class="card" *ngFor="let request of jobRequests" [class.editing]="editingRequestId === request.jobRequestId">
-                <div class="card-header">
-                    <div>
-                        <div class="card-title">{{request.title}}</div>
-                        <div class="card-subtitle">
-                            JR{{request.jobRequestId}} • Project ID: {{request.projectId}}
-                        </div>
-                    </div>
-                    <span class="status-badge" [ngClass]="getStatusClass(request.status)">
-                        {{getStatusLabel(request.status)}}
-                    </span>
-                </div>
-                <div class="card-content">
-                    <div class="info-row">
-                        <span class="info-label">Description:</span>
-                        <span class="info-value">{{request.description}}</span>
-                    </div>
-                    <div class="info-row" *ngIf="request.skills">
-                        <span class="info-label">Required Skills:</span>
-                        <span class="info-value">{{request.skills}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Experience:</span>
-                        <span class="info-value">
-                            {{request.minExperience}} - {{request.maxExperience}} years
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Head Count:</span>
-                        <span class="info-value">{{request.headCount}} Position(s)</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">CTC Range:</span>
-                        <span class="info-value">
-                            ₹{{request.minCtc}} - ₹{{request.maxCtc}}
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Priority:</span>
-                        <span class="info-value" [ngClass]="getPriorityClass(request.priority)">
-                            {{request.priority}}
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Created:</span>
-                        <span class="info-value">{{request.createdAt}}</span>
-                    </div>
-                    <div class="info-row" *ngIf="request.updatedAt !== request.createdAt">
-                        <span class="info-label">Updated:</span>
-                        <span class="info-value">{{request.updatedAt}}</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <button class="btn-sm btn-primary"
-                            *ngIf="request.status === 'APPROVED'"
-                            (click)="viewCandidates(request.jobRequestId)">
-                        <i class="fas fa-users"></i> View Candidates
-                    </button>
-                    <button class="btn-sm btn-warning"
-                            *ngIf="request.status === 'SUBMITTED'"
-                            disabled>
-                        <i class="fas fa-clock"></i> Waiting for Approval
-                    </button>
-                    <button class="btn-sm btn-edit" (click)="editRequest(request.jobRequestId)">
-                        <i class="fas fa-edit"></i> Edit Request
-                    </button>
-                </div>
+            <div class="login-link">
+                <p>Already have an account?  <a routerLink="/dashboard/candidate-login">Login here</a></p>
             </div>
-        </section>
+        </form>
     </div>
-</body>
-</html>
 
-We have this in TlService.ts
-getActiveProjectCount(): Observable<number> {
-    return this.httpClient.get<number>(this.baseurl+"active-projects");
+Component :
+export class CandidateRegistration {
+
+  candidateRegistrationDto:CandidateRegistrationDto=new CandidateRegistrationDto();
+  output:string="";
+
+  constructor(private candidateLoginService:CandidateLoginService,private router:Router){
+
+
   }
+
+
+  candidateRegistartion(){
+      console.log(this.candidateRegistrationDto);
+      this.candidateLoginService.candidateRegistartion(this.candidateRegistrationDto).subscribe({
+        next: (data) =>{
+          this.output=data;
+          console.log(this.output);
+          this.router.navigate(['/dashboard/candidate-login'])
+        },
+        error: (err)=>{
+          console.log("Exception Occured While Calling API");
+          console.log(err.error);
+        },
+        complete: ()=>{
+          console.log("Data completed Successfully");
+        }
+    });
+    }
+
+}
+Service : 
+export class CandidateLoginService{
+  
+  baseurl: string= "http://localhost:8082/api/auth/";
+  registrationBaseUrl:string="http://localhost:8082/api/candidates/create/candidate"
+
+  constructor(private httpClient:HttpClient){
+  }
+
+  candidatelogin(candidateLoginRequestdto : CandidateLoginRequestDto): Observable<CandidateLoginResponseDto>{
+
+      return this.httpClient.post<CandidateLoginResponseDto>(this.baseurl + "login/candidate",candidateLoginRequestdto);
+    
+  }
+  candidateRegistartion(candidateRegistartionDTO:CandidateRegistrationDto):Observable<string>{
+    return this.httpClient.post<string>(this.registrationBaseUrl ,candidateRegistartionDTO , {responseType:'text' as 'json'});
+  }
+ 
+}
