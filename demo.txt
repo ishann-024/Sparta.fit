@@ -1,173 +1,282 @@
-Check if this this component can display multiple components correctly : 
-<div id="projects" class="content-section">
-  <div class="page-header">
-    <div class="header-content">
-      <div>
-        <h1 class="page-title">My Projects</h1>
-        <p class="page-subtitle">Projects allocated to your team management</p>
-      </div>
-      <button class="btn btn-primary" onclick="openCreateJobRequestModal()">
-        <i class="fas fa-plus"></i> Request Resources
-      </button>
-    </div>
-  </div>
+Help me display dynamic multiple cards in follows after create job request button right now those details are hardcoded we want them to come from backend :
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Requests</title>
 
-  <div class="cards-grid">
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">{{projects.name}}</div>
-          <div class="card-subtitle">{{projectId}} • Assigned by {{projectManagerName}} (PM)</div>
+    <!-- FontAwesome CDN for icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+</head>
+<body>
+    <div class="applications-container">
+    <!-- Header Section -->
+    <section class="applications-header">
+        <div class="header-content">
+            <h1 class="page-title">Job Requests</h1>
+            <p class="page-subtitle">Create and manage resource requests for your projects</p>
+            <div class="applications-stats">
+                <div class="stat-item stats-total">
+                    <div class="stat-number">{{allJobRequestCount}}</div>
+                    <div class="stat-label">Total Job Requests</div>
+                </div>
+                <div class="stat-item stats-approved">
+                    <div class="stat-number">{{approvedJobRequestsCount}}</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-item stats-declined">
+                    <div class="stat-number">{{declinedJobRequestsCount}}</div>
+                    <div class="stat-label">Declined</div>
+                </div>
+                <div class="stat-item stats-pending">
+                    <div class="stat-number">{{pendingJobRequest}}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
         </div>
-        <span class="status-badge status-active">Active</span>
-      </div>
+    </section>
 
-      <div class="card-content">
-        <div class="info-row">
-          <span class="info-label">Project Manager:</span>
-          <span class="info-value">{{projectManagerName}}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Deadline:</span>
-          <span class="info-value">{{projects.endDate}}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Total Budget:</span>
-          <span class="info-value">{{projects.budgetBandMin}}-{{projects.budgetBandMax}}L</span>
-        </div>
-        <!-- <div class="info-row">
-          <span class="info-label">Team Size:</span>
-          <span class="info-value">{{headCount}}</span>
-        </div> -->
+    <!-- Create Job Request Button -->
+    <section class="page-header">
+        <br>
+        <button class="btn-primary" (click)="createNewRequest()">
+            <i class="fas fa-plus"></i> Create New Request
+        </button>
+    </section>
 
-        <!-- <div class="progress-section">
-          <div class="progress-header">
-            <span class="progress-text">Project Progress</span>
-            <span class="progress-percentage">68%</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 68%"></div>
-          </div>
-        </div> -->
-      </div>
-
-      <div class="card-actions">
-        <!-- <button class="btn btn-primary btn-sm">
-          <i class="fas fa-eye"></i> View Details
-        </button> -->
-        <!-- <button class="btn btn-success btn-sm" (click)="openFormDialog()">
-          <i class="fas fa-user-plus"></i> Request Team Members
-        </button> -->
-        <!-- <button class="btn btn-outline btn-sm">
-          <i class="fas fa-chart-line"></i> View Progress
-        </button> -->
-      </div>
-    </div>
-  </div>
+    <!-- Job Requests Grid -->
+    <section class="cards-grid">
+        <!-- Example Job Request Card -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">React Developer Required</div>
+                    <div class="card-subtitle">JR001 • E-commerce Platform</div>
+                </div>
+                <span class="status-badge status-approved">Approved</span>
+            </div>
+            <div class="card-content">
+                <div class="info-row">
+                    <span class="info-label">Project:</span>
+                    <span class="info-value">E-commerce Platform</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Required Skills:</span>
+                    <span class="info-value">React, Node.js, MongoDB</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Experience:</span>
+                    <span class="info-value">3+ years</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Quantity:</span>
+                    <span class="info-value">2 Developers</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">Posted on Job Portal</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Applications:</span>
+                    <span class="info-value">15 candidates applied</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn-sm btn-primary">
+                    <i class="fas fa-users"></i> View Candidates
+                </button>
+                <button class="btn-sm btn-edit">
+                    <i class="fas fa-edit"></i> Edit Request
+                </button>
+            </div>
+        </div>
+       
+        <br>
+       
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">UI/UX Designer</div>
+                    <div class="card-subtitle">JR002 • E-commerce Platform</div>
+                </div>
+                <span class="status-badge status-pending">Pending Approval</span>
+            </div>
+            <div class="card-content">
+                <div class="info-row">
+                    <span class="info-label">Project:</span>
+                    <span class="info-value">E-commerce Platform</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Required Skills:</span>
+                    <span class="info-value">Figma, Adobe XD, Prototyping</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Experience:</span>
+                    <span class="info-value">2+ years</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Quantity:</span>
+                    <span class="info-value">1 Designer</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Submitted:</span>
+                    <span class="info-value">Oct 20, 2024</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Urgency:</span>
+                    <span class="info-value">Medium</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-warning btn-sm">
+                    <i class="fas fa-clock"></i> Waiting for PM Approval
+                </button>
+                <button class="btn btn-edit">
+                    <i class="fas fa-edit"></i> Edit Request
+                </button>
+            </div>
+        </div>
+    </section>
 </div>
+  </body>
+</html>
 
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { JobRequestForm } from '../job-request-form/job-request-form';
-import { ProjectResponseDTO } from '../../dto/ProjectResponseDTO';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { TlService } from '../../service/tl-service';
-
-@Component({
-  selector: 'app-my-project',
-  imports: [RouterOutlet,RouterLink],
-  templateUrl: './my-project.html',
-  styleUrl: './my-project.css'
-})
-export class MyProject implements OnInit{
-
-  projects: ProjectResponseDTO = new ProjectResponseDTO();
+Component : 
+export class JobRequest {
+  approvedJobRequestsCount: number = 0;
+  declinedJobRequestsCount: number = 0;
+  allJobRequestCount: number = 0;
+  pendingJobRequest: number = 0;
   errorMessage: string = '';
-  projectManagerName: string = '';
-  headCount: number = 0;
-  projectId: number = 0;
+
+  constructor(private tlService: TlService,private router:Router) {}
 
   ngOnInit(): void {
-  this.fetchAllProjectsByTeamLead();
-  this.fetchProjectManagerName();
-  //this.fetchJobRequestHeadCount();
-  this.fetchProjectId();
+    this.fetchApprovedJobRequestsCount();
+    this.fetchDeclinedJobRequestsCount();
+    this.fetchAllJobRequestsCount();
+    this.fetchPendingJobRequest();
   }
-
-  constructor(public dialog: MatDialog, private tlService: TlService) {}
-
-      openFormDialog(): void {
-        const dialogRef = this.dialog.open(JobRequestForm);
-
-        dialogRef.afterClosed().subscribe(result => {
-          console.log('The dialog was closed');
-        });
-      }
-
-    fetchAllProjectsByTeamLead(): void {
-    this.tlService.getAllProjectsByTeamLead().subscribe({
+  fetchApprovedJobRequestsCount(): void { 
+    
+    this.tlService.getApprovedJobRequestsCount().subscribe({
       next: (data) => {
-        this.projects = data; // Put the single DTO in an array for display
-        console.log('Projects retrieved successfully:', data);
+        this.approvedJobRequestsCount = data;
+        console.log(data);
       },
       error: (err) => {
-        this.errorMessage = 'Failed to retrieve projects. Please try again later.';
-        console.error('API Error:', err);
+        console.log("Exception Occured While Calling API"); 
+        console.log(err.error);
       },
       complete: () => {
-        console.log('Project data retrieval completed.');
+        console.log("Data Completed Successfully");
       }
     });
   }
+
+  fetchDeclinedJobRequestsCount(): void { 
+    this.tlService.getDeclinedJobRequestsCount().subscribe({
+      next: (data) => {
+        this.declinedJobRequestsCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API"); 
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+
+  fetchAllJobRequestsCount(): void { 
+    this.tlService.getAllJobRequestCount().subscribe({
+      next: (data) => {
+        this.allJobRequestCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API"); 
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+
+  fetchPendingJobRequest(): void{
+    this.tlService.getPendingJobRequestsCount().subscribe({
+      next: (data) => {
+        this.pendingJobRequest = data;
+        console.log('Pending job request retrieved successfully:', data);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to retrieve Pending job request. Please try again later.';
+        console.error('API Error:', err);
+      }
+    });
+  }
+
   
-  fetchProjectManagerName(): void{
-    console.log("Entered function to find PM name");
-    this.tlService.getProjectManagerName().subscribe({
-      next: (data) => {
-        this.projectManagerName = data;
-        console.log('Project manager retrieved successfully:', data);
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to retrieve projects. Please try again later.';
-        console.error('API Error:', err);
-      },
-      complete: () => {
-        console.log('Project manager name retrieval completed.');
-      }
-    });
+  createNewRequest(): void {
+    this.router.navigate(['/tl-dashboard/create-job-request']);
   }
 
-  // fetchJobRequestHeadCount(): void{
-  //   console.log("Entered function to find PM name");
-  //   this.tlService.getJobRequestHeadCount().subscribe({
-  //     next: (data) => {
-  //       this.headCount = data;
-  //       console.log('Project manager retrieved successfully:', data);
-  //     },
-  //     error: (err) => {
-  //       this.errorMessage = 'Failed to retrieve projects. Please try again later.';
-  //       console.error('API Error:', err);
-  //     },
-  //     complete: () => {
-  //       console.log('Project manager name retrieval completed.');
-  //     }
-  //   });
-  // }
-
-  fetchProjectId(): void{
-    console.log("heyy:)");
-    this.tlService.getProjectId().subscribe({
-      next: (data) => {
-        this.projectId = data;
-        console.log('Project id retrieved successfully:', data);
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to retrieve project id. Please try again later.';
-        console.error('API Error:', err);
-      },
-      complete: () => {
-        console.log('Project id retrieval completed.');
-      }
-    });
-  }
 }
+
+
+this is my backend controller :
+@GetMapping("/get-job-requests")
+		public ResponseEntity<List<JobRequest>> getJobRequestsByTeamLeader(Authentication authentication) {		 
+			List<JobRequest> jobRequests = teamLeadService.getJobRequestsByTeamLeader(authentication.getName());
+			return ResponseEntity.ok(jobRequests);
+		}
+Sample Backend response : 
+[
+    {
+        "jobRequestId": 8,
+        "teamLeaderId": "MGS9991",
+        "projectManagerId": null,
+        "hrId": "EMP1003",
+        "projectId": 9,
+        "title": "System\nAnalyst",
+        "description": "Requirement gathering",
+        "skills": null,
+        "minExperience": 1.0,
+        "maxExperience": 3.0,
+        "headCount": 0,
+        "minCtc": 60000.0,
+        "maxCtc": 75000.0,
+        "priority": "LOW",
+        "status": "SUBMITTED",
+        "createdAt": "2025-09-18",
+        "updatedAt": "2025-09-18"
+    },
+    {
+        "jobRequestId": 38,
+        "teamLeaderId": "MGS9991",
+        "projectManagerId": "MGS1006",
+        "hrId": null,
+        "projectId": 9,
+        "title": "Devops",
+        "description": "Training project for freshers",
+        "skills": "Java,SpringBoot,Js,Angular,REST API",
+        "minExperience": 1.0,
+        "maxExperience": 2.0,
+        "headCount": 0,
+        "minCtc": 4.0,
+        "maxCtc": 8.0,
+        "priority": "HIGH",
+        "status": "SUBMITTED",
+        "createdAt": "2025-10-09",
+        "updatedAt": "2025-10-09"
+    }
+]
