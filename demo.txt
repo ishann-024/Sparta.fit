@@ -1,35 +1,202 @@
-@PostMapping("/job-requests/{jobRequestId}")
-    public ResponseEntity<String> updateJobRequest(@PathVariable("jobRequestId") int jobRequestId,
-            @RequestBody UpdateJobRequestDTO dto) {
-        try {
-            boolean isUpdated = teamLeadService.updateJobRequest(jobRequestId, dto);
-            if (isUpdated) {
-                return ResponseEntity.ok("Job Request Updated Successfully");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Job Request Not Found or Update Failed");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error updating job request: " + e.getMessage());
-        }
-    }
-public class UpdateJobRequestDTO {
-	private String title;
-	private String description;
-	private double minCtc;
-	private double maxCtc;
-	private String skills;
-	private double minExperience;
-	private double maxExperience;
-	private JobRequestStatus status;
-}
-Sample response backend  : Job Request Updated Successfully
-Following is a part of jobRequest component 
-In this we have a edit job request button on clicking it should open a form in same component no need of new component and on submit we should get approppriate response 
-<!-- Loading Spinner -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Requests</title>
+
+    
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+</head>
+<body>
+    <div class="applications-container">
+    <section class="applications-header">
+        <div class="header-content">
+            <h1 class="page-title">Job Requests</h1>
+            <p class="page-subtitle">Create and manage resource requests for your projects</p>
+            <div class="applications-stats">
+                <div class="stat-item stats-total">
+                    <div class="stat-number">{{allJobRequestCount}}</div>
+                    <div class="stat-label">Total Job Requests</div>
+                </div>
+                <div class="stat-item stats-approved">
+                    <div class="stat-number">{{approvedJobRequestsCount}}</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-item stats-declined">
+                    <div class="stat-number">{{declinedJobRequestsCount}}</div>
+                    <div class="stat-label">Declined</div>
+                </div>
+                <div class="stat-item stats-pending">
+                    <div class="stat-number">{{pendingJobRequest}}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="page-header">
+        <br>
+        <button class="btn-primary" (click)="createNewRequest()">
+            <i class="fas fa-plus"></i> Create New Request
+        </button>
+    </section>
+
+    
+    <section class="cards-grid">
+        
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">React Developer Required</div>
+                    <div class="card-subtitle">JR001 • E-commerce Platform</div>
+                </div>
+                <span class="status-badge status-approved">Approved</span>
+            </div>
+            <div class="card-content">
+                <div class="info-row">
+                    <span class="info-label">Project:</span>
+                    <span class="info-value">E-commerce Platform</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Required Skills:</span>
+                    <span class="info-value">React, Node.js, MongoDB</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Experience:</span>
+                    <span class="info-value">3+ years</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Quantity:</span>
+                    <span class="info-value">2 Developers</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">Posted on Job Portal</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Applications:</span>
+                    <span class="info-value">15 candidates applied</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn-sm btn-primary">
+                    <i class="fas fa-users"></i> View Candidates
+                </button>
+                <button class="btn-sm btn-edit">
+                    <i class="fas fa-edit"></i> Edit Request
+                </button>
+            </div>
+        </div>
+       
+        <br>
+       
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">UI/UX Designer</div>
+                    <div class="card-subtitle">JR002 • E-commerce Platform</div>
+                </div>
+                <span class="status-badge status-pending">Pending Approval</span>
+            </div>
+            <div class="card-content">
+                <div class="info-row">
+                    <span class="info-label">Project:</span>
+                    <span class="info-value">E-commerce Platform</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Required Skills:</span>
+                    <span class="info-value">Figma, Adobe XD, Prototyping</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Experience:</span>
+                    <span class="info-value">2+ years</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Quantity:</span>
+                    <span class="info-value">1 Designer</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Submitted:</span>
+                    <span class="info-value">Oct 20, 2024</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Urgency:</span>
+                    <span class="info-value">Medium</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-warning btn-sm">
+                    <i class="fas fa-clock"></i> Waiting for PM Approval
+                </button>
+                <button class="btn btn-edit">
+                    <i class="fas fa-edit"></i> Edit Request
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Requests</title>
+
+    <!-- FontAwesome CDN for icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+</head>
+<body>
+    <div class="applications-container">
+        <!-- Header Section -->
+        <section class="applications-header">
+            <div class="header-content">
+                <h1 class="page-title">Job Requests</h1>
+                <p class="page-subtitle">Create and manage resource requests for your projects</p>
+                <div class="applications-stats">
+                    <div class="stat-item stats-total">
+                        <div class="stat-number">{{allJobRequestCount}}</div>
+                        <div class="stat-label">Total Job Requests</div>
+                    </div>
+                    <div class="stat-item stats-approved">
+                        <div class="stat-number">{{approvedJobRequestsCount}}</div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                    <div class="stat-item stats-declined">
+                        <div class="stat-number">{{declinedJobRequestsCount}}</div>
+                        <div class="stat-label">Declined</div>
+                    </div>
+                    <div class="stat-item stats-pending">
+                        <div class="stat-number">{{pendingJobRequest}}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Create Job Request Button -->
+        <section class="page-header">
+            <br>
+            <button class="btn-primary" (click)="createNewRequest()">
+                <i class="fas fa-plus"></i> Create New Request
+            </button>
+        </section>
+
+        <!-- Loading Spinner -->
         <div *ngIf="isLoading" class="loading-container">
             <i class="fas fa-spinner fa-spin"></i> Loading job requests...
         </div>
@@ -118,3 +285,5 @@ In this we have a edit job request button on clicking it should open a form in s
             </div>
         </section>
     </div>
+</body>
+</html>
