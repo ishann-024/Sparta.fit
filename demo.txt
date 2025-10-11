@@ -1,59 +1,173 @@
-And for fill assessment form button this is the backend controller and DTO and sample response 
-@PostMapping("/fill-assessment-form")
-    public ResponseEntity<String> submitAssessment(@RequestBody AssessmentFormDTO assessmentForm) {
-        try {
-            teamLeadService.submitAssessment(assessmentForm);
-            return ResponseEntity.ok("Assessment submitted successfully");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error submitting assessment: " + e.getMessage());
-        }
-    }
+Check if this this component can display multiple components correctly : 
+<div id="projects" class="content-section">
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1 class="page-title">My Projects</h1>
+        <p class="page-subtitle">Projects allocated to your team management</p>
+      </div>
+      <button class="btn btn-primary" onclick="openCreateJobRequestModal()">
+        <i class="fas fa-plus"></i> Request Resources
+      </button>
+    </div>
+  </div>
 
-public class AssessmentFormDTO {
-    private Integer interviewId;
-    private InterviewStatus status; 
-    private String remarks;
-    private Double score;
-    private Integer candidateId;
-    private Integer jobRequestId;
-    private Integer roundNumber;
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">{{projects.name}}</div>
+          <div class="card-subtitle">{{projectId}} • Assigned by {{projectManagerName}} (PM)</div>
+        </div>
+        <span class="status-badge status-active">Active</span>
+      </div>
+
+      <div class="card-content">
+        <div class="info-row">
+          <span class="info-label">Project Manager:</span>
+          <span class="info-value">{{projectManagerName}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Deadline:</span>
+          <span class="info-value">{{projects.endDate}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Total Budget:</span>
+          <span class="info-value">{{projects.budgetBandMin}}-{{projects.budgetBandMax}}L</span>
+        </div>
+        <!-- <div class="info-row">
+          <span class="info-label">Team Size:</span>
+          <span class="info-value">{{headCount}}</span>
+        </div> -->
+
+        <!-- <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-text">Project Progress</span>
+            <span class="progress-percentage">68%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 68%"></div>
+          </div>
+        </div> -->
+      </div>
+
+      <div class="card-actions">
+        <!-- <button class="btn btn-primary btn-sm">
+          <i class="fas fa-eye"></i> View Details
+        </button> -->
+        <!-- <button class="btn btn-success btn-sm" (click)="openFormDialog()">
+          <i class="fas fa-user-plus"></i> Request Team Members
+        </button> -->
+        <!-- <button class="btn btn-outline btn-sm">
+          <i class="fas fa-chart-line"></i> View Progress
+        </button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { JobRequestForm } from '../job-request-form/job-request-form';
+import { ProjectResponseDTO } from '../../dto/ProjectResponseDTO';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { TlService } from '../../service/tl-service';
+
+@Component({
+  selector: 'app-my-project',
+  imports: [RouterOutlet,RouterLink],
+  templateUrl: './my-project.html',
+  styleUrl: './my-project.css'
+})
+export class MyProject implements OnInit{
+
+  projects: ProjectResponseDTO = new ProjectResponseDTO();
+  errorMessage: string = '';
+  projectManagerName: string = '';
+  headCount: number = 0;
+  projectId: number = 0;
+
+  ngOnInit(): void {
+  this.fetchAllProjectsByTeamLead();
+  this.fetchProjectManagerName();
+  //this.fetchJobRequestHeadCount();
+  this.fetchProjectId();
+  }
+
+  constructor(public dialog: MatDialog, private tlService: TlService) {}
+
+      openFormDialog(): void {
+        const dialogRef = this.dialog.open(JobRequestForm);
+
+        dialogRef.afterClosed().subscribe(result => {
+          console.log('The dialog was closed');
+        });
+      }
+
+    fetchAllProjectsByTeamLead(): void {
+    this.tlService.getAllProjectsByTeamLead().subscribe({
+      next: (data) => {
+        this.projects = data; // Put the single DTO in an array for display
+        console.log('Projects retrieved successfully:', data);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to retrieve projects. Please try again later.';
+        console.error('API Error:', err);
+      },
+      complete: () => {
+        console.log('Project data retrieval completed.');
+      }
+    });
+  }
+  
+  fetchProjectManagerName(): void{
+    console.log("Entered function to find PM name");
+    this.tlService.getProjectManagerName().subscribe({
+      next: (data) => {
+        this.projectManagerName = data;
+        console.log('Project manager retrieved successfully:', data);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to retrieve projects. Please try again later.';
+        console.error('API Error:', err);
+      },
+      complete: () => {
+        console.log('Project manager name retrieval completed.');
+      }
+    });
+  }
+
+  // fetchJobRequestHeadCount(): void{
+  //   console.log("Entered function to find PM name");
+  //   this.tlService.getJobRequestHeadCount().subscribe({
+  //     next: (data) => {
+  //       this.headCount = data;
+  //       console.log('Project manager retrieved successfully:', data);
+  //     },
+  //     error: (err) => {
+  //       this.errorMessage = 'Failed to retrieve projects. Please try again later.';
+  //       console.error('API Error:', err);
+  //     },
+  //     complete: () => {
+  //       console.log('Project manager name retrieval completed.');
+  //     }
+  //   });
+  // }
+
+  fetchProjectId(): void{
+    console.log("heyy:)");
+    this.tlService.getProjectId().subscribe({
+      next: (data) => {
+        this.projectId = data;
+        console.log('Project id retrieved successfully:', data);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to retrieve project id. Please try again later.';
+        console.error('API Error:', err);
+      },
+      complete: () => {
+        console.log('Project id retrieval completed.');
+      }
+    });
+  }
 }
-
-public enum InterviewStatus {
-	PENDING,INTERVIEW1_CLEARED,INTERVIEW2_CLEARED,HR_CLEARED,
-    INTERVIEW1_REJECTED,INTERVIEW2_REJECTED,HR_REJECTED;
-    
- // Convert String to InterviewStatus
-    public static InterviewStatus fromString(String status) {
-        if (status == null) {
-            return null;
-        }
-        try {
-            return InterviewStatus.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid interview status: " + status);
-        }
-    }
-
-    // Convert InterviewStatus to String for database
-    public String getDbValue() {
-        return this.name();
-    }
-
-    // Check if status indicates clearing current round
-    public boolean isCleared() {
-        return this == INTERVIEW1_CLEARED || this == INTERVIEW2_CLEARED || this == HR_CLEARED;
-    }
-
-    // Check if status indicates rejection
-    public boolean isRejected() {
-        return this == INTERVIEW1_REJECTED || this == INTERVIEW2_REJECTED || this == HR_REJECTED;
-    }
-}
-
-Response in backend  : Assessment submitted successfully
-
-We need to integrate this in our current pending-interviews component on clicking fill assessment form a dialog box should get open after submitting the form we should see the output is assessment form submitted or not.
-I don't think this will need a new component
