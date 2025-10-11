@@ -1,170 +1,4 @@
-update the followeing component for update job request and following html : 
-service : 
-updateJobRequest(jobRequestId: number, updateData: UpdateJobRequestDTO): Observable<string> {
-    const url = this.baseurl+"job-requests/"+jobRequestId;
-    return this.httpClient.post<string>(url, updateData, {
-      withCredentials: true
-    });
-  }
-it should take jobRequestId from frontend like the jobRequest which TL clicks the edit button of that should be update
-export class JobRequest {
-  approvedJobRequestsCount: number = 0;
-  declinedJobRequestsCount: number = 0;
-  allJobRequestCount: number = 0;
-  pendingJobRequest: number = 0;
-  errorMessage: string = '';
-  jobRequests: any[] = []; // Array to store job requests from backend
-  isLoading: boolean = false;
-
-  constructor(private tlService: TlService, private router: Router) {}
-
-  ngOnInit(): void {
-    this.fetchApprovedJobRequestsCount();
-    this.fetchDeclinedJobRequestsCount();
-    this.fetchAllJobRequestsCount();
-    this.fetchPendingJobRequest();
-    this.fetchJobRequests(); // Fetch job requests
-  }
-
-  fetchApprovedJobRequestsCount(): void {
-    this.tlService.getApprovedJobRequestsCount().subscribe({
-      next: (data) => {
-        this.approvedJobRequestsCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API");
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchDeclinedJobRequestsCount(): void {
-    this.tlService.getDeclinedJobRequestsCount().subscribe({
-      next: (data) => {
-        this.declinedJobRequestsCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API");
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchAllJobRequestsCount(): void {
-    this.tlService.getAllJobRequestCount().subscribe({
-      next: (data) => {
-        this.allJobRequestCount = data;
-        console.log(data);
-      },
-      error: (err) => {
-        console.log("Exception Occured While Calling API");
-        console.log(err.error);
-      },
-      complete: () => {
-        console.log("Data Completed Successfully");
-      }
-    });
-  }
-
-  fetchPendingJobRequest(): void {
-    this.tlService.getPendingJobRequestsCount().subscribe({
-      next: (data) => {
-        this.pendingJobRequest = data;
-        console.log('Pending job request retrieved successfully:', data);
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to retrieve Pending job request. Please try again later.';
-        console.error('API Error:', err);
-      }
-    });
-  }
-
-  fetchJobRequests(): void {
-    this.isLoading = true;
-    this.tlService.getJobRequests().subscribe({
-      next: (data) => {
-        this.jobRequests = data;
-        console.log('Job requests retrieved successfully:', data);
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to retrieve job requests. Please try again later.';
-        console.error('API Error:', err);
-        this.isLoading = false;
-      },
-      complete: () => {
-        console.log("Job Requests Data Loaded Successfully");
-      }
-    });
-  }
-
-  createNewRequest(): void {
-    this.router.navigate(['/tl-dashboard/create-job-request']);
-  }
-
-  // Helper methods for template
-  getStatusClass(status: string): string {
-    switch(status?.toUpperCase()) {
-      case 'APPROVED':
-        return 'status-approved';
-      case 'SUBMITTED':
-      case 'PENDING':
-        return 'status-pending';
-      case 'DECLINED':
-      case 'REJECTED':
-        return 'status-declined';
-      default:
-        return 'status-pending';
-    }
-  }
-
-  getStatusLabel(status: string): string {
-    switch(status?.toUpperCase()) {
-      case 'APPROVED':
-        return 'Approved';
-      case 'SUBMITTED':
-        return 'Pending Approval';
-      case 'DECLINED':
-        return 'Declined';
-      case 'REJECTED':
-        return 'Rejected';
-      default:
-        return status || 'Pending';
-    }
-  }
-
-  getPriorityClass(priority: string): string {
-    switch(priority?.toUpperCase()) {
-      case 'HIGH':
-        return 'priority-high';
-      case 'MEDIUM':
-        return 'priority-medium';
-      case 'LOW':
-        return 'priority-low';
-      default:
-        return '';
-    }
-  }
-
-  viewCandidates(jobRequestId: number): void {
-    // Implement navigation to candidates view
-    console.log('View candidates for job request:', jobRequestId);
-  }
-
-  editRequest(jobRequestId: number): void {
-    // Implement navigation to edit page
-    console.log('Edit job request:', jobRequestId);
-    this.router.navigate(['/tl-dashboard/edit-job-request', jobRequestId]);
-  }
-HTML : 
+fix the HTMl and CSS of this page only change the CSS of form to make it attractive
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -466,4 +300,497 @@ HTML :
 </html>
 
 
+CSS : 
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body and Container */
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding: 20px;
+    overflow: auto;
+}
+
+.applications-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+/* Header Section */
+.applications-header {
+    background: linear-gradient(135deg, #1e2a95 0%, #3b4bd8 100%);
+    color: white;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    background: linear-gradient(45deg, #fff, #e2e8f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 30px;
+}
+
+/* Stats Section */
+.applications-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stats Section */
+.applications-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);  /* Four items in one row */
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* Individual stat item styling */
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    position: relative;
+    background: linear-gradient(135deg, #4e73df, #1e2a95);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect */
+.stat-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Different colors for the individual stat items */
+.stats-total {
+    background: linear-gradient(135deg, #4e73df, #1e2a95);
+}
+
+.stats-approved {
+    background: linear-gradient(135deg, #28a745, #218838);
+}
+
+.stats-declined {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.stats-pending {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+}
+
+/* Stat number styling */
+.stat-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+/* Stat label styling */
+.stat-label {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* Added subtle hover on the stat label */
+.stat-item:hover .stat-label {
+    opacity: 1;
+}
+
+
+/* Cards Section */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);  /* Two boxes per row */
+    gap: 25px;
+    margin-top: 40px;
+}
+
+/* Job Request Card */
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.card-subtitle {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-approved {
+    background-color: #10b981;
+    color: white;
+}
+
+.status-approved:hover {
+    background-color: #059669;
+}
+
+.status-pending {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.status-pending:hover {
+    background-color: #eab308;
+}
+
+.status-declined {
+    background-color: #ef4444;
+    color: white;
+}
+
+.status-declined:hover {
+    background-color: #dc2626;
+}
+
+.status-waiting {
+    background-color: #4b8b3d;  /* Updated color for Waiting for Approval */
+    color: white;
+}
+
+/* 'Waiting for PM Approval' Button */
+.status-waiting-pm {
+    background-color: #f59e0b; /* Golden yellow (pending state) */
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Hover Effect */
+.status-waiting-pm:hover {
+    background-color: #eab308; /* Brighter yellow */
+    transform: scale(1.05);
+}
+
+
+.status-waiting:hover {
+    background-color: #38773d;
+}
+
+/* Action Buttons */
+.card-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary, .btn-outline {
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+
+/* 'Edit Request' Button */
+.btn-edit {
+    background-color: #6c757d; /* Neutral gray */
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Hover Effect */
+.btn-edit:hover {
+    background-color: #5a6268; /* Darker gray */
+    transform: scale(1.05);
+}
+
+
+/* 'Waiting for PM Approval' Button */
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #eab308); /* Gradient effect */
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 12px 25px;
+    border-radius: 50px;  /* Pill shape */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+/* Hover Effect */
+.btn-warning:hover {
+    background: linear-gradient(135deg, #eab308, #f59e0b); /* Reversed gradient for hover */
+    transform: scale(1.05);  /* Slight grow effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Slight shadow increase on hover */
+}
+
+/* Focus Effect */
+.btn-warning:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+
+.btn-primary {
+    background-color: #3b4bd8;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1e2a95;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #475569;
+    border: 2px solid #e2e8f0;
+}
+
+.btn-outline:hover {
+    background-color: #475569;
+    color: white;
+    border-color: #475569;
+}
+
+/* New Edit Button */
+.btn-edit {
+    background-color: #3b4bd8;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #1e2a95;
+}
+
+/* Waiting for PM Approval Button */
+.btn-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #eab308;
+}
+
+/* Center the 'Create Job Request' Button */
+.create-job-btn {
+    display: block;
+    width: 200px;
+    padding: 12px;
+    margin: 30px auto;
+    background-color: #3b4bd8;
+    color: white;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.create-job-btn:hover {
+    background-color: #1e2a95;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .applications-header {
+        padding: 30px 20px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .applications-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .create-job-btn {
+        width: 180px;
+    }
+}
+
+.loading-container {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+.loading-container i {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.error-message {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 15px;
+  margin: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.no-data-message i {
+  font-size: 48px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.priority-high {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.priority-medium {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.priority-low {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-declined {
+  background-color: #f8d7da;
+  color: #721c24;
 }
