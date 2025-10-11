@@ -1,564 +1,105 @@
-after clicking create account button nothing happens
-<body>
-    <div class="form-container">
-        <h2>Candidate Registration</h2>
+Still the button does not does anything
+<div class="form-container">
+    <h2>Candidate Registration</h2>
 
-        <div id="successMessage" class="message success-message"></div>
-        <div id="errorMessage" class="message error-message"></div>
-
-        <form id="registrationForm">
-            <div class="input-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
-            </div>
-
-            <div class="input-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
-            </div>
-
-            <div class="input-group">
-                <label for="passwordHash">Password</label>
-                <input type="password" id="passwordHash" name="passwordHash" placeholder="Create a strong password" required>
-            </div>
-
-            <div class="input-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
-            </div>
-
-            <div class="input-group">
-                <label for="phoneNumber">Phone Number</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" pattern="[0-9]{10}" placeholder="e.g., 9876543210" required>
-            </div>
-
-            <div class="input-group">
-                <label for="candidateRole">Previous Role</label>
-                <input type="text" id="candidateRole" name="candidateRole" placeholder="Enter your previous role" required>
-            </div>
-
-            <button type="submit" class="register-btn" id="registerBtn">
-                Create Account
-            </button>
-
-            <div class="login-link">
-                <p>Already have an account?  <a routerLink="/dashboard/candidate-login">Login here</a></p>
-            </div>
-        </form>
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="message success-message" style="display: block;">
+        {{ successMessage }}
     </div>
 
-CSS:
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Page background and general typography */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2084&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Animated background overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg,
-                    rgba(65, 105, 225, 0.1) 0%,
-                    rgba(138, 43, 226, 0.1) 50%,
-                    rgba(65, 105, 225, 0.1) 100%);
-            animation: gradientShift 15s ease infinite;
-            pointer-events: none;
-        }
-
-        @keyframes gradientShift {
-
-            0%,
-            100% {
-                opacity: 0.8;
-            }
-
-            50% {
-                opacity: 0.6;
-            }
-        }
-
-        /* Main card-like container for the registration form */
-        .form-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2);
-            width: 100%;
-            max-width: 500px;
-            padding: 40px;
-            animation: fadeInUp 0.8s ease-in-out;
-            position: relative;
-            z-index: 1;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Form heading */
-        h2 {
-            text-align: center;
-            background: linear-gradient(135deg, #4169e1, #8a2be2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-            margin-bottom: 30px;
-            font-size: 32px;
-            position: relative;
-        }
-
-        h2::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(135deg, #4169e1, #8a2be2);
-            border-radius: 2px;
-        }
-
-        /* Input group styling */
-        .input-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        label {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 8px;
-            color: #2d3748;
-            transition: color 0.3s ease;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Input fields styling */
-        input[type=text],
-        input[type=email],
-        input[type=password],
-        input[type=tel] {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid rgba(200, 211, 226, 0.8);
-            border-radius: 12px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        input:focus {
-            border-color: #4169e1;
-            box-shadow: 0 0 0 4px rgba(65, 105, 225, 0.15);
-            outline: none;
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 1);
-        }
-
-        input:focus+label {
-            color: #4169e1;
-        }
-
-        /* Floating label effect */
-        .input-group {
-            position: relative;
-        }
-
-        .input-group input:focus::placeholder {
-            opacity: 0.7;
-        }
-
-        /* Registration button styling */
-        .register-btn {
-            background: linear-gradient(135deg, #4169e1, #8a2be2);
-            color: white;
-            padding: 18px 20px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
-        }
-
-        .register-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .register-btn:hover::before {
-            left: 100%;
-        }
-
-        .register-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(65, 105, 225, 0.4);
-        }
-
-        .register-btn:active {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 15px rgba(65, 105, 225, 0.3);
-        }
-
-        /* Already have an account link styling */
-        .login-link {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 16px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-        }
-
-        .login-link p {
-            color: #4a5568;
-            margin: 0;
-        }
-
-        .login-link a {
-            color: #4169e1;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .login-link a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(135deg, #4169e1, #8a2be2);
-            transition: width 0.3s ease;
-        }
-
-        .login-link a:hover::after {
-            width: 100%;
-        }
-
-        .login-link a:hover {
-            color: #8a2be2;
-        }
-
-        /* Add subtle animations to form elements */
-        .input-group {
-            animation: slideInLeft 0.6s ease-out forwards;
-            opacity: 0;
-        }
-
-        .input-group:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .input-group:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .input-group:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .input-group:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        .input-group:nth-child(5) {
-            animation-delay: 0.5s;
-        }
-
-        .input-group:nth-child(6) {
-            animation-delay: 0.6s;
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .register-btn {
-            animation: slideInUp 0.8s ease-out 0.7s forwards;
-            opacity: 0;
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-link {
-            animation: fadeIn 1s ease-out 0.8s forwards;
-            opacity: 0;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Loading state for button */
-        .register-btn.loading {
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .register-btn.loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            margin-left: -10px;
-            margin-top: -10px;
-            border: 2px solid transparent;
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Responsive design */
-        @media (max-width: 600px) {
-            .form-container {
-                padding: 30px 20px;
-                margin: 10px;
-                border-radius: 16px;
-            }
-
-            h2 {
-                font-size: 28px;
-            }
-
-            input[type=text],
-            input[type=email],
-            input[type=password],
-            input[type=tel] {
-                padding: 14px 16px;
-            }
-
-            .register-btn {
-                padding: 16px 20px;
-                font-size: 16px;
-            }
-        }
-
-        /* Success/Error messages */
-        .message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
-            text-align: center;
-            display: none;
-        }
-
-        .success-message {
-            background: rgba(72, 187, 120, 0.1);
-            border: 1px solid #48bb78;
-            color: #276749;
-        }
-
-        .error-message {
-            background: rgba(245, 101, 101, 0.1);
-            border: 1px solid #f56565;
-            color: #c53030;
-        }
-
-        /* Form validation styling */
-        input.invalid {
-            border-color: #f56565;
-            box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
-        }
-
-        input.valid {
-            border-color: #48bb78;
-        }
-
-        /* Floating particles effect */
-        .form-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(65, 105, 225, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: float 20s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-
-            100% {
-                transform: translate(-50px, -50px) rotate(360deg);
-            }
-        }
-component : 
-@Component({
-  selector: 'app-candidate-registration',
-  imports: [FormsModule,RouterLink],
-  templateUrl: './candidate-registration.html',
-  styleUrls: ['./candidate-registration.css']
-})
-export class CandidateRegistration {
-  candidateRegistrationDto: CandidateRegistrationDto = new CandidateRegistrationDto();
-  successMessage: string = "";
-  errorMessage: string = "";
-  isLoading: boolean = false;
-
-  constructor(
-    private candidateLoginService: CandidateLoginService,
-    private router: Router
-  ) {}
-
-  candidateRegistration() {
-    // Clear previous messages
-    this.successMessage = "";
-    this.errorMessage = "";
-
-    // Validate password match
-    if (this.candidateRegistrationDto.passwordHash !== this.candidateRegistrationDto.confirmPassword) {
-      this.errorMessage = "Passwords do not match!";
-      return;
-    }
-
-    // Validate password strength (optional but recommended)
-    if (this.candidateRegistrationDto.passwordHash.length < 6) {
-      this.errorMessage = "Password must be at least 6 characters long!";
-      return;
-    }
-
-    this.isLoading = true;
-    console.log('Sending registration data:', this.candidateRegistrationDto);
-
-    this.candidateLoginService.candidateRegistration(this.candidateRegistrationDto).subscribe({
-      next: (data) => {
-        console.log('Registration successful:', data);
-        this.successMessage = "Registration successful! Redirecting to login...";
-        
-        // Redirect after 2 seconds
-        setTimeout(() => {
-          this.router.navigate(['/dashboard/candidate-login']);
-        }, 2000);
-      },
-      error: (err) => {
-        console.error("Registration error:", err);
-        this.isLoading = false;
-        
-        if (err.status === 400) {
-          this.errorMessage = "Invalid data. Please check all fields.";
-        } else if (err.status === 409) {
-          this.errorMessage = "Email already exists!";
-        } else {
-          this.errorMessage = "Registration failed. Please try again.";
-        }
-      },
-      complete: () => {
-        this.isLoading = false;
-        console.log("Registration request completed");
-      }
-    });
-  }
-
-  // Method to handle form submission
-  onSubmit(event: Event) {
-    event.preventDefault();
-    this.candidateRegistration();
-  }
-}
-
-Service : 
-candidateRegistration(candidateRegistrationDTO: CandidateRegistrationDto): Observable<any> {
-    // Send the DTO with the correct field mapping
-    const payload = {
-      email: candidateRegistrationDTO.email,
-      password: candidateRegistrationDTO.passwordHash,
-      confirmPassword: candidateRegistrationDTO.confirmPassword,
-      fullName: candidateRegistrationDTO.fullName,
-      phoneNumber: candidateRegistrationDTO.phoneNumber,
-      previousRole: candidateRegistrationDTO.candidateRole
-    };
-
-    return this.httpClient.post<any>(this.registrationBaseUrl, payload);
-  }
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="message error-message" style="display: block;">
+        {{ errorMessage }}
+    </div>
+
+    <form #registrationForm="ngForm" (ngSubmit)="onSubmit($event)">
+        <div class="input-group">
+            <label for="fullName">Full Name</label>
+            <input 
+                type="text" 
+                id="fullName" 
+                name="fullName" 
+                [(ngModel)]="candidateRegistrationDto.fullName"
+                placeholder="Enter your full name" 
+                required
+                #fullName="ngModel">
+        </div>
+
+        <div class="input-group">
+            <label for="email">Email Address</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                [(ngModel)]="candidateRegistrationDto.email"
+                placeholder="Enter your email address" 
+                required
+                email
+                #email="ngModel">
+        </div>
+
+        <div class="input-group">
+            <label for="passwordHash">Password</label>
+            <input 
+                type="password" 
+                id="passwordHash" 
+                name="passwordHash" 
+                [(ngModel)]="candidateRegistrationDto.passwordHash"
+                placeholder="Create a strong password" 
+                required
+                minlength="6"
+                #passwordHash="ngModel">
+        </div>
+
+        <div class="input-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                [(ngModel)]="candidateRegistrationDto.confirmPassword"
+                placeholder="Confirm your password" 
+                required
+                #confirmPassword="ngModel">
+        </div>
+
+        <div class="input-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input 
+                type="tel" 
+                id="phoneNumber" 
+                name="phoneNumber" 
+                [(ngModel)]="candidateRegistrationDto.phoneNumber"
+                pattern="[0-9]{10}" 
+                placeholder="e.g., 9876543210" 
+                required
+                #phoneNumber="ngModel">
+        </div>
+
+        <div class="input-group">
+            <label for="candidateRole">Previous Role</label>
+            <input 
+                type="text" 
+                id="candidateRole" 
+                name="candidateRole" 
+                [(ngModel)]="candidateRegistrationDto.candidateRole"
+                placeholder="Enter your previous role" 
+                required
+                #candidateRole="ngModel">
+        </div>
+
+        <button 
+            type="submit" 
+            class="register-btn" 
+            id="registerBtn"
+            [disabled]="isLoading"
+            [class.loading]="isLoading">
+            <span *ngIf="!isLoading">Create Account</span>
+            <span *ngIf="isLoading">Creating Account...</span>
+        </button>
+
+        <div class="login-link">
+            <p>Already have an account? <a routerLink="/dashboard/candidate-login">Login here</a></p>
+        </div>
+    </form>
+</div>
