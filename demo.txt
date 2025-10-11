@@ -297,3 +297,8 @@
     </div>
 </body>
 </html>
+
+We have this in TlService.ts
+getActiveProjectCount(): Observable<number> {
+    return this.httpClient.get<number>(this.baseurl+"active-projects");
+  }
