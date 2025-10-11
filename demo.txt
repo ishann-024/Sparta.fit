@@ -1,67 +1,121 @@
-I am getting this errors 
-X [ERROR] NG8004: No pipe found with name 'number'.
-To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component. [plugin angular-compiler]
+Fix this update Job request method 
+@PostMapping("/job-requests/{jobRequestId}")
+	public ResponseEntity<String> updateJobRequest(@PathVariable("jobRequestId") int jobRequestId,
+			@RequestBody UpdateJobRequestDTO dto) {
+		if(teamLeadService.updateJobRequest(jobRequestId, dto)) {
+		return ResponseEntity.ok("Job Request Updated Successfully");
+		}else {
+			return ResponseEntity.ok("Job Request Failed ");
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(teamLeadService.updateJobRequest(jobRequestId, dto));
+	}
 
-    src/app/teamlead-dashboard/job-request/job-request.html:223:55:
-      223 │ ... JR{{request.jobRequestId | number:'3.0-0'}} • Project ID: {...
-          ╵                                ~~~~~~
+@Override
+	public boolean updateJobRequest(int jobRequestId, UpdateJobRequestDTO dto) {
+		JobRequest jobRequest = jobRequestMapper.toEntity(dto, jobRequestId);
+		return teamLeadRepository.updateJobRequest(jobRequestId, dto);
+	}
 
-  Error occurs in the template of component JobRequest.
+public boolean updateJobRequest(int jobRequestId, UpdateJobRequestDTO dto) {
+		String sql = "UPDATE job_requests SET description = ?, skills = ?,experience_required = ?, min_ctc = ?, max_ctc = ?,updated_at = SYSDATE WHERE job_request_id = ?";
 
-    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
-      9 │   templateUrl: './job-request.html',
-        ╵                ~~~~~~~~~~~~~~~~~~~~
+		return jdbcTemplate.update(sql, dto.getDescription(), dto.getSkills(), dto.getExperienceRequired(),
+				dto.getMinCtc(), dto.getMaxCtc(), jobRequestId) > 0;
+	}
 
+public class JobRequestMapper {
+	
+	// Update DTO to Domain
+	 public JobRequest toEntity(UpdateJobRequestDTO dto, int jobRequestId) {
+	        JobRequest jobRequest = new JobRequest();
+	        jobRequest.setJobRequestId(jobRequestId); // comes from path variable
+	        jobRequest.setTitle(dto.getTitle());
+	        jobRequest.setDescription(dto.getDescription());
+	        jobRequest.setSkills(dto.getSkills());
+	        jobRequest.setMinExperience(dto.getMinExperience());
+	        jobRequest.setMaxExperience(dto.getMaxExperience());
+	        jobRequest.setMinCtc(dto.getMinCtc());
+	        jobRequest.setMaxCtc(dto.getMaxCtc());
+	        //jobRequest.setPriority(dto.getPriority());
 
-X [ERROR] NG8002: Can't bind to 'ngClass' since it isn't a known property of 'span'. [plugin angular-compiler]
+	        // Status is optional, if you want to allow TL to update it
+	        if (dto.getStatus() != null) {
+	            jobRequest.setStatus(dto.getStatus());
+	        }
 
-    src/app/teamlead-dashboard/job-request/job-request.html:226:47:
-      226 │ ... class="status-badge" [ngClass]="getStatusClass(request.status)">
-          ╵                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	        return jobRequest;
+	    }
 
-  Error occurs in the template of component JobRequest.
+    // Domain → Response DTO
+    public static ResponseJobRequestDTO toResponseDTO(JobRequest jobRequest) {
+        ResponseJobRequestDTO dto = new ResponseJobRequestDTO();
+        dto.setJobRequestId(jobRequest.getJobRequestId());
+        dto.setProjectId(jobRequest.getProjectId());
+        dto.setTeamLeaderId(jobRequest.getTeamLeaderId());
+        dto.setPmId(jobRequest.getProjectManagerId());
+        dto.setHrId(jobRequest.getHrId());
+        dto.setTitle(jobRequest.getTitle());
+        dto.setDescription(jobRequest.getDescription());
+        dto.setSkills(jobRequest.getSkills());
+        dto.setMaxExperience(jobRequest.getMaxExperience());
+        dto.setMinExperience(jobRequest.getMinExperience());
+        dto.setMaxCtc(jobRequest.getMaxCtc());
+        dto.setMinCtc(jobRequest.getMinCtc());
+        dto.setPriority(jobRequest.getPriority());
+        dto.setStatus(jobRequest.getStatus());
+        dto.setCreatedAt(jobRequest.getCreatedAt());
+        dto.setUpdatedAt(jobRequest.getUpdatedAt());
+        return dto;
+    }
 
-    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
-      9 │   templateUrl: './job-request.html',
-        ╵                ~~~~~~~~~~~~~~~~~~~~
+    // Create DTO → Domain
+    public static JobRequest fromCreateDTO(CreateJobRequestDTO dto) {
+        JobRequest jobRequest = new JobRequest();
+        jobRequest.setProjectId(dto.getProjectId());
+        jobRequest.setTeamLeaderId(dto.getTeamLeaderId());
+        jobRequest.setTitle(dto.getTitle());
+        jobRequest.setDescription(dto.getDescription());
+        jobRequest.setSkills(dto.getSkills());
+        jobRequest.setMinExperience(dto.getMinExperience());
+        jobRequest.setMaxExperience(dto.getMaxExperience());
+        jobRequest.setMinCtc(dto.getMinCtc());
+        jobRequest.setMaxCtc(dto.getMaxCtc());
+        jobRequest.setPriority(dto.getPriority());
+        jobRequest.setStatus(JobRequestStatus.DRAFT); // default
+        return jobRequest;
+    }
+}
 
+public class UpdateJobRequestDTO {
+	private String title;
+	private String description;
+	private double minCtc;
+	private double maxCtc;
+	private String skills;
+	private int minExperience;
+	private int maxExperience;
+	private JobRequestStatus status;
+	private String experienceRequired;
+}
 
-X [ERROR] NG8004: No pipe found with name 'number'.
-To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component. [plugin angular-compiler]
-
-    src/app/teamlead-dashboard/job-request/job-request.html:252:48:
-      252 │ ...        ₹{{request.minCtc | number:'1.0-0'}} - ₹{{request....
-          ╵                              ~~~~~~
-
-  Error occurs in the template of component JobRequest.
-
-    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
-      9 │   templateUrl: './job-request.html',
-        ╵                ~~~~~~~~~~~~~~~~~~~~
-
-
-X [ERROR] NG8004: No pipe found with name 'number'.
-To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component. [plugin angular-compiler]
-
-    src/app/teamlead-dashboard/job-request/job-request.html:252:87:
-      252 │ ...inCtc | number:'1.0-0'}} - ₹{{request.maxCtc | number:'1.0-0'}}
-          ╵                                               ~~~~~~
-
-  Error occurs in the template of component JobRequest.
-
-    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
-      9 │   templateUrl: './job-request.html',
-        ╵                ~~~~~~~~~~~~~~~~~~~~
-
-
-X [ERROR] NG8002: Can't bind to 'ngClass' since it isn't a known property of 'span'. [plugin angular-compiler]
-
-    src/app/teamlead-dashboard/job-request/job-request.html:257:49:
-      257 │ ...lass="info-value" [ngClass]="getPriorityClass(request.priority)">
-          ╵                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  Error occurs in the template of component JobRequest.
-
-    src/app/teamlead-dashboard/job-request/job-request.ts:9:15:
-      9 │   templateUrl: './job-request.html',
-        ╵                ~~~~~~~~~~~~~~~~~~~~
+public class JobRequest {
+    private int jobRequestId;
+    private String teamLeaderId;
+    private String projectManagerId;
+    private String hrId;
+    private int projectId;
+    private String title;
+    private String description;
+    private String skills;
+    //private int minExperience;
+    //private int maxExperience;
+    private double minExperience;
+    private double maxExperience;
+    private int headCount;
+    private double minCtc;
+    private double maxCtc;
+    private String priority;  // HIGH, MEDIUM, LOW
+    private JobRequestStatus status; // Enum: DRAFT, SUBMITTED, PM_REVIEWED, FORWARDED_TO_HR, CLOSED
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+}
