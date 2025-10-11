@@ -1,150 +1,170 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Job Requests</title>
+update the followeing component for update job request and following html : 
+service : 
+updateJobRequest(jobRequestId: number, updateData: UpdateJobRequestDTO): Observable<string> {
+    const url = this.baseurl+"job-requests/"+jobRequestId;
+    return this.httpClient.post<string>(url, updateData, {
+      withCredentials: true
+    });
+  }
+it should take jobRequestId from frontend like the jobRequest which TL clicks the edit button of that should be update
+export class JobRequest {
+  approvedJobRequestsCount: number = 0;
+  declinedJobRequestsCount: number = 0;
+  allJobRequestCount: number = 0;
+  pendingJobRequest: number = 0;
+  errorMessage: string = '';
+  jobRequests: any[] = []; // Array to store job requests from backend
+  isLoading: boolean = false;
 
-    
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-    />
-</head>
-<body>
-    <div class="applications-container">
-    <section class="applications-header">
-        <div class="header-content">
-            <h1 class="page-title">Job Requests</h1>
-            <p class="page-subtitle">Create and manage resource requests for your projects</p>
-            <div class="applications-stats">
-                <div class="stat-item stats-total">
-                    <div class="stat-number">{{allJobRequestCount}}</div>
-                    <div class="stat-label">Total Job Requests</div>
-                </div>
-                <div class="stat-item stats-approved">
-                    <div class="stat-number">{{approvedJobRequestsCount}}</div>
-                    <div class="stat-label">Approved</div>
-                </div>
-                <div class="stat-item stats-declined">
-                    <div class="stat-number">{{declinedJobRequestsCount}}</div>
-                    <div class="stat-label">Declined</div>
-                </div>
-                <div class="stat-item stats-pending">
-                    <div class="stat-number">{{pendingJobRequest}}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-            </div>
-        </div>
-    </section>
+  constructor(private tlService: TlService, private router: Router) {}
 
-    
-    <section class="page-header">
-        <br>
-        <button class="btn-primary" (click)="createNewRequest()">
-            <i class="fas fa-plus"></i> Create New Request
-        </button>
-    </section>
+  ngOnInit(): void {
+    this.fetchApprovedJobRequestsCount();
+    this.fetchDeclinedJobRequestsCount();
+    this.fetchAllJobRequestsCount();
+    this.fetchPendingJobRequest();
+    this.fetchJobRequests(); // Fetch job requests
+  }
 
-    
-    <section class="cards-grid">
-        
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-title">React Developer Required</div>
-                    <div class="card-subtitle">JR001 • E-commerce Platform</div>
-                </div>
-                <span class="status-badge status-approved">Approved</span>
-            </div>
-            <div class="card-content">
-                <div class="info-row">
-                    <span class="info-label">Project:</span>
-                    <span class="info-value">E-commerce Platform</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Required Skills:</span>
-                    <span class="info-value">React, Node.js, MongoDB</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Experience:</span>
-                    <span class="info-value">3+ years</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Quantity:</span>
-                    <span class="info-value">2 Developers</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Status:</span>
-                    <span class="info-value">Posted on Job Portal</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Applications:</span>
-                    <span class="info-value">15 candidates applied</span>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="btn-sm btn-primary">
-                    <i class="fas fa-users"></i> View Candidates
-                </button>
-                <button class="btn-sm btn-edit">
-                    <i class="fas fa-edit"></i> Edit Request
-                </button>
-            </div>
-        </div>
-       
-        <br>
-       
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-title">UI/UX Designer</div>
-                    <div class="card-subtitle">JR002 • E-commerce Platform</div>
-                </div>
-                <span class="status-badge status-pending">Pending Approval</span>
-            </div>
-            <div class="card-content">
-                <div class="info-row">
-                    <span class="info-label">Project:</span>
-                    <span class="info-value">E-commerce Platform</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Required Skills:</span>
-                    <span class="info-value">Figma, Adobe XD, Prototyping</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Experience:</span>
-                    <span class="info-value">2+ years</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Quantity:</span>
-                    <span class="info-value">1 Designer</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Submitted:</span>
-                    <span class="info-value">Oct 20, 2024</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Urgency:</span>
-                    <span class="info-value">Medium</span>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="btn btn-warning btn-sm">
-                    <i class="fas fa-clock"></i> Waiting for PM Approval
-                </button>
-                <button class="btn btn-edit">
-                    <i class="fas fa-edit"></i> Edit Request
-                </button>
-            </div>
-        </div>
-    </section>
-</div>
-  </body>
-</html> -->
+  fetchApprovedJobRequestsCount(): void {
+    this.tlService.getApprovedJobRequestsCount().subscribe({
+      next: (data) => {
+        this.approvedJobRequestsCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API");
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
 
+  fetchDeclinedJobRequestsCount(): void {
+    this.tlService.getDeclinedJobRequestsCount().subscribe({
+      next: (data) => {
+        this.declinedJobRequestsCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API");
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+
+  fetchAllJobRequestsCount(): void {
+    this.tlService.getAllJobRequestCount().subscribe({
+      next: (data) => {
+        this.allJobRequestCount = data;
+        console.log(data);
+      },
+      error: (err) => {
+        console.log("Exception Occured While Calling API");
+        console.log(err.error);
+      },
+      complete: () => {
+        console.log("Data Completed Successfully");
+      }
+    });
+  }
+
+  fetchPendingJobRequest(): void {
+    this.tlService.getPendingJobRequestsCount().subscribe({
+      next: (data) => {
+        this.pendingJobRequest = data;
+        console.log('Pending job request retrieved successfully:', data);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to retrieve Pending job request. Please try again later.';
+        console.error('API Error:', err);
+      }
+    });
+  }
+
+  fetchJobRequests(): void {
+    this.isLoading = true;
+    this.tlService.getJobRequests().subscribe({
+      next: (data) => {
+        this.jobRequests = data;
+        console.log('Job requests retrieved successfully:', data);
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to retrieve job requests. Please try again later.';
+        console.error('API Error:', err);
+        this.isLoading = false;
+      },
+      complete: () => {
+        console.log("Job Requests Data Loaded Successfully");
+      }
+    });
+  }
+
+  createNewRequest(): void {
+    this.router.navigate(['/tl-dashboard/create-job-request']);
+  }
+
+  // Helper methods for template
+  getStatusClass(status: string): string {
+    switch(status?.toUpperCase()) {
+      case 'APPROVED':
+        return 'status-approved';
+      case 'SUBMITTED':
+      case 'PENDING':
+        return 'status-pending';
+      case 'DECLINED':
+      case 'REJECTED':
+        return 'status-declined';
+      default:
+        return 'status-pending';
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    switch(status?.toUpperCase()) {
+      case 'APPROVED':
+        return 'Approved';
+      case 'SUBMITTED':
+        return 'Pending Approval';
+      case 'DECLINED':
+        return 'Declined';
+      case 'REJECTED':
+        return 'Rejected';
+      default:
+        return status || 'Pending';
+    }
+  }
+
+  getPriorityClass(priority: string): string {
+    switch(priority?.toUpperCase()) {
+      case 'HIGH':
+        return 'priority-high';
+      case 'MEDIUM':
+        return 'priority-medium';
+      case 'LOW':
+        return 'priority-low';
+      default:
+        return '';
+    }
+  }
+
+  viewCandidates(jobRequestId: number): void {
+    // Implement navigation to candidates view
+    console.log('View candidates for job request:', jobRequestId);
+  }
+
+  editRequest(jobRequestId: number): void {
+    // Implement navigation to edit page
+    console.log('Edit job request:', jobRequestId);
+    this.router.navigate(['/tl-dashboard/edit-job-request', jobRequestId]);
+  }
+HTML : 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -188,6 +208,163 @@
             </div>
         </section>
 
+        <!-- ============ EDIT FORM MODAL ============ -->
+        <section class="edit-form-section" *ngIf="isEditMode">
+            <div class="edit-form-container">
+                <div class="edit-form-header">
+                    <h2><i class="fas fa-edit"></i> Edit Job Request #{{editingRequestId}}</h2>
+                    <button class="close-btn" (click)="cancelEdit()" [disabled]="isSubmitting">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Success Message -->
+                <div *ngIf="successMessage" class="success-message">
+                    <i class="fas fa-check-circle"></i> {{successMessage}}
+                </div>
+
+                <!-- Error Message in Form -->
+                <div *ngIf="errorMessage && isEditMode" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
+                </div>
+
+                <form [formGroup]="editForm" (ngSubmit)="submitEditForm()">
+                    <div class="form-grid">
+                        <!-- Title -->
+                        <div class="form-group full-width">
+                            <label for="title">Job Title <span class="required">*</span></label>
+                            <input
+                                type="text"
+                                id="title"
+                                formControlName="title"
+                                class="form-control"
+                                placeholder="e.g., Senior React Developer"
+                                [class.invalid]="editForm.get('title')?.invalid && editForm.get('title')?.touched"
+                            />
+                            <span class="error-text" *ngIf="editForm.get('title')?.invalid && editForm.get('title')?.touched">
+                                Title is required (min 3 characters)
+                            </span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group full-width">
+                            <label for="description">Description <span class="required">*</span></label>
+                            <textarea
+                                id="description"
+                                formControlName="description"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Describe the job requirements..."
+                                [class.invalid]="editForm.get('description')?.invalid && editForm.get('description')?.touched"
+                            ></textarea>
+                            <span class="error-text" *ngIf="editForm.get('description')?.invalid && editForm.get('description')?.touched">
+                                Description is required (min 10 characters)
+                            </span>
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="form-group full-width">
+                            <label for="skills">Required Skills</label>
+                            <input
+                                type="text"
+                                id="skills"
+                                formControlName="skills"
+                                class="form-control"
+                                placeholder="e.g., Java, Spring Boot, Angular (comma-separated)"
+                            />
+                        </div>
+
+                        <!-- Experience Range -->
+                        <div class="form-group">
+                            <label for="minExperience">Min Experience (years) <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="minExperience"
+                                formControlName="minExperience"
+                                class="form-control"
+                                min="0"
+                                step="0.5"
+                                [class.invalid]="editForm.get('minExperience')?.invalid && editForm.get('minExperience')?.touched"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxExperience">Max Experience (years) <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="maxExperience"
+                                formControlName="maxExperience"
+                                class="form-control"
+                                min="0"
+                                step="0.5"
+                                [class.invalid]="editForm.get('maxExperience')?.invalid && editForm.get('maxExperience')?.touched"
+                            />
+                        </div>
+
+                        <!-- CTC Range -->
+                        <div class="form-group">
+                            <label for="minCtc">Min CTC (₹) <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="minCtc"
+                                formControlName="minCtc"
+                                class="form-control"
+                                min="0"
+                                step="1000"
+                                [class.invalid]="editForm.get('minCtc')?.invalid && editForm.get('minCtc')?.touched"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxCtc">Max CTC (₹) <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="maxCtc"
+                                formControlName="maxCtc"
+                                class="form-control"
+                                min="0"
+                                step="1000"
+                                [class.invalid]="editForm.get('maxCtc')?.invalid && editForm.get('maxCtc')?.touched"
+                            />
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group full-width">
+                            <label for="status">Status</label>
+                            <select id="status" formControlName="status" class="form-control">
+                                <option value="SUBMITTED">Submitted</option>
+                                <option value="APPROVED">Approved</option>
+                                <option value="DECLINED">Declined</option>
+                                <option value="REJECTED">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            (click)="cancelEdit()"
+                            [disabled]="isSubmitting"
+                        >
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                            [disabled]="editForm.invalid || isSubmitting"
+                        >
+                            <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+                            <i class="fas fa-save" *ngIf="!isSubmitting"></i>
+                            {{ isSubmitting ? 'Updating...' : 'Update Request' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+        <!-- ============ END EDIT FORM MODAL ============ -->
+
         <!-- Create Job Request Button -->
         <section class="page-header">
             <br>
@@ -202,7 +379,7 @@
         </div>
 
         <!-- Error Message -->
-        <div *ngIf="errorMessage && !isLoading" class="error-message">
+        <div *ngIf="errorMessage && !isLoading && !isEditMode" class="error-message">
             <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
         </div>
 
@@ -215,12 +392,12 @@
         <!-- Job Requests Grid -->
         <section class="cards-grid" *ngIf="!isLoading && jobRequests.length > 0">
             <!-- Dynamic Job Request Cards -->
-            <div class="card" *ngFor="let request of jobRequests">
+            <div class="card" *ngFor="let request of jobRequests" [class.editing]="editingRequestId === request.jobRequestId">
                 <div class="card-header">
                     <div>
                         <div class="card-title">{{request.title}}</div>
                         <div class="card-subtitle">
-                            JR{{request.jobRequestId | number:'3.0-0'}} • Project ID: {{request.projectId}}
+                            JR{{request.jobRequestId}} • Project ID: {{request.projectId}}
                         </div>
                     </div>
                     <span class="status-badge" [ngClass]="getStatusClass(request.status)">
@@ -249,7 +426,7 @@
                     <div class="info-row">
                         <span class="info-label">CTC Range:</span>
                         <span class="info-value">
-                            ₹{{request.minCtc | number:'1.0-0'}} - ₹{{request.maxCtc | number:'1.0-0'}}
+                            ₹{{request.minCtc}} - ₹{{request.maxCtc}}
                         </span>
                     </div>
                     <div class="info-row">
@@ -287,3 +464,6 @@
     </div>
 </body>
 </html>
+
+
+}
