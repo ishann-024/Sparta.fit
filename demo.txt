@@ -1,29 +1,9 @@
-Give me 20 insert queries for table job_requests the table details are as follows : 
-Column_name     	DataType 			Nullable DataDefault  	ColumnId
-JOB_REQUEST_ID		NUMBER				No			null			1	
-TEAM_LEADER_ID		VARCHAR2(40 BYTE)	Yes			null			2	
-PROJECT_MANAGER_ID	VARCHAR2(40 BYTE)	Yes			null			3	
-HR_ID				VARCHAR2(40 BYTE)	Yes			null			4	
-PROJECT_ID			NUMBER				Yes			null			5	
-TITLE				VARCHAR2(200 BYTE)	Yes			null			6	
-DESCRIPTION			VARCHAR2(2000 BYTE)	Yes			null			7	
-PRIORITY			VARCHAR2(10 BYTE)	Yes		   'MEDIUM' 		8	
-MIN_CTC				NUMBER(12,2)		Yes			null			9	
-MAX_CTC				NUMBER(12,2)		Yes			null			10	
-SKILLS				VARCHAR2(500 BYTE)	Yes			null			11	
-CREATED_AT			DATE				Yes			SYSDATE			12	
-UPDATED_AT			DATE				Yes			SYSDATE			13	
-MIN_EXPERIENCE		NUMBER(3,1)			Yes			null			14	
-MAX_EXPERIENCE		NUMBER(3,1)			Yes			null			15	
-JOB_TYPE			VARCHAR2(50 BYTE)	Yes			null			16	
-HEAD_COUNT			NUMBER				Yes			1				17	
-STATUS				VARCHAR2(30 BYTE)	Yes		   'DRAFT' 			18	
+INSERT INTO JOB_REQUESTS (JOB_REQUEST_ID, TEAM_LEADER_ID, PROJECT_MANAGER_ID, HR_ID, PROJECT_ID, TITLE, DESCRIPTION, PRIORITY, MIN_CTC, MAX_CTC, SKILLS, MIN_EXPERIENCE, MAX_EXPERIENCE, JOB_TYPE, HEAD_COUNT, STATUS) 
+VALUES (9, 'EMP9999', 'EMP1002', 'EMP1003', 1, 'Senior Java Developer', 'Looking for experienced Java developer with Spring Boot expertise for microservices development', 'HIGH', 12, 18, 'Java, Spring Boot, Microservices, Hibernate, REST API', 5.0, 8.0, 'FULL_TIME', 2, 'APPROVED');
 
+I am getting this error : 
+INSERT INTO JOB_REQUESTS (JOB_REQUEST_ID, TEAM_LEADER_ID, PROJECT_MANAGER_ID, HR_ID, PROJECT_ID, TITLE, DESCRIPTION, PRIORITY, MIN_CTC, MAX_CTC, SKILLS, MIN_EXPERIENCE, MAX_EXPERIENCE, JOB_TYPE, HEAD_COUNT, STATUS) 
+VALUES (9, 'EMP9999', 'EMP1002', 'EMP1003', 1, 'Senior Java Developer', 'Looking for experienced Java developer with Spring Boot expertise for microservices development', 'HIGH', 12, 18, 'Java, Spring Boot, Microservices, Hibernate, REST API', 5.0, 8.0, 'FULL_TIME', 2, 'APPROVED')
+Error report -
+ORA-02290: check constraint (HRPORTALREMOTE.SYS_C004209) violated
 
-some valid TEAM_LEADER_ID : EMP9999,EMP1013 which can be used in insert query
-
-some valid PROJECT_MANAGER_ID : EMP1002,EMP1012
-
-Some valid HR_ID : EMP1003, EMP1014
-
-Some valid PROJECT_ID : 1,2,3,4,5,6,7,8,9,10,21,41,61
