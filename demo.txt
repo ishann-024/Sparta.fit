@@ -1,9 +1,285 @@
-INSERT INTO JOB_REQUESTS (JOB_REQUEST_ID, TEAM_LEADER_ID, PROJECT_MANAGER_ID, HR_ID, PROJECT_ID, TITLE, DESCRIPTION, PRIORITY, MIN_CTC, MAX_CTC, SKILLS, MIN_EXPERIENCE, MAX_EXPERIENCE, JOB_TYPE, HEAD_COUNT, STATUS) 
-VALUES (9, 'EMP9999', 'EMP1002', 'EMP1003', 1, 'Senior Java Developer', 'Looking for experienced Java developer with Spring Boot expertise for microservices development', 'HIGH', 12, 18, 'Java, Spring Boot, Microservices, Hibernate, REST API', 5.0, 8.0, 'FULL_TIME', 2, 'APPROVED');
+I have these two login pages I want to display warning when user enters invalid credentials 
+Candidate-login service: 
 
-I am getting this error : 
-INSERT INTO JOB_REQUESTS (JOB_REQUEST_ID, TEAM_LEADER_ID, PROJECT_MANAGER_ID, HR_ID, PROJECT_ID, TITLE, DESCRIPTION, PRIORITY, MIN_CTC, MAX_CTC, SKILLS, MIN_EXPERIENCE, MAX_EXPERIENCE, JOB_TYPE, HEAD_COUNT, STATUS) 
-VALUES (9, 'EMP9999', 'EMP1002', 'EMP1003', 1, 'Senior Java Developer', 'Looking for experienced Java developer with Spring Boot expertise for microservices development', 'HIGH', 12, 18, 'Java, Spring Boot, Microservices, Hibernate, REST API', 5.0, 8.0, 'FULL_TIME', 2, 'APPROVED')
-Error report -
-ORA-02290: check constraint (HRPORTALREMOTE.SYS_C004209) violated
+@Injectable({
+  providedIn: 'root'
+})
+export class CandidateLoginService{
+  
+  baseurl: string= "http://localhost:8082/api/auth/";
+  registrationBaseUrl:string="http://localhost:8082/api/candidates/create/candidate"
+
+  constructor(private httpClient:HttpClient){
+  }
+
+  candidatelogin(candidateLoginRequestdto : CandidateLoginRequestDto): Observable<CandidateLoginResponseDto>{
+
+      return this.httpClient.post<CandidateLoginResponseDto>(this.baseurl + "login/candidate",candidateLoginRequestdto);
+    
+  }
+   candidateRegistration(candidateRegistrationDTO: CandidateRegistrationDto): Observable<any> {
+    // Send the DTO with the correct field mapping
+    const payload = {
+      email: candidateRegistrationDTO.email,
+      password: candidateRegistrationDTO.passwordHash,
+      confirmPassword: candidateRegistrationDTO.confirmPassword,
+      fullName: candidateRegistrationDTO.fullName,
+      phoneNumber: candidateRegistrationDTO.phoneNumber,
+      previousRole: candidateRegistrationDTO.candidateRole
+    };
+
+    return this.httpClient.post<any>(this.registrationBaseUrl, payload);
+  }
+}
+
+employee-login service :
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeLoginService {
+  
+
+  baseurl: string= "http://localhost:8082/api/auth/";
+
+  constructor(private httpClient:HttpClient,private router:Router){
+  }
+  employeeLogin(employeeLogin : EmployeeLoginRequest): Observable<CandidateLoginResponseDto>{ 
+      return this.httpClient.post<CandidateLoginResponseDto>(this.baseurl + "login/employee",employeeLogin);
+  }
+
+Controller : 
+@PostMapping("/login/employee")
+	public ResponseEntity<?> loginEmployee(@Valid @RequestBody EmployeeLoginRequest loginRequest) {
+		try {
+			// Authenticate the user
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmployeeId(), loginRequest.getPassword()));
+
+			// Set authentication in security context
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			// Load user details to get UserPrincipal
+			UserPrincipal userPrincipal = (UserPrincipal) employeeAuthService
+					.loadUserByUsername(loginRequest.getEmployeeId());
+
+			// Generate JWT token
+			String jwt = jwtTokenUtil.generateToken(userPrincipal);
+			ResponseCookie jwtCookie = createJwtCookie(jwt);
+
+			// Create response
+			LoginResponse res = new LoginResponse(null, // Token not in response body
+					userPrincipal.getUserId(), userPrincipal.getFullName(), userPrincipal.getRole(), "EMPLOYEE");
+
+			System.out.println("Employee login successful: " + loginRequest.getEmployeeId());
+
+			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(res);
+
+		} catch (BadCredentialsException e) {
+			System.out.println("Employee login failed: " + loginRequest.getEmployeeId());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login error: " + e.getMessage());
+		}
+	}
+
+	@PostMapping("/login/candidate")
+	public ResponseEntity<?> loginCandidate(@Valid @RequestBody CandidateLoginRequest loginRequest) {
+		try {
+			// Authenticate the user
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+			// Set authentication in security context
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			// Load user details to get UserPrincipal
+			UserPrincipal userPrincipal = (UserPrincipal) candidateAuthService
+					.loadUserByUsername(loginRequest.getEmail());
+
+			// Generate JWT token
+			String jwt = jwtTokenUtil.generateToken(userPrincipal);
+			ResponseCookie jwtCookie = createJwtCookie(jwt);
+
+			// Create response
+			LoginResponse res = new LoginResponse(null, // Token not in response body
+					userPrincipal.getUserId(), userPrincipal.getFullName(), userPrincipal.getRole(), "CANDIDATE");
+
+			System.out.println("Candidate login successful: " + loginRequest.getEmail());
+
+			return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(res);
+
+		} catch (BadCredentialsException e) {
+			System.out.println("Candidate login failed: " + loginRequest.getEmail());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login error: " + e.getMessage());
+		}
+	}
+
+candidate-login.html :
+<div class="login-page">
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <div class="form-container">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to your candidate account</p>
+
+        <div class="img-container">
+            <div class="avatar">👤</div>
+        </div>
+        
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+
+        <form #loginForm="ngForm" (ngSubmit)="loginCandidates(loginForm)">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="email"
+                        placeholder="👤 Enter your email address" 
+                        name="email" 
+                        [(ngModel)]="loginDto.email" 
+                        required
+                        #emailModel="ngModel">
+                    <!-- <div class="input-icon">👤</div> -->
+                </div>
+            </div>
+            
+            @if (checkIfError("email")) {
+            <p style="color: red; margin-top: -20px; margin-bottom: 10px; padding-top: 22px;">{{ getValidationErrorMessage('email') }}</p>
+            }
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password"
+                        placeholder="🔒 Enter your password" 
+                        name="password" 
+                        [(ngModel)]="loginDto.password" 
+                        required
+                        #passwordModel="ngModel">
+                    <!-- <div class="input-icon">🔒</div> -->
+                </div>
+            </div>
+            
+            @if (checkIfError("password")) {
+            <p style="color: red; margin-top: -20px; margin-bottom: 10px; padding-top: 22px;">{{ getValidationErrorMessage('password') }}</p>
+            }
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember" />
+                    <span>Remember me</span>
+                </label>
+                <a routerLink="/dashboard/forgot-password" class="forgot-password"> Forgot password? </a>
+            </div>
+
+            <button type="submit" class="login-button" id="loginBtn">Sign In</button>
+        </form>
+
+        <div class="create-account">
+            <p>Don't have an account? <a routerLink="/dashboard/candidate-registration">Create Account</a></p>
+        </div>
+    </div>
+</div>
+employee-login.html : 
+<body>
+  <div class="login-container">
+    <div class="logo-section">
+      <div class="logo"></div>
+      <div class="welcome-text">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Please sign in to your employee account</p>
+      </div>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+
+    <form id="loginForm" (submit)="loginEmployee()">
+      <div class="form-group">
+        <label for="employeeId">Employee ID</label>
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="employeeId"
+            name="employeeId"
+            placeholder="Enter your employee ID"
+            [(ngModel)]="employeeLogin.employeeId"
+            required
+          />
+          <div class="input-icon">👤</div>
+        </div>
+      </div>
+      @if (checkIfError("employeeId")) {
+      <p style="color: red; margin-top: -20px; margin-bottom: 10px">
+        {{ getValidationErrorMessage('employeeId') }}
+      </p>
+      }
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            [(ngModel)]="employeeLogin.password"
+            required
+          />
+          <div class="input-icon">🔒</div>
+        </div>
+      </div>
+      @if (checkIfError("password")) {
+      <p style="color: red; margin-top: -20px; margin-bottom: 10px">
+        {{ getValidationErrorMessage('password') }}
+      </p>
+      }
+
+      <section class="content-area">
+        <router-outlet></router-outlet>
+      </section>
+
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" name="remember" />
+          <span>Remember me</span>
+        </label>
+        <a routerLink="/dashboard/forgot-password" class="forgot-password"> Forgot password? </a>
+        <!-- <a href="/dashboard/employee-login/forgot-password" class="forgot-password" >Forgot password?</a> -->
+      </div>
+
+      <button type="submit" class="login-button" id="loginBtn">Sign In</button>
+    </form>
+
+    <div class="divider">
+      <span>Need help?</span>
+    </div>
+
+    <div class="additional-options">
+      <a href="#">
+        <span>📞</span>
+        Contact IT Support
+      </a>
+    </div>
+  </div>
+</body>
 
